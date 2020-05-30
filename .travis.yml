@@ -1,0 +1,30 @@
+language: python
+python:
+  - '3.8.0'
+matrix:
+  include:
+    - python: '3.8.0'
+    #- env: PYENV_VERSION=pypy3.8-7.1.1 PYENV_VERSION_STRING='PyPy 7.1.1'
+cache:
+  - pip
+  - directories:
+    - $HOME/.pyenv_cache
+
+before_install:
+  - |
+      if [[ -n "$PYENV_VERSION" ]]; then
+        wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
+        source setup-pyenv.sh
+      fi
+install:
+  - pipenv install --dev
+
+script:
+  - pytest -v --cov=goald .
+
+after_success:
+  - pyenv shell
+  - codecov
+  - pip install codacy-coverage
+  - python-codacy-coverage -r coverage.xml
+  - py.test --cov-report=xml --cov=goald tests/
