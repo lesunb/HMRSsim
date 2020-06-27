@@ -1,1 +1,10 @@
+# Virtual environment
 venv/
+
+# all the different pycaches
+simulator/__pycache__/
+simulator/models/__pycache__/
+simulator/resources/__pycache__/
+simulator/systems/__pycache__/
+simulator/components/__pycache__/
+simulator/utils/__pycache__/

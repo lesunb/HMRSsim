@@ -1,35 +1,62 @@
 import pyglet
 import esper
+import os
+import sys
+
+# Include current directory in path
+sys.path.append(os.getcwd())
 
 import prefabs
+import simulator.utils.helpers as helpers
+import simulator.resources.load_resources as loader
+from simulator.models.Wall import Wall
 
 from components.Velocity import Velocity
-
+from components.Collidable import Collidable
+from components.Position import Position
 from systems.MovementProcessor import MovementProcessor
 from systems.CollisionProcessor import CollisionProcessor
 from systems.RenderProcessor import RenderProcessor
 
 
 FPS = 60
-RESOLUTION = 720, 480
+DEFAULT_LINE_WIDTH = 10
 
-
+# Load map from .drawio file
+window_name, map_content = loader.mapFromDrawio('wall.drawio')
+WIDTH = int(map_content.attrib.get('pageWidth', 500))
+HEIGHT = int(map_content.attrib.get('pageHeight', 500))
+BKGD = helpers.hex_to_rgb(map_content.attrib.get('background', '#FFFFFF'))
+content_root = map_content[0]
 ###############################################
 #  Initialize pyglet window and graphics batch:
 ###############################################
-window = pyglet.window.Window(width=RESOLUTION[0],
-                              height=RESOLUTION[1],
-                              caption="Esper pyglet example")
+window = pyglet.window.Window(width=WIDTH,
+                              height=HEIGHT,
+                              caption=window_name)
 batch = pyglet.graphics.Batch()
+# Define default line width
+pyglet.gl.glLineWidth(DEFAULT_LINE_WIDTH)
+# Define background clear color
+pyglet.gl.glClearColor(BKGD[0], BKGD[1], BKGD[2], BKGD[3])
+pyglet.gl.glClear(pyglet.gl.GL_COLOR_BUFFER_BIT | pyglet.gl.GL_DEPTH_BUFFER_BIT)
 
 # Initialize Esper world, and create a "player" Entity with a few Components:
 world = esper.World()
-robot1 = prefabs.robot(world, batch, x=0, y=0)
-robot2 = prefabs.robot(world, batch, x=100, y=100)
+robot1 = prefabs.robot(world, batch, x=100, y=100)
+# Create Walls
+walls = []
+for cell in content_root:
+    if cell.tag == 'mxCell' and cell.attrib.get('style', None) is not None:
+        cell_style = helpers.parse_style(cell.attrib['style'])
+        if cell_style['shape'] == 'mxgraph.floorplan.wall':
+            walls.append(Wall.from_mxCell(cell, (WIDTH, HEIGHT)))
+            walls[-1].add_to_batch(batch)
+            walls[-1].add_to_world(world)
 
 # Create some Processor instances, and asign them to the World to be processed:
 movement_processor = MovementProcessor(
-    minx=0, miny=0, maxx=RESOLUTION[0], maxy=RESOLUTION[1])
+    minx=0, miny=0, maxx=WIDTH, maxy=HEIGHT)
 world.add_processor(movement_processor)
 
 collision_processor = CollisionProcessor()
@@ -37,10 +64,11 @@ world.add_processor(collision_processor)
 
 render_processor = RenderProcessor()
 world.add_processor(render_processor)
-
 ################################################
 #  Set up pyglet events for input and rendering:
 ################################################
+
+
 @window.event
 def on_key_press(key, mod):
     if key == pyglet.window.key.RIGHT:
@@ -51,7 +79,12 @@ def on_key_press(key, mod):
         world.component_for_entity(robot1, Velocity).y = 3
     if key == pyglet.window.key.DOWN:
         world.component_for_entity(robot1, Velocity).y = -3
-
+    if key == pyglet.window.key.P:
+        for i, w in enumerate(walls):
+            print("Wall {} - Position: {}\nCollision: {}\nDraw: {}".format(i, w.pos, w.boundaries, w.draw))
+        col = world.component_for_entity(robot1, Collidable)
+        pos = world.component_for_entity(robot1, Position)
+        print("[Robot]\nCollision: {}\nPosition: {}".format(col.shape, pos))
 
 @window.event
 def on_key_release(key, mod):
@@ -63,7 +96,7 @@ def on_key_release(key, mod):
 
 @window.event
 def on_draw():
-    # Clear the window:
+    # Clear the window to background color
     window.clear()
     # Draw the batch of Renderables:
     batch.draw()

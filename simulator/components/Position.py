@@ -6,3 +6,6 @@ class Position:
         self.h = h
         self.angle = angle
         self.changed = True
+
+    def __str__(self):
+        return "Position[({},{}) {} {} {}]".format(self.x, self.y, self.w, self.h, self.angle)
