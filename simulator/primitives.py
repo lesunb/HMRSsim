@@ -47,12 +47,38 @@ class Line:
       arr = geometry[2]
       for p in arr:
         points += [p.attrib['x'], p.attrib['y']]
-    return Line([src.attrib['x'], src.attrib['y']] + points + [target.attrib['x'], target.attrib['y']])
+    return Line(
+             [src.attrib['x'], src.attrib['y']] +
+             points +
+             [target.attrib['x'], target.attrib['y']]
+           )
 
-  def __init__(self, points):
+  def __init__(self, points, style={}):
     self.points = points
+    self.style = style
+
+  def __str__(self):
+    r = "Line[\n"
+    for p in self.points:
+      r += "({},{}),\n".format(p[0], p[1])
+    r += "]"
+    return r
 
   def add_to_batch(self, batch):
-    points = list(map(int, self.points))
-    print(len(points) // 2, points)
-    batch.add(len(points) // 2, pyglet.gl.GL_LINES, None, ('v2i', points))
+    points = []
+    color_array = []
+    color = list(map(
+                    lambda x: int(x*255),
+                    helpers.hex_to_rgb(self.style.get('fillColor', '#000000'))
+                    ))
+    for t in self.points:
+      points.append(t[0])
+      points.append(t[1])
+      color_array += color[0:3]
+
+    batch.add(
+      len(points) // 2,
+      pyglet.gl.GL_LINES,
+      None,
+      ('v2f', points),
+      ('c3B', color_array))

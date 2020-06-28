@@ -9,7 +9,7 @@ from simulator.utils.helpers import parse_style, translate_coordinates
 class Wall:
 
   @staticmethod
-  def from_mxCell(el, windowSize):
+  def from_mxCell(el, windowSize, lineWidth=10):
     # Parse style
     style = parse_style(el.attrib['style'])
     if style.get('shape') != 'mxgraph.floorplan.wall':
@@ -24,7 +24,7 @@ class Wall:
     height = int(geometry.attrib['height'])
     # Create drawing
     (x, y) = translate_coordinates((x, y), windowSize, height)
-    pos = Position(x=x, y=y, w=width, h=height)
+    pos = Position(x=x, y=y, w=width, h=height, movable=False)
     # Create collision box
     collision_box = Poly.from_box(
                       (pos.x + pos.w // 2, pos.y + pos.h // 2),

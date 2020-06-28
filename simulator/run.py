@@ -10,6 +10,7 @@ import prefabs
 import simulator.utils.helpers as helpers
 import simulator.resources.load_resources as loader
 from simulator.models.Wall import Wall
+from simulator.models.WallCorner import WallCorner
 
 from components.Velocity import Velocity
 from components.Collidable import Collidable
@@ -23,7 +24,7 @@ FPS = 60
 DEFAULT_LINE_WIDTH = 10
 
 # Load map from .drawio file
-window_name, map_content = loader.mapFromDrawio('wall.drawio')
+window_name, map_content = loader.mapFromDrawio('test.drawio')
 WIDTH = int(map_content.attrib.get('pageWidth', 500))
 HEIGHT = int(map_content.attrib.get('pageHeight', 500))
 BKGD = helpers.hex_to_rgb(map_content.attrib.get('background', '#FFFFFF'))
@@ -43,14 +44,15 @@ pyglet.gl.glClear(pyglet.gl.GL_COLOR_BUFFER_BIT | pyglet.gl.GL_DEPTH_BUFFER_BIT)
 
 # Initialize Esper world, and create a "player" Entity with a few Components:
 world = esper.World()
-robot1 = prefabs.robot(world, batch, x=100, y=100)
+robot1 = prefabs.robot(world, batch, x=200, y=200)
+
 # Create Walls
 walls = []
 for cell in content_root:
     if cell.tag == 'mxCell' and cell.attrib.get('style', None) is not None:
         cell_style = helpers.parse_style(cell.attrib['style'])
-        if cell_style['shape'] == 'mxgraph.floorplan.wall':
-            walls.append(Wall.from_mxCell(cell, (WIDTH, HEIGHT)))
+        if cell_style['shape'] == 'mxgraph.floorplan.wallCorner':
+            walls.append(WallCorner.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
             walls[-1].add_to_batch(batch)
             walls[-1].add_to_world(world)
 

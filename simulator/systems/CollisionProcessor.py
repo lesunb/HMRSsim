@@ -21,7 +21,8 @@ class CollisionProcessor(esper.Processor):
             for otherEnt, (otherCol, otherPos) in self.world.get_components(Collidable, Position):
                 if otherEnt == ent:
                     continue
-                otherCol.shape.pos = Vector(otherPos.x + otherPos.w // 2, otherPos.y + otherPos.h // 2)
+                if otherPos.movable:
+                    otherCol.shape.pos = Vector(otherPos.x + otherPos.w // 2, otherPos.y + otherPos.h // 2)
                 if self.checkCollide(col.shape, otherCol.shape):
                     print(choice(COLORS) +
                           f'colision detected between {ent} and {otherEnt}')
