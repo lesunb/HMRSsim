@@ -12,6 +12,7 @@ import simulator.resources.load_resources as loader
 from simulator.models.Wall import Wall
 from simulator.models.WallCorner import WallCorner
 from simulator.models.WallU import WallU
+from simulator.models.Room import Room
 
 from components.Velocity import Velocity
 from components.Collidable import Collidable
@@ -52,10 +53,13 @@ walls = []
 for cell in content_root:
     if cell.tag == 'mxCell' and cell.attrib.get('style', None) is not None:
         cell_style = helpers.parse_style(cell.attrib['style'])
-        if cell_style['shape'] == 'mxgraph.floorplan.wallCorner':
+        style = cell_style.get('shape', '')
+        if style == 'mxgraph.floorplan.wallCorner':
             walls.append(WallCorner.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
-        elif cell_style['shape'] == 'mxgraph.floorplan.wallU':
+        elif style == 'mxgraph.floorplan.wallU':
             walls.append(WallU.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
+        elif style == 'mxgraph.floorplan.room':
+            walls.append(Room.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
         else:
             continue
         walls[-1].add_to_batch(batch)
