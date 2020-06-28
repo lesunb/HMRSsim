@@ -11,6 +11,7 @@ import simulator.utils.helpers as helpers
 import simulator.resources.load_resources as loader
 from simulator.models.Wall import Wall
 from simulator.models.WallCorner import WallCorner
+from simulator.models.WallU import WallU
 
 from components.Velocity import Velocity
 from components.Collidable import Collidable
@@ -53,8 +54,12 @@ for cell in content_root:
         cell_style = helpers.parse_style(cell.attrib['style'])
         if cell_style['shape'] == 'mxgraph.floorplan.wallCorner':
             walls.append(WallCorner.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
-            walls[-1].add_to_batch(batch)
-            walls[-1].add_to_world(world)
+        elif cell_style['shape'] == 'mxgraph.floorplan.wallU':
+            walls.append(WallU.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
+        else:
+            continue
+        walls[-1].add_to_batch(batch)
+        walls[-1].add_to_world(world)
 
 # Create some Processor instances, and asign them to the World to be processed:
 movement_processor = MovementProcessor(

@@ -6,17 +6,16 @@ from components.Position import Position
 from simulator.utils.helpers import *
 
 
-class WallCorner:
+class WallU:
 
   @staticmethod
   def from_mxCell(el, windowSize, lineWidth=10):
     # Parse style
     style = parse_style(el.attrib['style'])
-    if style.get('shape', "") != 'mxgraph.floorplan.wallCorner':
-      raise Exception("Cannot create Wall from {}: shape is not mxgraph.floorplan.wallCorner".format(el))
+    if style.get('shape', "") != 'mxgraph.floorplan.wallU':
+      raise Exception("Cannot create Wall from {}: shape is not mxgraph.floorplan.wallU".format(el))
     # Get parent
     parent_element = el.attrib['parent']
-    direction = style.get('direction', 'east')
 
     # Get geometry
     geometry = el[0]
@@ -32,7 +31,9 @@ class WallCorner:
       (pos.x, pos.y),
       (pos.x, pos.y + pos.h),
       (pos.x - lineWidth // 2, pos.y + pos.h),
-      (pos.x + pos.w, pos.y + pos.h)
+      (pos.x + pos.w + lineWidth // 2, pos.y + pos.h),
+      (pos.x + pos.w, pos.y + pos.h),
+      (pos.x + pos.w, pos.y)
     ]
 
     # Collision box
@@ -40,32 +41,23 @@ class WallCorner:
       (pos.x - lineWidth // 2, pos.y),
       (pos.x - lineWidth // 2, pos.y + pos.h + lineWidth // 2),
       (pos.x + pos.w, pos.y + pos.h + lineWidth // 2),
-      (pos.x + pos.w, pos.y + pos.h - lineWidth // 2),
+      (pos.x + pos.w + lineWidth // 2, pos.y),
+      (pos.x + pos.w - lineWidth // 2, pos.y),
+      (pos.x + pos.w - lineWidth // 2, pos.y + pos.h - lineWidth // 2),
       (pos.x + lineWidth // 2, pos.y + pos.h - lineWidth // 2),
       (pos.x + lineWidth // 2, pos.y)   
     ]
-    # Get the right corner
-    if direction == 'north':
-      points = map(lambda x: rotate_around_point(x, math.radians(-90), center), points)
-      col_points = map(lambda x: rotate_around_point(x, math.radians(-90), center), col_points)
-    elif direction == 'south':
-      points = map(lambda x: rotate_around_point(x, math.radians(90), center), points)
-      col_points = map(lambda x: rotate_around_point(x, math.radians(90), center), col_points)
-    elif direction == 'west':
-      points = map(lambda x: rotate_around_point(x, math.radians(180), center), points)
-      col_points = map(lambda x: rotate_around_point(x, math.radians(180), center), col_points)
 
-    # Check for rotation
     if style.get('rotation', '') != '':
       rotate = int(style['rotation'])
       points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), points)
       col_points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), col_points)
-      
+
     drawing = primitives.Line(list(points), style)
     col_points = map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), col_points)
     box = Concave_Poly(Vector(center[0], center[1]), list(col_points))
 
-    return WallCorner(
+    return WallU(
       pos,
       drawing,
       box
