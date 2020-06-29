@@ -1,5 +1,6 @@
 {
   "python.linting.enabled": true,
   "python.linting.pylintEnabled": false,
-  "python.linting.flake8Enabled": true
+  "python.linting.flake8Enabled": true,
+  "python.pythonPath": "/Users/grodrigues/.pyenv/versions/3.8.2/bin/python"
 }
