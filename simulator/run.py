@@ -26,7 +26,7 @@ FPS = 60
 DEFAULT_LINE_WIDTH = 10
 
 # Load map from .drawio file
-window_name, map_content = loader.mapFromDrawio('test.drawio')
+window_name, map_content = loader.mapFromDrawio('tilted_walls.drawio')
 WIDTH = int(map_content.attrib.get('pageWidth', 500))
 HEIGHT = int(map_content.attrib.get('pageHeight', 500))
 BKGD = helpers.hex_to_rgb(map_content.attrib.get('background', '#FFFFFF'))
@@ -60,6 +60,8 @@ for cell in content_root:
             walls.append(WallU.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
         elif style == 'mxgraph.floorplan.room':
             walls.append(Room.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
+        elif style == 'mxgraph.floorplan.wall':
+            walls.append(Wall.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
         else:
             continue
         walls[-1].add_to_batch(batch)

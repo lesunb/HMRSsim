@@ -1,4 +1,5 @@
 import pyglet
+import math
 import simulator.utils.helpers as helpers
 
 class Rectangle:
@@ -12,12 +13,13 @@ class Rectangle:
     return Rectangle(x, y, width, height, style)
 
 
-  def __init__(self, x, y, width, height, style={}):
+  def __init__(self, x, y, width, height, style={}, angle=0):
     self.x = x
     self.y = y
     self.width = width
     self.height = height
     self.style = style
+    self.angle = angle
 
   def __str__(self):
     return "Rectangle[({}, {}) {} {}]".format(self.x, self.y, self.width, self.height)
@@ -31,9 +33,21 @@ class Rectangle:
                     lambda x: int(x*255),
                     helpers.hex_to_rgb(self.style.get('fillColor', '#000000'))
                     ))
+    points = [(x, y), (x+width, y), (x+width, y+height), (x, y+height)]
+    center = (x + width // 2, y + height // 2)
+    if self.angle != 0:
+        points = map(lambda x: helpers.rotate_around_point(x, math.radians(self.angle), center), points)
+    
+    points_print = []
+    colors = []
+    for p in points:
+      points_print.append(int(p[0]))
+      points_print.append(int(p[1]))
+      colors += color[:3]
+
     batch.add(4, pyglet.gl.GL_QUADS, None,
-      ('v2i', (x, y, x+width, y, x+width, y+height, x, y+height)),
-      ('c3B', (color[0], color[1], color[2], color[0], color[1], color[2], color[0], color[1], color[2], color[0], color[1], color[2]))
+      ('v2i', points_print),
+      ('c3B', colors)
     )
 
 class Line:

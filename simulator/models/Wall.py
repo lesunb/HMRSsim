@@ -1,6 +1,6 @@
 import simulator.primitives as primitives
 
-from collision import Poly
+from collision import Poly, Vector
 from components.Collidable import Collidable
 from components.Position import Position
 from simulator.utils.helpers import parse_style, translate_coordinates
@@ -27,10 +27,17 @@ class Wall:
     pos = Position(x=x, y=y, w=width, h=height, movable=False)
     # Create collision box
     collision_box = Poly.from_box(
-                      (pos.x + pos.w // 2, pos.y + pos.h // 2),
+                      Vector(pos.x + pos.w // 2, pos.y + pos.h // 2),
                       pos.w, pos.h
                     )
-    rectangle = primitives.Rectangle(x, y, width, height, style)
+
+    rotate = 0
+    if style.get('rotation', '') != '':
+      rotate = int(style['rotation'])
+      if rotate < 0:
+        rotate = 360 + rotate
+      collision_box.angle = rotate
+    rectangle = primitives.Rectangle(x, y, width, height, style, rotate)
     return Wall(pos, rectangle, collision_box, parent=parent_element)
 
   @staticmethod

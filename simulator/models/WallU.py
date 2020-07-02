@@ -50,6 +50,8 @@ class WallU:
 
     if style.get('rotation', '') != '':
       rotate = int(style['rotation'])
+      if rotate < 0:
+        rotate = 360 - rotate
       points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), points)
       col_points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), col_points)
 
