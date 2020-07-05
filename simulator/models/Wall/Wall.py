@@ -25,18 +25,20 @@ class Wall:
     # Create drawing
     (x, y) = translate_coordinates((x, y), windowSize, height)
     pos = Position(x=x, y=y, w=width, h=height, movable=False)
-    # Create collision box
-    collision_box = Poly.from_box(
-                      Vector(pos.x + pos.w // 2, pos.y + pos.h // 2),
-                      pos.w, pos.h
-                    )
+    
 
     rotate = 0
     if style.get('rotation', '') != '':
       rotate = int(style['rotation'])
       if rotate < 0:
         rotate = 360 + rotate
-      collision_box.angle = rotate
+    pos.angle = rotate
+    
+    # Create collision box
+    col_points = pos._get_box()
+    center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
+    col_points = list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), col_points))
+    collision_box = Poly(Vector(center[0], center[1]), col_points)
     rectangle = primitives.Rectangle(x, y, width, height, style, rotate)
     return Wall(pos, rectangle, collision_box, parent=parent_element)
 

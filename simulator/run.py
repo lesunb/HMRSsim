@@ -9,7 +9,7 @@ sys.path.append(os.getcwd())
 import prefabs
 import simulator.utils.helpers as helpers
 import simulator.resources.load_resources as loader
-from simulator.models.Wall import Wall
+from simulator.models.Wall.Wall import Wall
 from simulator.models.WallCorner import WallCorner
 from simulator.models.WallU import WallU
 from simulator.models.Room import Room
@@ -26,10 +26,13 @@ FPS = 60
 DEFAULT_LINE_WIDTH = 10
 
 # Load map from .drawio file
-window_name, map_content = loader.mapFromDrawio('tilted_walls.drawio')
+window_name, map_content = loader.mapFromDrawio('wall.drawio')
 WIDTH = int(map_content.attrib.get('pageWidth', 500))
 HEIGHT = int(map_content.attrib.get('pageHeight', 500))
-BKGD = helpers.hex_to_rgb(map_content.attrib.get('background', '#FFFFFF'))
+
+BKGD = helpers.hex_to_rgb('#FFFFFF')
+if map_content.attrib.get('background', 'none') != 'none':
+    BKGD = helpers.hex_to_rgb(map_content.attrib['background'])
 content_root = map_content[0]
 ###############################################
 #  Initialize pyglet window and graphics batch:

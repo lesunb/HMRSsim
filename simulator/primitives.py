@@ -24,6 +24,17 @@ class Rectangle:
   def __str__(self):
     return "Rectangle[({}, {}) {} {}]".format(self.x, self.y, self.width, self.height)
 
+  def _get_points(self):
+    x = self.x
+    y = self.y
+    width = self.width
+    height = self.height
+    points = [(x, y), (x+width, y), (x+width, y+height), (x, y+height)]
+    center = (x + width // 2, y + height // 2)
+    if self.angle != 0:
+        points = map(lambda x: helpers.rotate_around_point(x, math.radians(self.angle), center), points)
+    return points
+    
   def add_to_batch(self, batch):
     x = self.x
     y = self.y
