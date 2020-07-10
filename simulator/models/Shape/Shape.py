@@ -6,7 +6,7 @@ from components.Position import Position
 from simulator.utils.helpers import parse_style, translate_coordinates
 
 
-class Box:
+class Shape:
 
   @staticmethod
   def from_mxCell(el, windowSize, lineWidth=10):
@@ -31,13 +31,21 @@ class Box:
         rotate = 360 + rotate
     pos.angle = rotate
     
-    # Create collision box
-    col_points = pos._get_box()
+    draw = None
+    col_points = None
     center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
+
+    if 'ellipse' in style:
+      draw = primitives.Ellipse(center, width, height, style, rotate)
+      col_points = draw._get_points()
+    else:
+      draw = primitives.Rectangle(x, y, width, height, style, rotate)
+      col_points = pos._get_box()
+
     col_points = list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), col_points))
     collision_box = Poly(Vector(center[0], center[1]), col_points)
-    rectangle = primitives.Rectangle(x, y, width, height, style, rotate)
-    return Box(pos, rectangle, collision_box, parent=parent_element)
+
+    return Shape(pos, draw, collision_box, parent=parent_element)
 
   @staticmethod
   def from_points(x, y, width, height):
@@ -48,7 +56,7 @@ class Box:
 
   def __init__(self,
                position: Position,
-               drawing: primitives.Rectangle,
+               drawing,
                collision: Poly,
                collidable=True,
                parent=None):

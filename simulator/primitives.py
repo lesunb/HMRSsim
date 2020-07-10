@@ -107,3 +107,69 @@ class Line:
       None,
       ('v2f', points),
       ('c3B', color_array))
+
+class Ellipse():
+  """General equation for ellipse: (x-h)^2 / a^2) + (y-k)^2 / b^2 = 1
+  - a is radius on x-axis
+  - b is radius on y-axis
+  - (h,k) are the coordinates of ellipse's center
+  """
+
+  def __init__(self, center, width, height, style = {}, rotate = 0):
+    self.center = center
+    self.a = width // 2
+    self.b = height // 2
+    self.style = style
+    self.angle = rotate
+
+  # (x / a)^2 + (y / b)^2 = 1 --> (y/b)^2 = 1 - (x/a)^2 --> y = math.sqrt(1 - (x/2)^2) * b
+  def add_to_batch(self, batch):
+
+    color = list(map(
+                    lambda x: int(x*255),
+                    helpers.hex_to_rgb(self.style.get('fillColor', '#000000'))
+                    ))
+    color = color[:3]
+    points = []
+    rev = []
+    h = self.center[0]
+    k = self.center[1]
+    for i in range(h - self.a, h + self.a + 1):
+      y = math.sqrt(1 - ((i - h)/self.a)**2) * self.b + k
+      points.append((i, y))
+      rev.append((i, k - (y - k)))
+    points += list(reversed(rev))
+
+    if self.angle != 0:
+        points = map(lambda x: helpers.rotate_around_point(x, math.radians(self.angle), self.center), points)
+
+    v = []
+    for p in points:
+      v.append(p[0])
+      v.append(p[1])
+    
+    batch.add(
+      len(v) // 2,
+      pyglet.gl.GL_POLYGON,
+      pyglet.graphics.Group(),
+      ('v2f', v),
+      ('c3b', color * (len(v) // 2))
+    )
+
+  def _get_points(self):
+    points = []
+    rev = []
+    h = self.center[0]
+    k = self.center[1]
+    step = math.floor(self.a / 20)
+    for i in range(h - self.a, h + self.a + 1, step):
+      y = math.sqrt(1 - ((i - h)/self.a)**2) * self.b + k
+      points.append((i, y))
+      rev.append((i, k - (y - k)))
+    points += list(reversed(rev[1:-1]))
+
+    if self.angle != 0:
+        points = map(lambda x: helpers.rotate_around_point(x, math.radians(self.angle), self.center), points)
+    return points
+
+

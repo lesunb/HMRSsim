@@ -13,7 +13,7 @@ from simulator.models.Wall.Wall import Wall
 from simulator.models.WallCorner import WallCorner
 from simulator.models.WallU import WallU
 from simulator.models.Room import Room
-from simulator.models.Box.Box import Box
+from simulator.models.Shape.Shape import Shape
 
 from components.Velocity import Velocity
 from components.Collidable import Collidable
@@ -26,8 +26,9 @@ from systems.RenderProcessor import RenderProcessor
 FPS = 60
 DEFAULT_LINE_WIDTH = 10
 
+
 # Load map from .drawio file
-window_name, map_content = loader.mapFromDrawio('rectangles.drawio')
+window_name, map_content = loader.mapFromDrawio('circles.drawio')
 WIDTH = int(map_content.attrib.get('pageWidth', 500))
 HEIGHT = int(map_content.attrib.get('pageHeight', 500))
 
@@ -67,7 +68,7 @@ for cell in content_root:
         elif style == 'mxgraph.floorplan.wall':
             walls.append(Wall.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
         else:
-            walls.append(Box.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
+            walls.append(Shape.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
         walls[-1].add_to_batch(batch)
         walls[-1].add_to_world(world)
 

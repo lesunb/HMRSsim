@@ -12,6 +12,9 @@ def parse_style(style):
   for item in items:
     if item == "":
       continue
+    elif '=' not in item:
+      s[item] = True
+      continue
     [key, value] = item.split('=')
     s[key] = value
   return s
