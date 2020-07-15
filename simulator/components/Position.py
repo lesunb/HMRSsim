@@ -10,6 +10,7 @@ class Position:
         self.angle = angle
         self.changed = True
         self.movable = movable
+        self.center = (x + w // 2, y + h // 2)
 
     def __str__(self):
         return "Position[({},{}) {} {} {}]".format(self.x, self.y, self.w, self.h, self.angle)

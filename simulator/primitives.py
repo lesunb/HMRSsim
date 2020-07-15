@@ -14,8 +14,7 @@ class Rectangle:
 
 
   def __init__(self, x, y, width, height, style={}, angle=0):
-    self.x = x
-    self.y = y
+    self.center = (x, y)
     self.width = width
     self.height = height
     self.style = style
@@ -25,8 +24,7 @@ class Rectangle:
     return "Rectangle[({}, {}) {} {}]".format(self.x, self.y, self.width, self.height)
 
   def _get_points(self):
-    x = self.x
-    y = self.y
+    x, y = self.center
     width = self.width
     height = self.height
     points = [(x, y), (x+width, y), (x+width, y+height), (x, y+height)]
@@ -36,8 +34,7 @@ class Rectangle:
     return points
     
   def add_to_batch(self, batch):
-    x = self.x
-    y = self.y
+    x, y = self.center
     width = self.width
     height = self.height
     color = list(map(
@@ -56,7 +53,7 @@ class Rectangle:
       points_print.append(int(p[1]))
       colors += color[:3]
 
-    batch.add(4, pyglet.gl.GL_QUADS, None,
+    return batch.add(4, pyglet.gl.GL_QUADS, None,
       ('v2i', points_print),
       ('c3B', colors)
     )
@@ -101,7 +98,7 @@ class Line:
       points.append(t[1])
       color_array += color[0:3]
 
-    batch.add(
+    return batch.add(
       len(points) // 2,
       pyglet.gl.GL_LINES,
       None,
@@ -148,7 +145,7 @@ class Ellipse():
       v.append(p[0])
       v.append(p[1])
     
-    batch.add(
+    return batch.add(
       len(v) // 2,
       pyglet.gl.GL_POLYGON,
       pyglet.graphics.Group(),

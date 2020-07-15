@@ -15,20 +15,22 @@ from simulator.models.WallU import WallU
 from simulator.models.Room import Room
 from simulator.models.Shape.Shape import Shape
 
+from components.Path import Path
 from components.Velocity import Velocity
 from components.Collidable import Collidable
 from components.Position import Position
 from systems.MovementProcessor import MovementProcessor
 from systems.CollisionProcessor import CollisionProcessor
 from systems.RenderProcessor import RenderProcessor
+from systems.PathProcessor import PathProcessor
 
 
 FPS = 60
 DEFAULT_LINE_WIDTH = 10
-
+FILE = 'circles.drawio' if len(sys.argv) == 1 else sys.argv[1] 
 
 # Load map from .drawio file
-window_name, map_content = loader.mapFromDrawio('circles.drawio')
+window_name, map_content = loader.mapFromDrawio(FILE)
 WIDTH = int(map_content.attrib.get('pageWidth', 500))
 HEIGHT = int(map_content.attrib.get('pageHeight', 500))
 
@@ -51,10 +53,11 @@ pyglet.gl.glClear(pyglet.gl.GL_COLOR_BUFFER_BIT | pyglet.gl.GL_DEPTH_BUFFER_BIT)
 
 # Initialize Esper world, and create a "player" Entity with a few Components:
 world = esper.World()
-robot1 = prefabs.robot(world, batch, x=200, y=200)
 
 # Create Walls
 walls = []
+robot1 = None
+draw2entity = {}
 for cell in content_root:
     if cell.tag == 'mxCell' and cell.attrib.get('style', None) is not None:
         cell_style = helpers.parse_style(cell.attrib['style'])
@@ -71,7 +74,30 @@ for cell in content_root:
             walls.append(Shape.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
         walls[-1].add_to_batch(batch)
         walls[-1].add_to_world(world)
+    if cell.tag == 'object':
+        if cell.attrib['type'] == 'robot':
+            s = Shape.from_object(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH)
+            s.add_to_batch(batch)
+            robot1 = s.add_to_world(world)
+            draw2entity[cell.attrib['id']] = robot1
+        elif cell.attrib['type'] == 'path':
+            mxCell = cell[0]
+            points = Path.from_mxCell(mxCell, HEIGHT)
+            obj = mxCell.attrib.get('source', None)
+            ent = draw2entity.get(obj, None)
+            if ent is None:
+                print("Path origin not found")
+            else:
+                print("Adding path to entity")
+                world.add_component(ent, Path(points))
+                print("[run] Path", world.component_for_entity(ent, Path))
+                print("[run] Position", world.component_for_entity(ent, Position))
+        else:
+            print("Unrecognized object", cell)
 
+if robot1 == None:
+    print("Creating robot from prefab")
+    robot1 = prefabs.robot(world, batch, x=200, y=200)
 # Create some Processor instances, and asign them to the World to be processed:
 movement_processor = MovementProcessor(
     minx=0, miny=0, maxx=WIDTH, maxy=HEIGHT)
@@ -82,6 +108,9 @@ world.add_processor(collision_processor)
 
 render_processor = RenderProcessor()
 world.add_processor(render_processor)
+
+path_processor = PathProcessor()
+world.add_processor(path_processor)
 ################################################
 #  Set up pyglet events for input and rendering:
 ################################################

@@ -31,7 +31,9 @@ def sprite(batch, image="redsquare.png", x=0, y=0):
                                 batch=batch)
 
 def mapFromDrawio(drawioxml):
-    tree = ET.parse(os.path.join(map_dir, drawioxml))
+    f = os.path.join(map_dir, drawioxml)
+    print("Loading map from", f)
+    tree = ET.parse(f)
     root = tree.getroot()
     content = ET.fromstring(inflate(root[0].text, True))
     return (root[0].attrib.get('name', "Window 1"), content)

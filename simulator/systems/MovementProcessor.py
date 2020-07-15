@@ -28,4 +28,4 @@ class MovementProcessor(esper.Processor):
                 pos.x = new_x
                 pos.y = new_y
             else:
-                pos.changed = False
+                pos.changed = False or pos.changed
