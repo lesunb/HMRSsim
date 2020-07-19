@@ -27,7 +27,7 @@ from systems.PathProcessor import PathProcessor
 
 FPS = 60
 DEFAULT_LINE_WIDTH = 10
-FILE = 'circles.drawio' if len(sys.argv) == 1 else sys.argv[1] 
+FILE = 'tilted_walls.drawio' if len(sys.argv) == 1 else sys.argv[1] 
 
 # Load map from .drawio file
 window_name, map_content = loader.mapFromDrawio(FILE)

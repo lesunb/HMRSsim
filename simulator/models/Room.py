@@ -1,6 +1,7 @@
 import simulator.primitives as primitives
 
-from collision import Poly, Vector    # If we change Collision and Collision system we might use Poly (optimized). But they need to handle more than 1 shape per entity
+from collision import Poly, Vector    
+from typing import List
 from components.Collidable import Collidable
 from components.Position import Position
 from simulator.utils.helpers import *
@@ -37,18 +38,34 @@ class Room:
       (pos.x + pos.w + lineWidth // 2, pos.y),
       (pos.x - lineWidth // 2, pos.y)
     ]
+    # Collision points
+    # TODO: Verify corners
+    boxes = [
+      (
+        (pos.x + lineWidth // 2, pos.y + pos.h // 2),
+        [(pos.x, pos.y), (pos.x, pos.y + pos.h), (pos.x + lineWidth, pos.y + pos.h), (pos.x + lineWidth, pos.y)]
+      ),
+      (
+        (pos.x + pos.w // 2, pos.y + pos.h + lineWidth // 2),
+        [(pos.x, pos.y + pos.h), (pos.x, pos.y + pos.h + lineWidth), (pos.x + pos.w, pos.y + pos.h + lineWidth), (pos.x + pos.w, pos.y + pos.h)]
+      ),
+      (
+        (pos.x + pos.w + lineWidth // 2, pos.y + pos.h // 2),
+        [(pos.x + pos.w, pos.y + pos.h), (pos.x + pos.w + lineWidth, pos.y + pos.h), (pos.x + pos.w + lineWidth, pos.y), (pos.x + pos.w, pos.y)]
+      ),
+      (
+        (pos.x + pos.w // 2, pos.y + lineWidth // 2),
+        [(pos.x, pos.y), (pos.x, pos.y + lineWidth), (pos.x + pos.w, pos.y + lineWidth), (pos.x + pos.w, pos.y)]
+      )
+    ]
 
-    # TODO: Maybe having the room collidable inside of it is not the best idea
-    box = Poly.from_box(
-                      Vector(pos.x + pos.w // 2, pos.y + pos.h // 2),
-                      pos.w, pos.h
-                    )
-
+    boxes = list(map(lambda x: Poly(tuple2vector(x[0]), get_rel_points(x[0], x[1])), boxes))
     if style.get('rotation', '') != '':
       rotate = int(style['rotation'])
       if rotate < 0:
         rotate = 360 - rotate
-      box.angle = rotate
+      for box in boxes:
+        box.angle = rotate
       points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), points)
 
     drawing = primitives.Line(list(points), style)
@@ -56,13 +73,13 @@ class Room:
     return Room(
       pos,
       drawing,
-      box
+      boxes
     )
 
   def __init__(self,
                position: Position,
                drawing: primitives.Line,
-               collision: Poly,
+               collision: List[Poly],
                collidable=True,
                parent=None):
 

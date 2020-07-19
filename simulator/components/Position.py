@@ -2,6 +2,8 @@ import math
 import simulator.utils.helpers as helpers
 
 class Position:
+    """Position components hold the position of an Entity in the esper World.
+    """
     def __init__(self, x=0.0, y=0.0, angle=0.0, w=0.0, h=0.0, movable=True):
         self.x = x
         self.y = y
@@ -12,6 +14,8 @@ class Position:
         self.movable = movable
         self.center = (x + w // 2, y + h // 2)
 
+    # Helper functions
+    # Intended for testing purposes, and instantiate new Components from a Position component
     def __str__(self):
         return "Position[({},{}) {} {} {}]".format(self.x, self.y, self.w, self.h, self.angle)
 

@@ -1,4 +1,5 @@
 import math
+from collision import Vector
 
 def hex_to_rgb(hex_color):
   r = hex_color[1:3]
@@ -23,6 +24,12 @@ def translate_coordinates(coordinates, dimens, height):
   y = dimens[1] - coordinates[1] - height
   return (coordinates[0], y)
 
+def get_rel_points(center, points):
+  return list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), points))
+
+def tuple2vector(x):
+  return Vector(x[0], x[1])
+  
 def rotate_around_point(xy, radians, origin=(0, 0)):
     """Rotate a point around a given point.
     

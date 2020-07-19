@@ -58,6 +58,7 @@ class Shape:
 
     return Shape(pos, draw, collision_box, parent=parent_element)
 
+  # TODO: Update to make accept Ellipses
   @staticmethod
   def from_points(x, y, width, height):
     rectangle = primitives.Rectangle(x, y, width, height)
