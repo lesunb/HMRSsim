@@ -76,12 +76,17 @@ class WallU:
     self.pos = position
     if collidable:
       self.boundaries = collision
+    self.batch_draw = None
 
-  def add_to_batch(self, batch):
-    self.draw.add_to_batch(batch)
-
-  def add_to_world(self, world):
+  def add_to_world(self, world, batch):
     self.entity = world.create_entity()
     world.add_component(self.entity, Collidable(shape=self.boundaries))
     world.add_component(self.entity, self.pos)
+    if self.batch_draw is None:
+      self.batch_draw = self._add_to_batch(batch)
     return self.entity
+
+  def _add_to_batch(self, batch):
+    if self.batch_draw is None:
+      self.draw.add_to_batch(batch)
+    return self.batch_draw

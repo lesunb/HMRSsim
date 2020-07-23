@@ -9,11 +9,7 @@ sys.path.append(os.getcwd())
 import prefabs
 import simulator.utils.helpers as helpers
 import simulator.resources.load_resources as loader
-from simulator.models.Wall.Wall import Wall
-from simulator.models.WallCorner import WallCorner
-from simulator.models.WallU import WallU
-from simulator.models.Room import Room
-from simulator.models.Shape.Shape import Shape
+import simulator.models.mxCellDecoder as mxCellDecoder
 
 from components.Path import Path
 from components.Velocity import Velocity
@@ -60,20 +56,9 @@ robot1 = None
 draw2entity = {}
 for cell in content_root:
     if cell.tag == 'mxCell' and cell.attrib.get('style', None) is not None:
-        cell_style = helpers.parse_style(cell.attrib['style'])
-        style = cell_style.get('shape', '')
-        if style == 'mxgraph.floorplan.wallCorner':
-            walls.append(WallCorner.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
-        elif style == 'mxgraph.floorplan.wallU':
-            walls.append(WallU.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
-        elif style == 'mxgraph.floorplan.room':
-            walls.append(Room.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
-        elif style == 'mxgraph.floorplan.wall':
-            walls.append(Wall.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
-        else:
-            walls.append(Shape.from_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
-        walls[-1].add_to_batch(batch)
-        walls[-1].add_to_world(world)
+        w = mxCellDecoder.parse_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH)
+        walls.append(w)
+        walls[-1].add_to_world(world, batch)
     if cell.tag == 'object':
         if cell.attrib['type'] == 'robot':
             s = Shape.from_object(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH)
