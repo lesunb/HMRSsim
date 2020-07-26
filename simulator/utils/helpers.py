@@ -2,6 +2,9 @@ import math
 from collision import Vector
 
 def hex_to_rgb(hex_color):
+  """Transforms a color from hecadecimal string (e.g. #FF0000)
+  To rgba, with values from 0.0 to 255.0, which is pyglet standard.
+  """
   r = hex_color[1:3]
   g = hex_color[3:5]
   b = hex_color[5:]

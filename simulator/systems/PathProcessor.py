@@ -10,7 +10,7 @@ class PathProcessor(esper.Processor):
     def process(self, dt):
 
       for ent, (pos, path) in self.world.get_components(Position, Path):
-        # print(f"Processing {ent}")
+        #print(f"Processing {ent}")
         point = path.points[path.curr_point]
         pos_center = pos.center
         print(f"[Path] Point {point} is {path.curr_point}th point")

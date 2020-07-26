@@ -18,7 +18,6 @@ class RenderProcessor(esper.Processor):
             # An example of keeping the sprite inside screen boundaries. Basically,
             # adjust the position back inside screen boundaries if it is outside:
             if rend.is_primitive:
-                print(f"[Render] Primitive render ({ent})")
                 lst_pos = rend.center
                 this_pos = (pos.x + pos.w // 2, pos.y + pos.h // 2)
                 delta = this_pos[0] - lst_pos[0], this_pos[1] - lst_pos[1]

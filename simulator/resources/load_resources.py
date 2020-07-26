@@ -9,7 +9,6 @@ import xml.etree.ElementTree as ET
 
 working_dir = os.path.dirname(os.path.realpath(__file__))
 images_dir = os.path.join(working_dir, 'images')
-map_dir = os.path.join(working_dir, 'map')
 
 pyglet.resource.path = [working_dir, images_dir]
 pyglet.resource.reindex()
@@ -31,9 +30,7 @@ def sprite(batch, image="redsquare.png", x=0, y=0):
                                 batch=batch)
 
 def mapFromDrawio(drawioxml):
-    f = os.path.join(map_dir, drawioxml)
-    print("Loading map from", f)
-    tree = ET.parse(f)
+    tree = ET.parse(drawioxml)
     root = tree.getroot()
     content = ET.fromstring(inflate(root[0].text, True))
     return (root[0].attrib.get('name', "Window 1"), content)

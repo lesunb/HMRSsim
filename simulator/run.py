@@ -6,15 +6,12 @@ import sys
 # Include current directory in path
 sys.path.append(os.getcwd())
 
-import prefabs
-import simulator.utils.helpers as helpers
-import simulator.resources.load_resources as loader
-import simulator.models.mxCellDecoder as mxCellDecoder
 
-from components.Path import Path
 from components.Velocity import Velocity
-from components.Collidable import Collidable
-from components.Position import Position
+
+import map_parser
+import prefabs
+
 from systems.MovementProcessor import MovementProcessor
 from systems.CollisionProcessor import CollisionProcessor
 from systems.RenderProcessor import RenderProcessor
@@ -25,64 +22,17 @@ FPS = 60
 DEFAULT_LINE_WIDTH = 10
 FILE = 'tilted_walls.drawio' if len(sys.argv) == 1 else sys.argv[1] 
 
-# Load map from .drawio file
-window_name, map_content = loader.mapFromDrawio(FILE)
-WIDTH = int(map_content.attrib.get('pageWidth', 500))
-HEIGHT = int(map_content.attrib.get('pageHeight', 500))
+simulation = map_parser.build_simulation_from_map(FILE)
 
-BKGD = helpers.hex_to_rgb('#FFFFFF')
-if map_content.attrib.get('background', 'none') != 'none':
-    BKGD = helpers.hex_to_rgb(map_content.attrib['background'])
-content_root = map_content[0]
-###############################################
-#  Initialize pyglet window and graphics batch:
-###############################################
-window = pyglet.window.Window(width=WIDTH,
-                              height=HEIGHT,
-                              caption=window_name)
-batch = pyglet.graphics.Batch()
-# Define default line width
-pyglet.gl.glLineWidth(DEFAULT_LINE_WIDTH)
-# Define background clear color
-pyglet.gl.glClearColor(BKGD[0], BKGD[1], BKGD[2], BKGD[3])
-pyglet.gl.glClear(pyglet.gl.GL_COLOR_BUFFER_BIT | pyglet.gl.GL_DEPTH_BUFFER_BIT)
+world = simulation['world']
+window = simulation['window']
+batch = simulation['batch']
+(window_name, (WIDTH, HEIGHT), BKGD) = simulation['window_props']
+draw2ent = simulation['draw_map']
+objects = simulation['objects']
 
-# Initialize Esper world, and create a "player" Entity with a few Components:
-world = esper.World()
+robot1 = objects[0] if len(objects) > 0 else None
 
-# Create Walls
-walls = []
-robot1 = None
-draw2entity = {}
-for cell in content_root:
-    if cell.tag == 'mxCell' and cell.attrib.get('style', None) is not None:
-        w = mxCellDecoder.parse_mxCell(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH)
-        walls.append(w)
-        walls[-1].add_to_world(world, batch)
-    if cell.tag == 'object':
-        if cell.attrib['type'] == 'robot':
-            s = Shape.from_object(cell, (WIDTH, HEIGHT), DEFAULT_LINE_WIDTH)
-            s.add_to_batch(batch)
-            robot1 = s.add_to_world(world)
-            draw2entity[cell.attrib['id']] = robot1
-        elif cell.attrib['type'] == 'path':
-            mxCell = cell[0]
-            points = Path.from_mxCell(mxCell, HEIGHT)
-            obj = mxCell.attrib.get('source', None)
-            ent = draw2entity.get(obj, None)
-            if ent is None:
-                print("Path origin not found")
-            else:
-                print("Adding path to entity")
-                world.add_component(ent, Path(points))
-                print("[run] Path", world.component_for_entity(ent, Path))
-                print("[run] Position", world.component_for_entity(ent, Position))
-        else:
-            print("Unrecognized object", cell)
-
-if robot1 == None:
-    print("Creating robot from prefab")
-    robot1 = prefabs.robot(world, batch, x=200, y=200)
 # Create some Processor instances, and asign them to the World to be processed:
 movement_processor = MovementProcessor(
     minx=0, miny=0, maxx=WIDTH, maxy=HEIGHT)
@@ -96,11 +46,10 @@ world.add_processor(render_processor)
 
 path_processor = PathProcessor()
 world.add_processor(path_processor)
+
 ################################################
 #  Set up pyglet events for input and rendering:
 ################################################
-
-
 @window.event
 def on_key_press(key, mod):
     if key == pyglet.window.key.RIGHT:
@@ -111,12 +60,6 @@ def on_key_press(key, mod):
         world.component_for_entity(robot1, Velocity).y = 3
     if key == pyglet.window.key.DOWN:
         world.component_for_entity(robot1, Velocity).y = -3
-    if key == pyglet.window.key.P:
-        for i, w in enumerate(walls):
-            print("Wall {} - Position: {}\nCollision: {}\nDraw: {}".format(i, w.pos, w.boundaries, w.draw))
-        col = world.component_for_entity(robot1, Collidable)
-        pos = world.component_for_entity(robot1, Position)
-        print("[Robot]\nCollision: {}\nPosition: {}".format(col.shape, pos))
 
 @window.event
 def on_key_release(key, mod):
