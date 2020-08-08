@@ -13,14 +13,9 @@ import simulator.models.mxCellDecoder as mxCellDecoder
 
 from components.Path import Path
 
-RESOURCES_FOLDER = os.environ.get('HMRS_RES', os.path.join(os.getcwd(), 'simulator', 'resources', 'map'))
-
-def build_simulation_from_map(file='map.drawio', line_width=10):
-
-  # Get the file path
-  filepath = os.path.join(RESOURCES_FOLDER, file)
+def build_simulation_from_map(file, line_width=10):
   # Load map from .drawio file
-  window_name, map_content = loader.mapFromDrawio(filepath)
+  window_name, map_content = loader.mapFromDrawio(file)
   width = int(map_content.attrib.get('pageWidth', 500))
   height = int(map_content.attrib.get('pageHeight', 500))
 
@@ -47,7 +42,7 @@ def build_simulation_from_map(file='map.drawio', line_width=10):
       'batch': batch,
       'window_props': (window_name, (width, height), BKGD),
       'draw_map': draw_map,
-      'objects': objects
+      'objects': objects,
   }
 
 def build_simulation_objects(content_root, batch: pyglet.graphics.Batch, world: esper.World, window_options):

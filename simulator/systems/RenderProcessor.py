@@ -8,7 +8,7 @@ class RenderProcessor(esper.Processor):
     def __init__(self):
         super().__init__()
 
-    def process(self, dt):
+    def process(self, env):
         # This will iterate over every Entity that has BOTH of these components:
         for ent, (pos, rend) in self.world.get_components(Position, Renderable):
             if not pos.changed:

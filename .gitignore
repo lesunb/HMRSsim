@@ -163,3 +163,5 @@ Thumbs.db
 
 # VSCode
 .vscode/settings.json
+.vscode/
+.idea/

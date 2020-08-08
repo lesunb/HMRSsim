@@ -12,7 +12,7 @@ class CollisionProcessor(esper.Processor):
     def __init__(self):
         super().__init__()
 
-    def process(self, dt):
+    def process(self, env):
         for ent, (col, pos, vel) in self.world.get_components(Collidable, Position, Velocity):
             # update the position of the shape
             for shape in col.shapes:
