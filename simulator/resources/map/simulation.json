@@ -1,5 +1,4 @@
 {
     "context": "resources/map",
-    "map": "robot.drawio",
-    "_duration": 5
+    "map": "poi_test.drawio"
 }

@@ -8,8 +8,8 @@ class PathProcessor(esper.Processor):
     def __init__(self):
         super().__init__()
 
-    def process(self, args):
-        [env, killswitch] = args
+    def process(self, kwargs):
+        killswitch = kwargs.get('KILLSWITCH', None)
         for ent, (pos, path) in self.world.get_components(Position, Path):
             # print(f"Processing {ent}")
             point = path.points[path.curr_point]
@@ -20,11 +20,10 @@ class PathProcessor(esper.Processor):
                 path.curr_point += 1
                 if path.curr_point == len(path.points):
                     # end of path
-                    print("Removing Path component from", ent)
+                    # print("Removing Path component from", ent)
                     pos.changed = False or pos.changed
                     self.world.remove_component(ent, Path)
                     if killswitch is not None:
-                        print("Succeeding killswitch")
                         killswitch.succeed(True)
                     return
                 point = path.points[path.curr_point]
@@ -41,7 +40,7 @@ class PathProcessor(esper.Processor):
             else:
                 dy = max(- path.speed, dy)
 
-            print(f"[Path] Pos: ({pos.x},{pos.y}). Delta: ({dx}, {dy})")
+            # print(f"[Path] Pos: ({pos.x},{pos.y}). Delta: ({dx}, {dy})")
             pos.x += dx
             pos.y += dy
             pos.center = (pos.x + pos.w // 2, pos.y + pos.h // 2)

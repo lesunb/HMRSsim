@@ -1,21 +1,27 @@
 import simulator.primitives as primitives
+import json
 
 from collision import Poly, Vector
 from components.Collidable import Collidable
 from components.Position import Position
 from components.Renderable import Renderable
-from components.Velocity import Velocity
+from components.POI import POI
 from simulator.utils.helpers import parse_style, translate_coordinates
 
 
 def from_object(el, batch, windowSize, lineWidth=10):
   options = el.attrib
+
+  components, style, draw = from_mxCell(el[0], batch, windowSize, lineWidth)
   if 'collidable' not in options:
     options['collidable'] = True
   if 'movable' not in options:
     options['movable'] = True
-  components, style, draw = from_mxCell(el[0], batch, windowSize, lineWidth)
-  
+  if 'POI' in options:
+    points = json.loads(options['POI'])
+    points = list(map((lambda p: translate_coordinates(p, windowSize, 0)), points))
+    components.append(POI(points=points))
+
   options.update(style)
   if options['movable']:
     pos = components[0]

@@ -158,7 +158,7 @@ class Ellipse():
     rev = []
     h = self.center[0]
     k = self.center[1]
-    step = math.floor(self.a / 20)
+    step = math.floor(self.a / 20) + 1
     for i in range(h - self.a, h + self.a + 1, step):
       y = math.sqrt(1 - ((i - h)/self.a)**2) * self.b + k
       points.append((i, y))
