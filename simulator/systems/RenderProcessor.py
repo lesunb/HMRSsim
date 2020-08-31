@@ -2,6 +2,7 @@ import esper
 
 from components.Renderable import Renderable
 from components.Position import Position
+from components.Label import Label
 
 
 class RenderProcessor(esper.Processor):
@@ -24,5 +25,9 @@ class RenderProcessor(esper.Processor):
                 rend.center = this_pos
                 for i, v in enumerate(rend.sprite.vertices):
                     rend.sprite.vertices[i] = int(v + delta[(i&1)])
+                if self.world.has_component(ent, Label):
+                    label = self.world.component_for_entity(ent, Label)
+                    label.labelTag.x = this_pos[0]
+                    label.labelTag.y = this_pos[1]
             else:
                 rend.sprite.position = (pos.x, pos.y)

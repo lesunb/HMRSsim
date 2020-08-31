@@ -54,7 +54,7 @@ class Rectangle:
       colors += color[:3]
 
     return batch.add(4, pyglet.gl.GL_QUADS, None,
-      ('v2i', points_print),
+      ('v2f', points_print),
       ('c3B', colors)
     )
 
@@ -123,16 +123,17 @@ class Ellipse():
   def add_to_batch(self, batch):
 
     color = list(map(
-                    lambda x: int(x*255),
+                    lambda x: int(x * 255),
                     helpers.hex_to_rgb(self.style.get('fillColor', '#000000'))
                     ))
     color = color[:3]
     points = []
     rev = []
-    h = self.center[0]
-    k = self.center[1]
-    for i in range(h - self.a, h + self.a + 1):
-      y = math.sqrt(1 - ((i - h)/self.a)**2) * self.b + k
+    h = int(self.center[0])
+    k = int(self.center[1])
+    a = int(self.a)
+    for i in range(h - a, h + a + 1):
+      y = math.sqrt(1 - ((i - h)/a)**2) * self.b + k
       points.append((i, y))
       rev.append((i, k - (y - k)))
     points += list(reversed(rev))
@@ -156,11 +157,12 @@ class Ellipse():
   def _get_points(self):
     points = []
     rev = []
-    h = self.center[0]
-    k = self.center[1]
-    step = math.floor(self.a / 20) + 1
-    for i in range(h - self.a, h + self.a + 1, step):
-      y = math.sqrt(1 - ((i - h)/self.a)**2) * self.b + k
+    h = int(self.center[0])
+    k = int(self.center[1])
+    a = int(self.a)
+    step = math.floor(a / 20) + 1
+    for i in range(h - a, h + a + 1, step):
+      y = math.sqrt(1 - ((i - h)/a)**2) * self.b + k
       points.append((i, y))
       rev.append((i, k - (y - k)))
     points += list(reversed(rev[1:-1]))

@@ -1,5 +1,5 @@
 import simulator.primitives as primitives
-
+import pyglet
 from collision import Concave_Poly, Vector    # If we change Collision and Collision system we might use Poly (optimized). But they need to handle more than 1 shape per entity
 from components.Collidable import Collidable
 from components.Position import Position
@@ -18,10 +18,10 @@ def from_mxCell(el, batch, windowSize, lineWidth=10):
 
   # Get geometry
   geometry = el[0]
-  x = int(geometry.attrib.get('x', '0'))
-  y = int(geometry.attrib.get('y', '0'))
-  width = int(geometry.attrib['width'])
-  height = int(geometry.attrib['height'])
+  x = float(geometry.attrib.get('x', '0'))
+  y = float(geometry.attrib.get('y', '0'))
+  width = float(geometry.attrib['width'])
+  height = float(geometry.attrib['height'])
   # Create drawing
   (x, y) = translate_coordinates((x, y), windowSize, height)
   pos = Position(x=x, y=y, w=width, h=height, movable=False)
@@ -57,13 +57,20 @@ def from_mxCell(el, batch, windowSize, lineWidth=10):
   if style.get('rotation', '') != '':
     rotate = int(style['rotation'])
     if rotate < 0:
-      rotate = 360 - rotate
+      rotate = 360 + rotate
     points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), points)
     col_points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), col_points)
     
   drawing = primitives.Line(list(points), style)
   drawing.add_to_batch(batch)
-  
+
+  label = el.attrib.get('value', '')
+  if label:
+    label = pyglet.text.HTMLLabel(label,
+                                  batch=batch,
+                                  x=center[0], y=center[1],
+                                  anchor_x='center', anchor_y='center')
+
   col_points = map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), col_points)
   box = Concave_Poly(Vector(center[0], center[1]), list(col_points))
 

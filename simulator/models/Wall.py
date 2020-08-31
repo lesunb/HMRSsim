@@ -1,5 +1,5 @@
 import simulator.primitives as primitives
-
+import pyglet
 from collision import Poly, Vector
 from components.Collidable import Collidable
 from components.Position import Position
@@ -17,10 +17,10 @@ def from_mxCell(el, batch, windowSize, lineWidth=10):
   style['parent'] = parent_element
   # Get geometry
   geometry = el[0]
-  x = int(geometry.attrib.get('x', '0'))
-  y = int(geometry.attrib.get('y', '0'))
-  width = int(geometry.attrib['width'])
-  height = int(geometry.attrib['height'])
+  x = float(geometry.attrib.get('x', '0'))
+  y = float(geometry.attrib.get('y', '0'))
+  width = float(geometry.attrib['width'])
+  height = float(geometry.attrib['height'])
   # Create drawing
   (x, y) = translate_coordinates((x, y), windowSize, height)
   pos = Position(x=x, y=y, w=width, h=height, movable=False)
@@ -31,6 +31,13 @@ def from_mxCell(el, batch, windowSize, lineWidth=10):
     if rotate < 0:
       rotate = 360 + rotate
   pos.angle = rotate
+
+  label = el.attrib.get('value', '')
+  if label:
+    label = pyglet.text.HTMLLabel(label,
+                                  batch=batch,
+                                  x=center[0], y=center[1],
+                                  anchor_x='center', anchor_y='center')
   
   # Create collision box
   col_points = pos._get_box()

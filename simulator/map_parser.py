@@ -64,14 +64,14 @@ def build_simulation_objects(content_root, batch: pyglet.graphics.Batch, world: 
                 for c in components:
                     world.add_component(ent, c)
                 draw2entity[style['id']] = (ent, style)
-                objects.append(ent)
+                objects.append((ent, style['id']))
             elif cell.attrib['type'] == 'path':
                 mxCell = cell[0]
                 points = Path.from_mxCell(mxCell, windowSize[1])
                 obj = mxCell.attrib.get('source', None)
-                (ent, _) = draw2entity.get(obj, None)
+                (ent, _) = draw2entity.get(obj, (None, None))
                 if ent is None:
-                    print(f"Path origin ({obj}) not found")
+                    print(f"Path origin ({obj}) not found. Trying target.")
                 else:
                     print(f"Adding path to entity {ent}")
                     world.add_component(ent, Path(points))

@@ -39,6 +39,10 @@ batch = simulation['batch']
 draw2ent = simulation['draw_map']
 objects = simulation['objects']
 
+print(f"==> Simulation objects")
+for id, objId in objects:
+    entity = draw2ent.get(objId)
+    print(f"OBJ #{id} (draw {objId}). Type {entity[1]['type']}")
 robot1 = objects[0] if len(objects) > 0 else None
 
 # Create some Processor instances, and assign them to the World to be processed:
