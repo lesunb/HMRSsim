@@ -4,6 +4,7 @@ import sys
 import json
 import simpy
 import pathlib
+import esper
 
 from typing import NamedTuple
 # Include current directory in path
@@ -13,12 +14,15 @@ from components.Velocity import Velocity
 
 import map_parser
 
+from components.Map import Map
+
 from systems.MovementProcessor import MovementProcessor
 from systems.CollisionProcessor import CollisionProcessor
 from systems.RenderProcessor import RenderProcessor
 from systems.PathProcessor import PathProcessor
 
 import systems.GotoProcessor as gotoProcessor
+import systems.MapProcessor as mapProcessor
 
 
 EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
@@ -32,7 +36,7 @@ FILE = pathlib.Path(config.get('context', '.')) / config.get('map', 'map.drawio'
 SIMULATION_DURATION = config.get('duration', -1)
 
 simulation = map_parser.build_simulation_from_map(FILE)
-world = simulation['world']
+world: esper.World = simulation['world']
 window = simulation['window']
 batch = simulation['batch']
 (window_name, (WIDTH, HEIGHT), BKGD) = simulation['window_props']
@@ -43,6 +47,12 @@ print(f"==> Simulation objects")
 for id, objId in objects:
     entity = draw2ent.get(objId)
     print(f"OBJ #{id} (draw {objId}). Type {entity[1]['type']}")
+    # print(f"Object has components {world.components_for_entity(id)}")
+    if world.has_component(id, Map):
+        ent_map = world.component_for_entity(id, Map)
+        print("\tAvailable paths:")
+        for idx, key in enumerate(ent_map.paths.keys()):
+            print(f"\t{idx}. {key}")
 robot1 = objects[0] if len(objects) > 0 else None
 
 # Create some Processor instances, and assign them to the World to be processed:
@@ -65,30 +75,44 @@ world.add_processor(path_processor)
 
 KEYS = pyglet.window.key
 GOTO = False
+MAP = False
 buff = []
 
 @window.event
 def on_text(text):
     if GOTO and text != 'G':
         buff.append(text)
+    elif MAP:
+        buff.append(text)
 
 
 @window.event
 def on_key_press(key, mod):
     global GOTO
-    if mod & KEYS.MOD_SHIFT and key == KEYS.G:
+    global MAP
+    if not GOTO and mod & KEYS.MOD_SHIFT and key == KEYS.G:
         print(f"Goto key pressed. Usage: ^G ent-poi ENTER")
         GOTO = True
+    if not MAP and mod & KEYS.MOD_SHIFT and key == KEYS.M:
+        print(f"Map key pressed. Usage: ^M ent key")
+        MAP = True
     if key == KEYS.ENTER or key == KEYS.RETURN:
         if GOTO:
-            GOTO = False
             ent, poi = "".join(buff).split('-')
             print(f"End of Goto sequence. Taking entity {ent} to point {poi}")
             payload = gotoProcessor.GOTO_PAYLOAD(int(ent), int(poi))
             new_event = EVENT(gotoProcessor.GOTO_EVENT_TAG, payload)
             eventStore.put(new_event)
+        elif MAP:
+            ent, key = "".join(buff[1:]).split(' ')
+            print(f"End of Map sequence. Taking entity {ent} to path {key}")
+            payload = mapProcessor.MAP_PAYLOAD(int(ent), key)
+            new_event = EVENT(mapProcessor.MAP_EVENT_TAG, payload)
+            eventStore.put(new_event)
         buff.clear()
         GOTO = False
+        MAP = False
+
 @window.event
 def on_draw():
     # Clear the window to background color
@@ -116,6 +140,8 @@ def simulation_loop(pass_switch_ref):
     }
     # Discrete processors
     env.process(gotoProcessor.process(kwargs))
+    env.process(mapProcessor.process(kwargs))
+    # Other processors
     while not EXIT:
         pyglet.clock.tick()
         world.process(kwargs)
