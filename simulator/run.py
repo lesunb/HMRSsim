@@ -21,6 +21,7 @@ from systems.PathProcessor import PathProcessor
 
 import systems.GotoDESProcessor as gotoProcessor
 import systems.MapDESProcessor as mapProcessor
+import systems.StopCollisionDESProcessor as StopCollision
 
 
 EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
@@ -139,6 +140,7 @@ def simulation_loop(pass_switch_ref):
     # Discrete processors
     env.process(gotoProcessor.process(kwargs))
     env.process(mapProcessor.process(kwargs))
+    env.process(StopCollision.process(kwargs))
     # Other processors
     while not EXIT:
         pyglet.clock.tick()

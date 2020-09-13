@@ -34,11 +34,12 @@ class CollisionProcessor(esper.Processor):
                     vel.x = 0
                     vel.y = 0
                     vel.alpha = 0
-                    print(choice(COLORS) +
-                          f'colision detected between {ent} and {otherEnt}')
+                    # print(choice(COLORS) +
+                    #       f'colision detected between {ent} and {otherEnt}')
                     if eventStore:
-                        print(f'Firing event ent --> otherEnt {col.event_tag}')
                         event = EVENT(col.event_tag, (ent, otherEnt))
+                        # print(f'Firing event ent --> otherEnt: {event}')
+                        eventStore.put(event)
 
     @staticmethod
     def checkCollide(shapes1, shapes2):
