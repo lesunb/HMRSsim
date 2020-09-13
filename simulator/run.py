@@ -10,8 +10,6 @@ from typing import NamedTuple
 # Include current directory in path
 sys.path.append(os.getcwd())
 
-from components.Velocity import Velocity
-
 import map_parser
 
 from components.Map import Map

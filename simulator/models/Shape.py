@@ -5,6 +5,7 @@ from collision import Poly, Vector
 from components.Collidable import Collidable
 from components.Position import Position
 from components.Renderable import Renderable
+from components.Velocity import Velocity
 from components.POI import POI
 from components.Label import Label
 from simulator.utils.helpers import parse_style, translate_coordinates
@@ -32,6 +33,10 @@ def from_object(el, batch, windowSize, lineWidth=10):
         pos = components[0]
         center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
         components.append(Renderable(sprite=draw, primitive=True, center=center))
+        components.append(Velocity(x=0, y=0))
+    if 'collision_tag' in options:
+        coll = list(filter(lambda c: isinstance(c, Collidable), components))[0]
+        coll.event_tag = options['collision_tag']
     return components, options
 
 
