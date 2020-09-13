@@ -19,8 +19,8 @@ from systems.CollisionProcessor import CollisionProcessor
 from systems.RenderProcessor import RenderProcessor
 from systems.PathProcessor import PathProcessor
 
-import systems.GotoProcessor as gotoProcessor
-import systems.MapProcessor as mapProcessor
+import systems.GotoDESProcessor as gotoProcessor
+import systems.MapDESProcessor as mapProcessor
 
 
 EVENT = NamedTuple('Event', [('type', str), ('payload', object)])

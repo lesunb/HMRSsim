@@ -20,6 +20,8 @@ class PathProcessor(esper.Processor):
                 path.curr_point += 1
                 if path.curr_point == len(path.points):
                     # end of path
+                    vel.x = 0
+                    vel.y = 0
                     # print("Removing Path component from", ent)
                     pos.changed = False or pos.changed
                     self.world.remove_component(ent, Path)
