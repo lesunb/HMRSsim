@@ -11,7 +11,7 @@ def parse_mxCell(el, batch, windowOptions):
         TODO: Complete description...
     """
     if el.tag != 'mxCell':
-        raise Error(f"Element {el.tag} is not mxCell.")
+        raise Exception(f"Element {el.tag} is not mxCell.")
 
     windowSize, lineWidth = windowOptions
     cell_style = helpers.parse_style(el.attrib['style'])
