@@ -1,6 +1,6 @@
 import pyglet
 import math
-import simulator.utils.helpers as helpers
+import utils.helpers as helpers
 
 class Rectangle:
   @staticmethod

@@ -1,10 +1,10 @@
-import simulator.primitives as primitives
+import primitives as primitives
 import pyglet
 from collision import Poly, Vector
 from components.Collidable import Collidable
 from components.Position import Position
 from components.Renderable import Renderable
-from simulator.utils.helpers import parse_style, translate_coordinates
+from utils.helpers import parse_style, translate_coordinates
 
 
 def from_mxCell(el, batch, windowSize, lineWidth=10):

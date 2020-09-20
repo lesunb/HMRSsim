@@ -1,10 +1,10 @@
 import pyglet
-import simulator.primitives as primitives
+import primitives as primitives
 
 from collision import Concave_Poly
 from components.Collidable import Collidable
 from components.Position import Position
-from simulator.utils.helpers import *
+from utils.helpers import *
 
 
 def from_mxCell(el, batch, windowSize, lineWidth=10):

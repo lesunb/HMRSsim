@@ -6,9 +6,9 @@ import sys
 # Include current directory in path
 sys.path.append(os.getcwd())
 
-import simulator.utils.helpers as helpers
-import simulator.resources.load_resources as loader
-import simulator.models.mxCellDecoder as mxCellDecoder
+import utils.helpers as helpers
+import resources.load_resources as loader
+import models.mxCellDecoder as mxCellDecoder
 
 from components.Path import Path
 from components.Map import Map

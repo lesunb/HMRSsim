@@ -3,7 +3,7 @@
 """
 from typing import Tuple
 
-import simulator.utils.helpers as helpers
+import utils.helpers as helpers
 from . import Wall, WallCorner, WallU, Room, Shape
 
 def parse_mxCell(el, batch, windowOptions):

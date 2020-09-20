@@ -1,9 +1,9 @@
-import simulator.primitives as primitives
+import primitives as primitives
 import pyglet
 from collision import Concave_Poly, Vector    # If we change Collision and Collision system we might use Poly (optimized). But they need to handle more than 1 shape per entity
 from components.Collidable import Collidable
 from components.Position import Position
-from simulator.utils.helpers import *
+from utils.helpers import *
 
 
 def from_mxCell(el, batch, windowSize, lineWidth=10):

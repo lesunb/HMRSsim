@@ -1,5 +1,5 @@
 import math
-import simulator.utils.helpers as helpers
+import utils.helpers as helpers
 
 class Position:
     """Position components hold the position of an Entity in the esper World.

@@ -1,5 +1,5 @@
 
-import simulator.utils.helpers as helpers 
+import utils.helpers as helpers 
 class Path:
 
   @staticmethod

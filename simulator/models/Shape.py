@@ -1,4 +1,4 @@
-import simulator.primitives as primitives
+import primitives as primitives
 import json
 import pyglet
 from collision import Poly, Vector
@@ -9,7 +9,7 @@ from components.Velocity import Velocity
 from components.POI import POI
 from components.Label import Label
 from components.BatteryComponent import Battery
-from simulator.utils.helpers import parse_style, translate_coordinates
+from utils.helpers import parse_style, translate_coordinates
 
 
 def from_object(el, batch, windowSize, lineWidth=10):
