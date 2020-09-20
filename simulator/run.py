@@ -22,6 +22,7 @@ from systems.PathProcessor import PathProcessor
 import systems.GotoDESProcessor as gotoProcessor
 import systems.MapDESProcessor as mapProcessor
 import systems.StopCollisionDESProcessor as StopCollision
+import systems.EnergyConsumptionDESProcessor as energySystem
 
 
 EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
@@ -95,6 +96,10 @@ def on_key_press(key, mod):
     if not MAP and mod & KEYS.MOD_SHIFT and key == KEYS.M:
         print(f"Map key pressed. Usage: ^M ent key")
         MAP = True
+    if key == KEYS.D:
+        payload = energySystem.CHANGE_ACTION_PAYLOAD(1, 'moving')
+        new_event = EVENT(energySystem.CHANGE_ACTION_TAG, payload)
+        eventStore.put(new_event)
     if key == KEYS.ENTER or key == KEYS.RETURN:
         if GOTO:
             ent, poi = "".join(buff).split('-')
@@ -123,6 +128,7 @@ def on_draw():
 @window.event
 def on_close():
     global EXIT
+    print(f'Exiting from window')
     EXIT = True
 
 
@@ -141,6 +147,7 @@ def simulation_loop(pass_switch_ref):
     env.process(gotoProcessor.process(kwargs))
     env.process(mapProcessor.process(kwargs))
     env.process(StopCollision.process(kwargs))
+    env.process(energySystem.process(kwargs))
     # Other processors
     while not EXIT:
         pyglet.clock.tick()
@@ -155,6 +162,7 @@ def simulation_loop(pass_switch_ref):
         switch = yield killswitch | env.timeout(1.0 / FPS, False)
         if killswitch in switch:
             break
+    return 0
 
 
 EXIT = False

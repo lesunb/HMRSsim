@@ -8,6 +8,7 @@ from components.Renderable import Renderable
 from components.Velocity import Velocity
 from components.POI import POI
 from components.Label import Label
+from components.BatteryComponent import Battery
 from simulator.utils.helpers import parse_style, translate_coordinates
 
 
@@ -27,6 +28,10 @@ def from_object(el, batch, windowSize, lineWidth=10):
         pos = list(filter(lambda c: isinstance(c, Position), components))[0]
         label = Label(label=options['label'], pos=pos.center, batch=batch)
         components.append(label)
+    if 'battery' in options:
+        bat_info = json.loads(options['battery'])
+        bat = Battery(charge=float(bat_info['initialCharge']), lookupTable=bat_info['lookupTable'])
+        components.append(bat)
 
     options.update(style)
     if options['movable']:
