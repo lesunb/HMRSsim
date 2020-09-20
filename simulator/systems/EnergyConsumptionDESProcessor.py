@@ -27,9 +27,8 @@ def process(kwargs):
 
     while True:
         item = event_store.get(lambda ev: ev.type == CHANGE_ACTION_TAG)
-        timeout = env.timeout(10)
+        timeout = env.timeout(1)
         event = yield item | timeout
-        print(event)
         if item in event:
             # Event
             item = event[item]
