@@ -34,10 +34,10 @@ def from_object(el, batch, windowSize, lineWidth=10):
         components.append(bat)
 
     options.update(style)
-    if options['movable']:
-        pos = components[0]
-        center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
-        components.append(Renderable(sprite=draw, primitive=True, center=center))
+    pos = components[0]
+    center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
+    components.append(Renderable(sprite=draw, primitive=True, center=center))
+    if options['type'] == 'robot':
         components.append(Velocity(x=0, y=0))
     if 'collision_tag' in options:
         coll = list(filter(lambda c: isinstance(c, Collidable), components))[0]

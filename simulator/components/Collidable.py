@@ -1,7 +1,7 @@
 
 
 class Collidable:
-    def __init__(self, shape, collision_tag='generic collision'):
+    def __init__(self, shape, collision_tag='genericCollision'):
         if isinstance(shape, list):
             self.shapes = shape
         else:

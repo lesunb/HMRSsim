@@ -7,12 +7,14 @@ import pathlib
 import esper
 
 from typing import NamedTuple
+
 # Include current directory in path
 sys.path.append(os.getcwd())
 
 import map_parser
 
 from components.Map import Map
+from components.Renderable import Renderable
 
 from systems.MovementProcessor import MovementProcessor
 from systems.CollisionProcessor import CollisionProcessor
@@ -23,7 +25,36 @@ import systems.GotoDESProcessor as gotoProcessor
 import systems.MapDESProcessor as mapProcessor
 import systems.StopCollisionDESProcessor as StopCollision
 import systems.EnergyConsumptionDESProcessor as energySystem
+import systems.ManageObjects as ObjectManager
+from models.mxCellDecoder import parse_object
 
+
+def remove_entity(ent_name):
+    ent, style = interactive[ent_name]
+    payload = ObjectManager.MANAGER_EVENT(ent, 'remove')
+    event = EVENT(ObjectManager.MANAGER_TAG, payload)
+    eventStore.put(event)
+    interactive[ent_name][0] = -1
+    draw2ent[style['id']][0] = -1
+
+
+def recreate_entity(name, newpos=(100, 100)):
+    ent, style = interactive[name]
+    if ent != -1:
+        print(f'Alredy entity with name {name} (is #{ent})')
+        return
+    new_obj = parse_object(style['skeleton'], batch, ((WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
+    components, attributes = new_obj
+    pos = components[0]
+    pos.x = newpos[0] - (pos.w // 2)
+    pos.y = newpos[1] - (pos.h // 2)
+    pos.center = newpos
+    pos.changed = True
+    newent = world.create_entity()
+    for c in components:
+        world.add_component(newent, c)
+    interactive[name] = [newent, attributes]
+    draw2ent[style['id']][0] = -1
 
 EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
 FPS = 60
@@ -42,6 +73,11 @@ batch = simulation['batch']
 (window_name, (WIDTH, HEIGHT), BKGD) = simulation['window_props']
 draw2ent = simulation['draw_map']
 objects = simulation['objects']
+interactive = simulation['interactive']
+
+print(f'==> Interactive')
+for name, obj in interactive.items():
+    print(f'{name} - entity #{obj[0]}')
 
 print(f"==> Simulation objects")
 for id, objId in objects:
@@ -78,6 +114,7 @@ GOTO = False
 MAP = False
 buff = []
 
+
 @window.event
 def on_text(text):
     if GOTO and text != 'G':
@@ -96,10 +133,17 @@ def on_key_press(key, mod):
     if not MAP and mod & KEYS.MOD_SHIFT and key == KEYS.M:
         print(f"Map key pressed. Usage: ^M ent key")
         MAP = True
+    if key == KEYS.P:
+        print('Removing')
+        remove_entity('medicine')
+    if key == KEYS.R:
+        print('Re-creating')
+        recreate_entity('medicine')
     if key == KEYS.D:
-        payload = energySystem.CHANGE_ACTION_PAYLOAD(1, 'moving')
-        new_event = EVENT(energySystem.CHANGE_ACTION_TAG, payload)
-        eventStore.put(new_event)
+        robot_has_renderable = world.has_component(1, Renderable)
+        med_has_renderable = world.has_component(13, Renderable)
+        print(f'Robot has renderable? {robot_has_renderable}')
+        print(f'Medicine has renderable? {med_has_renderable}')
     if key == KEYS.ENTER or key == KEYS.RETURN:
         if GOTO:
             ent, poi = "".join(buff).split('-')
@@ -117,6 +161,7 @@ def on_key_press(key, mod):
         GOTO = False
         MAP = False
 
+
 @window.event
 def on_draw():
     # Clear the window to background color
@@ -129,7 +174,7 @@ def on_draw():
 def on_close():
     global EXIT
     print(f'Exiting from window')
-    EXIT = True
+    EXIT = False
 
 
 ####################################################
@@ -147,7 +192,8 @@ def simulation_loop(pass_switch_ref):
     env.process(gotoProcessor.process(kwargs))
     env.process(mapProcessor.process(kwargs))
     env.process(StopCollision.process(kwargs))
-    env.process(energySystem.process(kwargs))
+    # env.process(energySystem.process(kwargs))
+    env.process(ObjectManager.process(kwargs))
     # Other processors
     while not EXIT:
         pyglet.clock.tick()

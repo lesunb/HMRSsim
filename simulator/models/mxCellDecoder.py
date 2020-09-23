@@ -6,6 +6,7 @@ from typing import Tuple
 import utils.helpers as helpers
 from . import Wall, WallCorner, WallU, Room, Shape
 
+
 def parse_mxCell(el, batch, windowOptions):
     """ Parses an mxCell extracted from .drawio XML (the simulation map)
         TODO: Complete description...
@@ -31,6 +32,7 @@ def parse_mxCell(el, batch, windowOptions):
     # Adds the cell id before returning
     obj[1]['id'] = el.attrib['id']
     return obj
+
 
 def parse_object(el, batch, windowOptions):
     windowSize, lineWidth = windowOptions

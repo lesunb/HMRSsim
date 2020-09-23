@@ -2,6 +2,7 @@ import pyglet
 import esper
 import os
 import sys
+import copy
 
 # Include current directory in path
 sys.path.append(os.getcwd())
@@ -36,7 +37,7 @@ def build_simulation_from_map(file, line_width=10):
     pyglet.gl.glClear(pyglet.gl.GL_COLOR_BUFFER_BIT | pyglet.gl.GL_DEPTH_BUFFER_BIT)
 
     world = esper.World()
-    (draw_map, objects) = build_simulation_objects(content_root, batch, world, ((width, height), line_width))
+    (draw_map, objects, interactive) = build_simulation_objects(content_root, batch, world, ((width, height), line_width))
     return {
         'world': world,
         'window': window,
@@ -44,12 +45,14 @@ def build_simulation_from_map(file, line_width=10):
         'window_props': (window_name, (width, height), BKGD),
         'draw_map': draw_map,
         'objects': objects,
+        'interactive': interactive
     }
 
 
 def build_simulation_objects(content_root, batch: pyglet.graphics.Batch, world: esper.World, window_options):
     # Create Walls
     draw2entity = {}
+    interactive = {}
     objects = []
     windowSize = window_options[0]
     for cell in content_root:
@@ -58,15 +61,24 @@ def build_simulation_objects(content_root, batch: pyglet.graphics.Batch, world: 
             ent = world.create_entity()
             for c in components:
                 world.add_component(ent, c)
-            draw2entity[style['id']] = (ent, style)
+            draw2entity[style['id']] = [ent, style]
         if cell.tag == 'object':
             if cell.attrib['type'] == 'robot':
                 (components, style) = mxCellDecoder.parse_object(cell, batch, window_options)
                 ent = world.create_entity()
                 for c in components:
                     world.add_component(ent, c)
-                draw2entity[style['id']] = (ent, style)
+                draw2entity[style['id']] = [ent, style]
                 objects.append((ent, style['id']))
+            elif cell.attrib['type'] == 'pickable':
+                skeleton = copy.copy(cell)
+                (components, style) = mxCellDecoder.parse_object(cell, batch, window_options)
+                style['skeleton'] = skeleton
+                ent = world.create_entity()
+                for c in components:
+                    world.add_component(ent, c)
+                draw2entity[style['id']] = [ent, style]
+                interactive[style['name']] = [ent, style]
             elif cell.attrib['type'] == 'path':
                 mxCell = cell[0]
                 points = Path.from_mxCell(mxCell, windowSize[1])
@@ -101,4 +113,4 @@ def build_simulation_objects(content_root, batch: pyglet.graphics.Batch, world: 
                         world.add_component(ent, newMap)
             else:
                 print("Unrecognized object", cell)
-    return draw2entity, objects
+    return draw2entity, objects, interactive

@@ -7,3 +7,5 @@ class Renderable:
         self.initialized = False
         self.is_primitive = primitive
 
+    def __str__(self):
+        return f'Renderable[primitive={self.is_primitive}]'

@@ -37,6 +37,8 @@ class CollisionProcessor(esper.Processor):
                     # print(choice(COLORS) +
                     #       f'colision detected between {ent} and {otherEnt}')
                     if eventStore:
+                        if col.event_tag == 'genericColision':
+                            print(f'Collision! {ent} - {otherEnt}')
                         event = EVENT(col.event_tag, (ent, otherEnt))
                         # print(f'Firing event ent --> otherEnt: {event}')
                         eventStore.put(event)
