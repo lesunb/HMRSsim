@@ -13,6 +13,7 @@ import models.mxCellDecoder as mxCellDecoder
 
 from components.Path import Path
 from components.Map import Map
+from components.Inventory import Inventory
 
 
 def build_simulation_from_map(file, line_width=10):
@@ -37,17 +38,17 @@ def build_simulation_from_map(file, line_width=10):
     pyglet.gl.glClear(pyglet.gl.GL_COLOR_BUFFER_BIT | pyglet.gl.GL_DEPTH_BUFFER_BIT)
 
     world = esper.World()
-    (draw_map, objects, interactive) = build_simulation_objects(content_root, batch, world, ((width, height), line_width))
+    simulation = world.create_entity()  # Simulation is always the first entity
+    draw_map, objects, interactive = build_simulation_objects(content_root, batch, world, ((width, height), line_width))
+    world.add_component(simulation, Inventory(interactive))
     return {
         'world': world,
         'window': window,
         'batch': batch,
         'window_props': (window_name, (width, height), BKGD),
         'draw_map': draw_map,
-        'objects': objects,
-        'interactive': interactive
+        'objects': objects
     }
-
 
 def build_simulation_objects(content_root, batch: pyglet.graphics.Batch, world: esper.World, window_options):
     # Create Walls

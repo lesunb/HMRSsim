@@ -15,6 +15,7 @@ import map_parser
 
 from components.Map import Map
 from components.Renderable import Renderable
+from components.Inventory import Inventory
 
 from systems.MovementProcessor import MovementProcessor
 from systems.CollisionProcessor import CollisionProcessor
@@ -73,11 +74,8 @@ batch = simulation['batch']
 (window_name, (WIDTH, HEIGHT), BKGD) = simulation['window_props']
 draw2ent = simulation['draw_map']
 objects = simulation['objects']
-interactive = simulation['interactive']
-
-print(f'==> Interactive')
-for name, obj in interactive.items():
-    print(f'{name} - entity #{obj[0]}')
+# Global inventory
+interactive = world.component_for_entity(1, Inventory).objects
 
 print(f"==> Simulation objects")
 for id, objId in objects:
