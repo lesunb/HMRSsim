@@ -1,6 +1,10 @@
 from typing import NamedTuple
-
+from enum import Enum
 from components.Renderable import Renderable
+
+class ObjectManagerOps(Enum):
+    REMOVE = 'remove'
+    RECREATE = 'recreate'
 
 MANAGER_EVENT = NamedTuple('ManagerPayload', [('entity', int), ('op', str)])
 MANAGER_TAG = 'ManagerEventTag'
@@ -15,7 +19,7 @@ def process(kwargs):
     while True:
         event = yield event_store.get(lambda ev: ev.type == MANAGER_TAG)
         payload: MANAGER_EVENT = event.payload
-        if payload.op == 'remove':
+        if payload.op == ObjectManagerOps.REMOVE:
             remove_entity(payload.entity, world)
 
 

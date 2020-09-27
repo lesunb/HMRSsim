@@ -1,11 +1,9 @@
 import pyglet
 import esper
-import os
-import sys
 import copy
+import json
 
-# Include current directory in path
-sys.path.append(os.getcwd())
+import dynamic_importer
 
 import utils.helpers as helpers
 import resources.load_resources as loader
@@ -14,6 +12,7 @@ import models.mxCellDecoder as mxCellDecoder
 from components.Path import Path
 from components.Map import Map
 from components.Inventory import Inventory
+from components.Pickable import Pickable
 
 
 def build_simulation_from_map(file, line_width=10):
@@ -50,6 +49,7 @@ def build_simulation_from_map(file, line_width=10):
         'objects': objects
     }
 
+
 def build_simulation_objects(content_root, batch: pyglet.graphics.Batch, world: esper.World, window_options):
     # Create Walls
     draw2entity = {}
@@ -67,6 +67,13 @@ def build_simulation_objects(content_root, batch: pyglet.graphics.Batch, world: 
             if cell.attrib['type'] == 'robot':
                 (components, style) = mxCellDecoder.parse_object(cell, batch, window_options)
                 ent = world.create_entity()
+                # Custom components
+                for key, val in cell.attrib.items():
+                    if key.startswith('component_'):
+                        component_name = key[10:]  # removes "component_" from the name
+                        init_values = json.loads(val)
+                        component = dynamic_importer.init_component(component_name, init_values)
+                        components.append(component)
                 for c in components:
                     world.add_component(ent, c)
                 draw2entity[style['id']] = [ent, style]
@@ -74,12 +81,13 @@ def build_simulation_objects(content_root, batch: pyglet.graphics.Batch, world: 
             elif cell.attrib['type'] == 'pickable':
                 skeleton = copy.copy(cell)
                 (components, style) = mxCellDecoder.parse_object(cell, batch, window_options)
-                style['skeleton'] = skeleton
+                pick = Pickable(float(cell.attrib['weight']), cell.attrib['name'], skeleton)
+                components.append(pick)
                 ent = world.create_entity()
                 for c in components:
                     world.add_component(ent, c)
                 draw2entity[style['id']] = [ent, style]
-                interactive[style['name']] = [ent, style]
+                interactive[style['name']] = [ent, skeleton]
             elif cell.attrib['type'] == 'path':
                 mxCell = cell[0]
                 points = Path.from_mxCell(mxCell, windowSize[1])

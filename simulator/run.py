@@ -1,5 +1,4 @@
 import pyglet
-import os
 import sys
 import json
 import simpy
@@ -7,9 +6,6 @@ import pathlib
 import esper
 
 from typing import NamedTuple
-
-# Include current directory in path
-sys.path.append(os.getcwd())
 
 import map_parser
 
@@ -27,16 +23,9 @@ import systems.MapDESProcessor as mapProcessor
 import systems.StopCollisionDESProcessor as StopCollision
 import systems.EnergyConsumptionDESProcessor as energySystem
 import systems.ManageObjects as ObjectManager
+import systems.ClawDESProcessor as ClawProcessor
+
 from models.mxCellDecoder import parse_object
-
-
-def remove_entity(ent_name):
-    ent, style = interactive[ent_name]
-    payload = ObjectManager.MANAGER_EVENT(ent, 'remove')
-    event = EVENT(ObjectManager.MANAGER_TAG, payload)
-    eventStore.put(event)
-    interactive[ent_name][0] = -1
-    draw2ent[style['id']][0] = -1
 
 
 def recreate_entity(name, newpos=(100, 100)):
@@ -58,6 +47,7 @@ def recreate_entity(name, newpos=(100, 100)):
     draw2ent[style['id']][0] = -1
 
 EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
+
 FPS = 60
 DEFAULT_LINE_WIDTH = 10
 CONFIG = 'simulation.json' if len(sys.argv) == 1 else sys.argv[1]
@@ -133,15 +123,12 @@ def on_key_press(key, mod):
         MAP = True
     if key == KEYS.P:
         print('Removing')
-        remove_entity('medicine')
-    if key == KEYS.R:
-        print('Re-creating')
-        recreate_entity('medicine')
-    if key == KEYS.D:
-        robot_has_renderable = world.has_component(1, Renderable)
-        med_has_renderable = world.has_component(13, Renderable)
-        print(f'Robot has renderable? {robot_has_renderable}')
-        print(f'Medicine has renderable? {med_has_renderable}')
+        payload = ClawProcessor.CLAW_GRAB_PAYLOAD(ClawProcessor.ClawOps.GRAB, 'medicine', 2)
+        event = EVENT(ClawProcessor.CLAW_TAG, payload)
+        eventStore.put(event)
+    # if key == KEYS.R:
+    #     print('Re-creating')
+    #     recreate_entity('medicine')
     if key == KEYS.ENTER or key == KEYS.RETURN:
         if GOTO:
             ent, poi = "".join(buff).split('-')
@@ -192,6 +179,7 @@ def simulation_loop(pass_switch_ref):
     env.process(StopCollision.process(kwargs))
     # env.process(energySystem.process(kwargs))
     env.process(ObjectManager.process(kwargs))
+    env.process(ClawProcessor.process(kwargs))
     # Other processors
     while not EXIT:
         pyglet.clock.tick()

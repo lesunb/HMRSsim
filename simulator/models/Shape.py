@@ -89,4 +89,4 @@ def from_mxCell(el, batch, windowSize, lineWidth=10):
     col_points = list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), col_points))
     collision_box = Poly(Vector(center[0], center[1]), col_points)
 
-    return ([pos, Collidable(shape=collision_box)], style, batch_draw)
+    return [pos, Collidable(shape=collision_box)], style, batch_draw

@@ -1,5 +1,10 @@
 import math
-from collision import Vector
+import typing
+
+import primitives
+from collision import Vector, Poly
+
+ShapeType = typing.Union[primitives.Rectangle, primitives.Ellipse]
 
 def hex_to_rgb(hex_color):
   """Transforms a color from hecadecimal string (e.g. #FF0000)
@@ -51,3 +56,9 @@ def rotate_around_point(xy, radians, origin=(0, 0)):
     qy = offset_y + -sin_rad * adjusted_x + cos_rad * adjusted_y
 
     return qx, qy
+
+
+def collision_from_points(shape: ShapeType, center: typing.Tuple[int, int]) -> Poly:
+    points = shape._get_points()
+    col_points = list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), points))
+    return Poly(tuple2vector(center), col_points)
