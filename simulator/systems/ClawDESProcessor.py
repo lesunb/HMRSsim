@@ -54,17 +54,14 @@ def _pick_object(obj_name, me):
         col = Collidable(shape=helpers.collision_from_points(span, pos.center))
         claw.boundaries = col
     # For every pickable component, see if it's within range
-    for ent, (pick, col) in _WORLD.get_components(Pickable, Collidable):
+    for _, (pick, col) in _WORLD.get_components(Pickable, Collidable):
         if pick.name == obj_name:
             # This is the object we want. Let's see if it's in range and under limit weight
             for s1 in col.shapes:
                 if collide(claw.boundaries.shapes[0], s1):
                     if pick.weight <= claw.max_weight:
-                        # Remove object from global inventory
-                        global_inventory = _WORLD.component_for_entity(1, Inventory).objects
-                        del global_inventory[obj_name]
                         # Take the object
-                        payload = ObjectManager.MANAGER_EVENT(ent, ObjectManager.ObjectManagerOps.REMOVE)
+                        payload = ObjectManager.GrabPayload(obj_name, ObjectManager.ObjectManagerOps.REMOVE)
                         event = EVENT(ObjectManager.MANAGER_TAG, payload)
                         # TODO: Add response to this request to see if removal was OK
                         # For example, maybe I'm trying to pick up something that other robots want

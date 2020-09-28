@@ -25,27 +25,6 @@ import systems.EnergyConsumptionDESProcessor as energySystem
 import systems.ManageObjects as ObjectManager
 import systems.ClawDESProcessor as ClawProcessor
 
-from models.mxCellDecoder import parse_object
-
-
-def recreate_entity(name, newpos=(100, 100)):
-    ent, style = interactive[name]
-    if ent != -1:
-        print(f'Alredy entity with name {name} (is #{ent})')
-        return
-    new_obj = parse_object(style['skeleton'], batch, ((WIDTH, HEIGHT), DEFAULT_LINE_WIDTH))
-    components, attributes = new_obj
-    pos = components[0]
-    pos.x = newpos[0] - (pos.w // 2)
-    pos.y = newpos[1] - (pos.h // 2)
-    pos.center = newpos
-    pos.changed = True
-    newent = world.create_entity()
-    for c in components:
-        world.add_component(newent, c)
-    interactive[name] = [newent, attributes]
-    draw2ent[style['id']][0] = -1
-
 EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
 
 FPS = 60
@@ -171,7 +150,10 @@ def simulation_loop(pass_switch_ref):
         "ENV": env,
         "WORLD": world,
         "_KILLSWITCH": (killswitch if pass_switch_ref else None),
-        "EVENT_STORE": eventStore
+        "EVENT_STORE": eventStore,
+        # Pyglet specific things (for the re-create entity)
+        "BATCH": batch,
+        "WINDOW_OPTIONS": ((WIDTH, HEIGHT), DEFAULT_LINE_WIDTH)
     }
     # Discrete processors
     env.process(gotoProcessor.process(kwargs))

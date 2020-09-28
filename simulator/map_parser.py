@@ -86,8 +86,7 @@ def build_simulation_objects(content_root, batch: pyglet.graphics.Batch, world: 
                 ent = world.create_entity()
                 for c in components:
                     world.add_component(ent, c)
-                draw2entity[style['id']] = [ent, style]
-                interactive[style['name']] = [ent, skeleton]
+                interactive[style['name']] = ent
             elif cell.attrib['type'] == 'path':
                 mxCell = cell[0]
                 points = Path.from_mxCell(mxCell, windowSize[1])
