@@ -105,9 +105,11 @@ def on_key_press(key, mod):
         payload = ClawProcessor.CLAW_GRAB_PAYLOAD(ClawProcessor.ClawOps.GRAB, 'medicine', 2)
         event = EVENT(ClawProcessor.CLAW_TAG, payload)
         eventStore.put(event)
-    # if key == KEYS.R:
-    #     print('Re-creating')
-    #     recreate_entity('medicine')
+    if key == KEYS.D:
+        print('Re-creating')
+        payload = ClawProcessor.CLAW_GRAB_PAYLOAD(ClawProcessor.ClawOps.DROP, 'medicine', 2)
+        event = EVENT(ClawProcessor.CLAW_TAG, payload)
+        eventStore.put(event)
     if key == KEYS.ENTER or key == KEYS.RETURN:
         if GOTO:
             ent, poi = "".join(buff).split('-')

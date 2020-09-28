@@ -43,6 +43,8 @@ def process(kwargs):
         op = event.payload.op
         if op == ClawOps.GRAB:
             _pick_object(event.payload.obj, event.payload.me)
+        elif op == ClawOps.DROP:
+            _drop_object(event.payload.obj, event.payload.me)
 
 
 def _pick_object(obj_name, me):
@@ -79,3 +81,18 @@ def _pick_object(obj_name, me):
                 else:
                     print(f'Pickable {obj_name} not within claw range!')
 
+
+def _drop_object(obj_name, me):
+    pos = _WORLD.component_for_entity(me, Position)
+    inventory = _WORLD.component_for_entity(me, Inventory)
+    skeleton = inventory.objects.get(obj_name, None)
+    if skeleton is None:
+        print(f'Not holding object {obj_name}')
+    drop_offset = (pos.center[0], pos.center[1] + pos.h)
+    drop_payload = ObjectManager.DropPayload(
+        obj_name,
+        ObjectManager.ObjectManagerOps.RECREATE,
+        skeleton,
+        drop_offset
+    )
+    _EVENT_STORE.put(EVENT(ObjectManager.MANAGER_TAG, drop_payload))
