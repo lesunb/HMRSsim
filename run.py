@@ -100,15 +100,16 @@ def on_key_press(key, mod):
     if not MAP and mod & KEYS.MOD_SHIFT and key == KEYS.M:
         print(f"Map key pressed. Usage: ^M ent key")
         MAP = True
-    if key == KEYS.P:
+    if key == KEYS.P and not MAP and not GOTO:
         print('Removing')
         payload = ClawProcessor.CLAW_GRAB_PAYLOAD(ClawProcessor.ClawOps.GRAB, 'medicine', 2)
         event = EVENT(ClawProcessor.CLAW_TAG, payload)
         eventStore.put(event)
-    if key == KEYS.D:
+    if key == KEYS.D and not MAP and not GOTO:
         print('Re-creating')
         payload = ClawProcessor.CLAW_GRAB_PAYLOAD(ClawProcessor.ClawOps.DROP, 'medicine', 2)
         event = EVENT(ClawProcessor.CLAW_TAG, payload)
+
         eventStore.put(event)
     if key == KEYS.ENTER or key == KEYS.RETURN:
         if GOTO:
