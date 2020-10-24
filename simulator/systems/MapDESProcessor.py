@@ -1,10 +1,18 @@
-from typing import NamedTuple
+from typing import NamedTuple, List
+
+from simpy import FilterStore
 
 from components.Map import Map
 from components.Path import Path
+from main import EVENT
+
+import components.Script as scriptComponent
+from systems.GotoDESProcessor import GotoPayload, GotoEventTag
+from systems.PathProcessor import EndOfPathTag
 
 MapPayload = NamedTuple('MapPayload', [('entity', int), ('route', str)])
 MapEventTag = 'MapEvent'
+MapInstructionId = 'Map'
 
 def process(kwargs):
     event_store = kwargs.get('EVENT_STORE', None)
@@ -26,3 +34,13 @@ def process(kwargs):
         # print(f"Path to follow is {path_to_follow} ({isinstance(path_component, Path)})")
         print(f"Adding path {payload.route} to entity {payload.entity}")
         world.add_component(payload.entity, path_component)
+
+# Functions that handle instructions
+# A function returns the state of the Script component after executing
+def mapInstruction(ent: int, args: List[str], script: scriptComponent.Script, event_store: FilterStore) -> scriptComponent.States:
+    payload = MapPayload(ent, args[0])
+    new_event = EVENT(MapEventTag, payload)
+    event_store.put(new_event)
+    script.state = scriptComponent.States.BLOQUED
+    script.expecting.append(EndOfPathTag)
+    return script.state
