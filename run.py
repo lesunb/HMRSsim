@@ -22,6 +22,8 @@ simulator = Simulator(sys.argv[1])
 width, height = simulator.window_dimensions
 window = simulator.window
 eventStore = simulator.KWARGS['EVENT_STORE']
+exitEvent = simulator.EXIT_EVENT
+env = simulator.ENV
 
 # Defines and initializes esper.Processor for the simulation
 normal_processors = [
@@ -110,6 +112,7 @@ def on_close():
     global EXIT
     print(f'Exiting from window')
     EXIT = False
+    exitEvent.succeed()
 
 
 if __name__ == "__main__":

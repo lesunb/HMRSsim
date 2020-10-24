@@ -63,6 +63,7 @@ class Simulator:
 
         self.EXIT = False
         self.ENV = simpy.Environment()
+        self.EXIT_EVENT = self.ENV.event()
         self.KWARGS = {
             "ENV": self.ENV,
             "WORLD": self.world,
@@ -123,4 +124,4 @@ class Simulator:
             self.ENV.run(until=self.duration)
         else:
             self.ENV.process(self.simulation_loop())
-            self.ENV.run()
+            self.ENV.run(until=self.EXIT_EVENT)
