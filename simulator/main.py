@@ -82,7 +82,7 @@ class Simulator:
         Such systems must have a generator function with the following signature:
             def process(kwargs: dict) -> None:
         """
-        self.ENV.process(system.process(kwargs=self.KWARGS))
+        self.ENV.process(system(kwargs=self.KWARGS))
 
     def add_system(self, system):
         """

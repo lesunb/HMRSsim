@@ -12,7 +12,12 @@ import systems.StopCollisionDESProcessor as StopCollision
 import systems.EnergyConsumptionDESProcessor as energySystem
 import systems.ManageObjects as ObjectManager
 import systems.ClawDESProcessor as ClawProcessor
-import systems.ScriptEventsDES as ScriptProcessor
+from systems.ScriptEventsDES import init
+
+extra_instructions = [
+    (gotoProcessor.GotoInstructionId, gotoProcessor.goInstruction)
+]
+ScriptProcessor = init(extra_instructions)
 
 from main import Simulator, EVENT
 
@@ -34,12 +39,12 @@ normal_processors = [
 ]
 # Defines DES processors
 des_processors = [
-    ClawProcessor,
-    ObjectManager,
-    StopCollision,
-    gotoProcessor,
-    mapProcessor,
-    energySystem,
+    ClawProcessor.process,
+    ObjectManager.process,
+    StopCollision.process,
+    gotoProcessor.process,
+    mapProcessor.process,
+    energySystem.process,
     ScriptProcessor
 ]
 # Add processors to the simulation, according to processor type

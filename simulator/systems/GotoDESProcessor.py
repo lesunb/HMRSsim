@@ -1,12 +1,18 @@
 import esper
-from typing import NamedTuple
+from typing import NamedTuple, List
+from simpy import FilterStore
 
+import components.Script as scriptComponent
 from components.Path import Path
 from components.POI import POI
 from components.Position import Position
 
+from main import EVENT
+
+from systems.PathProcessor import EndOfPathTag
 GotoPayload = NamedTuple('GotoPayload', [('entity', int), ('target', int)])
 GotoEventTag = 'GoToEvent'
+GotoInstructionId = 'Go'
 
 
 def process(kwargs):
@@ -33,7 +39,17 @@ def process(kwargs):
         world.add_component(payload.entity, new_path)
 
 
-
+# Functions that handle instructions
+# A function returns the state of the Script component after executing
+def goInstruction(ent: int, args: List[str], script: scriptComponent.Script, event_store: FilterStore) -> scriptComponent.States:
+    poi = int(args[0])
+    payload = GotoPayload(int(ent), int(poi))
+    new_event = EVENT(GotoEventTag, payload)
+    event_store.put(new_event)
+    # Needs to block the script
+    script.state = scriptComponent.States.BLOQUED
+    script.expecting.append(EndOfPathTag)
+    return script.state
 
 
 
