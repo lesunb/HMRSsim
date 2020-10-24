@@ -70,27 +70,27 @@ def on_key_press(key, mod):
         MAP = True
     if key == KEYS.P and not MAP and not GOTO:
         print('Removing')
-        payload = ClawProcessor.CLAW_GRAB_PAYLOAD(ClawProcessor.ClawOps.GRAB, 'medicine', 2)
-        event = EVENT(ClawProcessor.CLAW_TAG, payload)
+        payload = ClawProcessor.GRAB_ClawPayload(ClawProcessor.ClawOps.GRAB, 'medicine', 2)
+        event = EVENT(ClawProcessor.ClawTag, payload)
         eventStore.put(event)
     if key == KEYS.D and not MAP and not GOTO:
         print('Re-creating')
-        payload = ClawProcessor.CLAW_GRAB_PAYLOAD(ClawProcessor.ClawOps.DROP, 'medicine', 2)
-        event = EVENT(ClawProcessor.CLAW_TAG, payload)
+        payload = ClawProcessor.GRAB_ClawPayload(ClawProcessor.ClawOps.DROP, 'medicine', 2)
+        event = EVENT(ClawProcessor.ClawTag, payload)
 
         eventStore.put(event)
     if key == KEYS.ENTER or key == KEYS.RETURN:
         if GOTO:
             ent, poi = "".join(buff).split('-')
             print(f"End of Goto sequence. Taking entity {ent} to point {poi}")
-            payload = gotoProcessor.GOTO_PAYLOAD(int(ent), int(poi))
-            new_event = EVENT(gotoProcessor.GOTO_EVENT_TAG, payload)
+            payload = gotoProcessor.GotoPayload(int(ent), int(poi))
+            new_event = EVENT(gotoProcessor.GotoEventTag, payload)
             eventStore.put(new_event)
         elif MAP:
             ent, key = "".join(buff[1:]).split(' ')
             print(f"End of Map sequence. Taking entity {ent} to path {key}")
-            payload = mapProcessor.MAP_PAYLOAD(int(ent), key)
-            new_event = EVENT(mapProcessor.MAP_EVENT_TAG, payload)
+            payload = mapProcessor.MapPayload(int(ent), key)
+            new_event = EVENT(mapProcessor.MapEventTag, payload)
             eventStore.put(new_event)
         buff.clear()
         GOTO = False

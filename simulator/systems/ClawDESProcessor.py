@@ -22,8 +22,8 @@ class ClawOps(Enum):
     DROP = 'Drop'
 
 
-CLAW_GRAB_PAYLOAD = NamedTuple('ClawGrabPayload', [('op', str), ('obj', str), ('me', int)])
-CLAW_TAG = 'ClawAction'
+GRAB_ClawPayload = NamedTuple('ClawGrabPayload', [('op', str), ('obj', str), ('me', int)])
+ClawTag = 'ClawAction'
 
 EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
 
@@ -39,7 +39,7 @@ def process(kwargs):
     if _EVENT_STORE is None:
         raise Exception("Can't find eventStore")
     while True:
-        event = yield _EVENT_STORE.get(lambda ev: ev.type == CLAW_TAG)
+        event = yield _EVENT_STORE.get(lambda ev: ev.type == ClawTag)
         op = event.payload.op
         if op == ClawOps.GRAB:
             _pick_object(event.payload.obj, event.payload.me)

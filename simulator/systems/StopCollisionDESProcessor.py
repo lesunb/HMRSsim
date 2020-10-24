@@ -5,7 +5,8 @@ from components.Path import Path
 
 from main import EVENT
 from systems.PathProcessor import EndOfPathTag, EndOfPathPayload
-STOP_EVENT_TAG = 'stopEvent'
+StopEventTag = 'stopEvent'
+GenericCollisionTag = 'genericCollision'
 
 def process(kwargs):
     event_store = kwargs.get('EVENT_STORE', None)
@@ -16,8 +17,8 @@ def process(kwargs):
 
     while True:
         # Gets next collision event
-        event = yield event_store.get(lambda ev: ev.type == STOP_EVENT_TAG or ev.type == 'genericCollision')
-        if event.type == 'genericCollision':
+        event = yield event_store.get(lambda ev: ev.type == StopEventTag or ev.type == GenericCollisionTag)
+        if event.type == GenericCollisionTag:
             continue
         (ent, otherEnt) = event.payload
         pos = world.component_for_entity(ent, Position)

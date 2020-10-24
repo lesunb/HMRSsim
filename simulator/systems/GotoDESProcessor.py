@@ -5,8 +5,8 @@ from components.Path import Path
 from components.POI import POI
 from components.Position import Position
 
-GOTO_PAYLOAD = NamedTuple('GotoPayload', [('entity', int), ('target', int)])
-GOTO_EVENT_TAG = 'GoToEvent'
+GotoPayload = NamedTuple('GotoPayload', [('entity', int), ('target', int)])
+GotoEventTag = 'GoToEvent'
 
 
 def process(kwargs):
@@ -16,8 +16,8 @@ def process(kwargs):
         raise Exception("Can't find eventStore")
     while True:
         # Gets next goto event
-        event = yield event_store.get(lambda ev: ev.type == GOTO_EVENT_TAG)
-        payload: GOTO_PAYLOAD = event.payload
+        event = yield event_store.get(lambda ev: ev.type == GotoEventTag)
+        payload: GotoPayload = event.payload
         entity_poi = world.component_for_entity(payload.entity, POI)
         # Target point
         # TODO: Safety check on index

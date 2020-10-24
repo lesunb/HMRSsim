@@ -30,8 +30,8 @@ def process(kwargs):
     # A function returns the state of the Script component after executing
     def goInstruction(ent: int, args: List[str], script: scriptComponent.Script) -> scriptComponent.States:
         poi = int(args[0])
-        payload = gotoProcessor.GOTO_PAYLOAD(int(ent), int(poi))
-        new_event = EVENT(gotoProcessor.GOTO_EVENT_TAG, payload)
+        payload = gotoProcessor.GotoPayload(int(ent), int(poi))
+        new_event = EVENT(gotoProcessor.GotoEventTag, payload)
         __event_store.put(new_event)
         # Needs to block the script
         script.state = scriptComponent.States.BLOQUED
