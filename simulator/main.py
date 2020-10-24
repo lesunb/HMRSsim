@@ -13,6 +13,7 @@ from typing import NamedTuple
 import map_parser
 
 from components.Map import Map
+from components.Script import Script
 from components.Inventory import Inventory
 
 EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
@@ -56,6 +57,9 @@ class Simulator:
                 print("\tAvailable paths:")
                 for idx, key in enumerate(ent_map.paths.keys()):
                     print(f"\t{idx}. {key}")
+            if self.world.has_component(oid, Script):
+                script = self.world.component_for_entity(oid, Script)
+                print(script)
 
         self.EXIT = False
         self.ENV = simpy.Environment()
@@ -63,10 +67,10 @@ class Simulator:
             "ENV": self.ENV,
             "WORLD": self.world,
             "_KILLSWITCH": self.ENV.event() if self.duration > 0 else None,
-            "EVENT_STORE": simpy.FilterStore(self.ENV, capacity=20),
+            "EVENT_STORE": simpy.FilterStore(self.ENV),
             # Pyglet specific things (for the re-create entity)
             "BATCH": self.batch,
-            "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH)
+            "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
 
     def add_DES_system(self, system):

@@ -12,6 +12,7 @@ import systems.StopCollisionDESProcessor as StopCollision
 import systems.EnergyConsumptionDESProcessor as energySystem
 import systems.ManageObjects as ObjectManager
 import systems.ClawDESProcessor as ClawProcessor
+import systems.ScriptEventsDES as ScriptProcessor
 
 from main import Simulator, EVENT
 
@@ -36,7 +37,8 @@ des_processors = [
     StopCollision,
     gotoProcessor,
     mapProcessor,
-    energySystem
+    energySystem,
+    ScriptProcessor
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:

@@ -1,19 +1,24 @@
 import esper
-
+import simpy
 from components.Position import Position
 from components.Path import Path
 
+from main import EVENT
+from systems.PathProcessor import EndOfPathTag, EndOfPathPayload
 STOP_EVENT_TAG = 'stopEvent'
 
 def process(kwargs):
     event_store = kwargs.get('EVENT_STORE', None)
     world: esper.World = kwargs.get('WORLD', None)
+    env: simpy.Environment = kwargs.get('ENV', None)
     if event_store is None:
         raise Exception("Can't find eventStore")
 
     while True:
         # Gets next collision event
-        event = yield event_store.get(lambda ev: ev.type == STOP_EVENT_TAG)
+        event = yield event_store.get(lambda ev: ev.type == STOP_EVENT_TAG or ev.type == 'genericCollision')
+        if event.type == 'genericCollision':
+            continue
         (ent, otherEnt) = event.payload
         pos = world.component_for_entity(ent, Position)
         other_pos = world.component_for_entity(otherEnt, Position)
@@ -36,6 +41,8 @@ def process(kwargs):
 
         # If following path, remove it
         if world.has_component(ent, Path):
+            end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, env.now))
+            event_store.put(end_of_path)
             world.remove_component(ent, Path)
 
 

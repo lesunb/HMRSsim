@@ -1,8 +1,15 @@
 import esper
+from typing import NamedTuple
+from simpy import FilterStore
 
+from main import EVENT
 from components.Path import Path
 from components.Position import Position
 from components.Velocity import Velocity
+
+
+EndOfPathPayload = NamedTuple('EndOfPathPayload', [('ent', int), ('timestamp', str)])
+EndOfPathTag = 'EndOfPath'
 
 
 class PathProcessor(esper.Processor):
@@ -10,6 +17,8 @@ class PathProcessor(esper.Processor):
         super().__init__()
 
     def process(self, kwargs):
+        event_store: FilterStore = kwargs.get('EVENT_STORE', None)
+        env = kwargs.get('ENV', None)
         for ent, (pos, path, vel) in self.world.get_components(Position, Path, Velocity):
             # print(f"Processing {ent}")
             point = path.points[path.curr_point]
@@ -25,6 +34,10 @@ class PathProcessor(esper.Processor):
                     # print("Removing Path component from", ent)
                     pos.changed = False or pos.changed
                     self.world.remove_component(ent, Path)
+                    # Adds an EndOfPath event, in case anyone is listening
+                    end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, env.now))
+                    # print(f'[{env.now}] PathProcessor adding EndOfPath event {end_of_path}')
+                    event_store.put(end_of_path)
                     return
                 point = path.points[path.curr_point]
                 # print(f"Point {point} is {path.curr_point}th point")
