@@ -1,14 +1,16 @@
 from enum import Enum
 
-from typing import NamedTuple
+from typing import NamedTuple, List
 from esper import World
-from simpy import FilterStore
+from simpy import FilterStore, Store, Environment
+from main import EVENT
 
 from components.Position import Position
 from components.Claw import Claw
 from components.Collidable import Collidable
 from components.Pickable import Pickable
 from components.Inventory import Inventory
+from components.Script import Script, States
 
 from collision import collide
 from primitives import Ellipse
@@ -22,34 +24,42 @@ class ClawOps(Enum):
     DROP = 'Drop'
 
 
-GRAB_ClawPayload = NamedTuple('ClawGrabPayload', [('op', str), ('obj', str), ('me', int)])
+GRAB_ClawPayload = NamedTuple('ClawGrabPayload', op=ClawOps, obj=str, me=int)
+RESPONSE_ClawPayload = NamedTuple('ClawOperationDone', op=ClawOps, ent=int, success=bool, msg=str)
 ClawTag = 'ClawAction'
+ClawDoneTag = 'ClawAttemptComplete'
 
-EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
+GrabInstructionTag = 'Grab'
 
 _EVENT_STORE: FilterStore
 _WORLD: World
+_ENV: Environment
 
 
 def process(kwargs):
     global _EVENT_STORE
     global _WORLD
+    global _ENV
     _EVENT_STORE = kwargs.get('EVENT_STORE', None)
     _WORLD = kwargs.get('WORLD', None)
+    _ENV = kwargs.get('ENV', None)
     if _EVENT_STORE is None:
         raise Exception("Can't find eventStore")
     while True:
         event = yield _EVENT_STORE.get(lambda ev: ev.type == ClawTag)
         op = event.payload.op
+        print(f'Claw Received op {op}')
         if op == ClawOps.GRAB:
-            _pick_object(event.payload.obj, event.payload.me)
+            pick_object(event.payload.obj, event.payload.me)
         elif op == ClawOps.DROP:
             _drop_object(event.payload.obj, event.payload.me)
 
 
-def _pick_object(obj_name, me):
+def pick_object(obj_name: str, me: int):
     pos = _WORLD.component_for_entity(me, Position)
     claw = _WORLD.component_for_entity(me, Claw)
+    success: bool = False
+    msg: str = f'Object {obj_name} not found.'
     # Create boundaries, if necessary
     if claw.boundaries is None:
         span = Ellipse(pos.center, claw.max_range, claw.max_range)
@@ -63,23 +73,34 @@ def _pick_object(obj_name, me):
                 if collide(claw.boundaries.shapes[0], s1):
                     if pick.weight <= claw.max_weight:
                         # Take the object
-                        payload = ObjectManager.GrabPayload(obj_name, ObjectManager.ObjectManagerOps.REMOVE)
-                        event = EVENT(ObjectManager.MANAGER_TAG, payload)
-                        # TODO: Add response to this request to see if removal was OK
-                        # For example, maybe I'm trying to pick up something that other robots want
-                        # So I don't know if I've actually picked it until the removal request is complete.
+                        reply_channel = Store(_ENV)
+                        payload = ObjectManager.GrabPayload(obj_name, ObjectManager.ObjectManagerOps.REMOVE,
+                                                            reply_channel)
+                        event = EVENT(ObjectManager.ManagerTag, payload)
                         _EVENT_STORE.put(event)
-                        # Add removed component to my inventory
-                        if not _WORLD.has_component(me, Inventory):
-                            _WORLD.add_component(me, Inventory())
-                        inventory = _WORLD.component_for_entity(me, Inventory)
-                        inventory.objects[obj_name] = pick.skeleton
-                        print(f'Picked {obj_name}. My inventory: {inventory.objects}')
-                        return True
+                        # Wait for reply
+                        response = yield reply_channel.get()
+                        if response.get('success', False):
+                            success = True
+                            # Add removed component to my inventory
+                            if not _WORLD.has_component(me, Inventory):
+                                _WORLD.add_component(me, Inventory())
+                            inventory = _WORLD.component_for_entity(me, Inventory)
+                            inventory.objects[obj_name] = pick.skeleton
+                            msg = f'Picked {obj_name}. My inventory: {inventory.objects}'
+                        else:
+                            success = False
+                            msg = response.get('msg', '')
                     else:
-                        print(f'Pickable {obj_name} too heavy. Max weight:{claw.max_weight}. Object weight: {pick.weight}')
+                        msg = f'Pickable {obj_name} too heavy. Max weight:{claw.max_weight}. Object weight: {pick.weight}'
+                        success = False
                 else:
-                    print(f'Pickable {obj_name} not within claw range!')
+                    msg = f'Pickable {obj_name} not within claw range!'
+                    success = False
+    response = RESPONSE_ClawPayload(op=ClawOps.GRAB, ent=me, success=success, msg=msg)
+    event_to_put = EVENT(ClawDoneTag, response)
+    _EVENT_STORE.put(event_to_put)
+    return success, msg
 
 
 def _drop_object(obj_name, me):
@@ -95,4 +116,10 @@ def _drop_object(obj_name, me):
         skeleton,
         drop_offset
     )
-    _EVENT_STORE.put(EVENT(ObjectManager.MANAGER_TAG, drop_payload))
+    _EVENT_STORE.put(EVENT(ObjectManager.ManagerTag, drop_payload))
+
+def grabInstruction(ent: int, args: List[str], script: Script, event_store: FilterStore) -> States:
+    _ENV.process(pick_object(obj_name=args[0], me=ent))
+    script.state = States.BLOQUED
+    script.expecting.append(ClawDoneTag)
+    return script.state

@@ -16,7 +16,8 @@ from systems.ScriptEventsDES import init
 
 extra_instructions = [
     (gotoProcessor.GotoInstructionId, gotoProcessor.goInstruction),
-    (mapProcessor.MapInstructionId, mapProcessor.mapInstruction)
+    (mapProcessor.MapInstructionId, mapProcessor.mapInstruction),
+    (ClawProcessor.GrabInstructionTag, ClawProcessor.grabInstruction)
 ]
 ScriptProcessor = init(extra_instructions)
 

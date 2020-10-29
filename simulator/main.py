@@ -16,7 +16,7 @@ from components.Map import Map
 from components.Script import Script
 from components.Inventory import Inventory
 
-EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
+EVENT = NamedTuple('Event', type=str, payload=object)
 
 
 class Simulator:

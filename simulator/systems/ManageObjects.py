@@ -1,6 +1,6 @@
 from typing import NamedTuple, Tuple
 from enum import Enum
-from simpy import FilterStore
+from simpy import FilterStore, Store
 from esper import World
 from pyglet.graphics import Batch
 
@@ -16,10 +16,10 @@ class ObjectManagerOps(Enum):
     RECREATE = 'recreate'
 
 
-GrabPayload = NamedTuple('GrabPayload', [('object', str), ('op', str)])
+GrabPayload = NamedTuple('GrabPayload', object=str, op=str, reply_channel=Store)
 DropPayload = NamedTuple('DropPayload', [('object', str), ('op', str), ('skeleton', any), ('new_position', Tuple[float, float])])
 
-MANAGER_TAG = 'ManagerEventTag'
+ManagerTag = 'ManagerEventTag'
 
 __event_store: FilterStore
 __world: World
@@ -40,10 +40,12 @@ def process(kwargs):
         raise Exception("Can't find eventStore")
 
     while True:
-        event = yield __event_store.get(lambda ev: ev.type == MANAGER_TAG)
+        event = yield __event_store.get(lambda ev: ev.type == ManagerTag)
         payload = event.payload
+        print(f'Object Manager received event {event}')
         if payload.op == ObjectManagerOps.REMOVE:
-            remove_entity(payload.object)
+            success, msg = remove_entity(payload.object)
+            payload.reply_channel.put({'success': success, 'msg': msg})
         if payload.op == ObjectManagerOps.RECREATE:
             recreate_entity(payload.object, payload.skeleton, payload.new_position)
 
@@ -54,17 +56,16 @@ def remove_entity(obj_name):
     # To prevent race conditions if many robots try to pick up the same thing
     global_inventory = __world.component_for_entity(1, Inventory).objects
     if obj_name not in global_inventory:
-        print(f'This object does not belong to the global_inventory.')
-        return False
+        return False, 'This object does not belong to the global_inventory.'
     ent = global_inventory[obj_name]
     del global_inventory[obj_name]
     if not __world.has_component(ent, Renderable):
-        return True
+        return True, ''
     r = __world.component_for_entity(ent, Renderable)
     if r.is_primitive:
         r.sprite.delete()
     __world.delete_entity(ent)
-    return True
+    return True, ''
 
 
 def recreate_entity(obj_name, skeleton, newpos):
