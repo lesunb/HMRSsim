@@ -19,5 +19,7 @@ class Script:
         self.expecting = []
 
     def __str__(self):
-        sep = '\n'
-        return f'Script[{self.curr_instruction}/{len(self.instructions)} - {self.state}]:\n{sep.join(self.instructions)}'
+        r = f'Script[{self.curr_instruction}/{len(self.instructions)} - {self.state}]:\n'
+        r += '\n'.join(self.instructions)
+        r += '\n' + ("-" * 10)
+        return r

@@ -30,6 +30,7 @@ ClawTag = 'ClawAction'
 ClawDoneTag = 'ClawAttemptComplete'
 
 GrabInstructionTag = 'Grab'
+DropInstructionTag = 'Drop'
 
 _EVENT_STORE: FilterStore
 _WORLD: World
@@ -52,7 +53,7 @@ def process(kwargs):
         if op == ClawOps.GRAB:
             pick_object(event.payload.obj, event.payload.me)
         elif op == ClawOps.DROP:
-            _drop_object(event.payload.obj, event.payload.me)
+            drop_object(event.payload.obj, event.payload.me)
 
 
 def pick_object(obj_name: str, me: int):
@@ -103,23 +104,43 @@ def pick_object(obj_name: str, me: int):
     return success, msg
 
 
-def _drop_object(obj_name, me):
+def drop_object(obj_name, me):
     pos = _WORLD.component_for_entity(me, Position)
     inventory = _WORLD.component_for_entity(me, Inventory)
     skeleton = inventory.objects.get(obj_name, None)
+    success: bool = False
+    msg: str = "Something went wrong"
     if skeleton is None:
-        print(f'Not holding object {obj_name}')
-    drop_offset = (pos.center[0], pos.center[1] + pos.h)
-    drop_payload = ObjectManager.DropPayload(
-        obj_name,
-        ObjectManager.ObjectManagerOps.RECREATE,
-        skeleton,
-        drop_offset
-    )
-    _EVENT_STORE.put(EVENT(ObjectManager.ManagerTag, drop_payload))
+        msg = f'Not holding object {obj_name}'
+    else:
+        reply_channel = Store(_ENV)
+        drop_offset = (pos.center[0], pos.center[1] + pos.h)
+        drop_payload = ObjectManager.DropPayload(
+            obj_name,
+            ObjectManager.ObjectManagerOps.RECREATE,
+            skeleton,
+            drop_offset,
+            reply_channel
+        )
+        _EVENT_STORE.put(EVENT(ObjectManager.ManagerTag, drop_payload))
+        # Wait for reply
+        response = yield reply_channel.get()
+        if response.get('success', False):
+            success = True
+            msg = ''
+    response = RESPONSE_ClawPayload(op=ClawOps.DROP, ent=me, success=success, msg=msg)
+    event_to_put = EVENT(ClawDoneTag, response)
+    _EVENT_STORE.put(event_to_put)
+    return success, msg
 
 def grabInstruction(ent: int, args: List[str], script: Script, event_store: FilterStore) -> States:
     _ENV.process(pick_object(obj_name=args[0], me=ent))
+    script.state = States.BLOQUED
+    script.expecting.append(ClawDoneTag)
+    return script.state
+
+def dropInstrution(ent: int, args: List[str], script: Script, event_store: FilterStore) -> States:
+    _ENV.process(drop_object(obj_name=args[0], me=ent))
     script.state = States.BLOQUED
     script.expecting.append(ClawDoneTag)
     return script.state

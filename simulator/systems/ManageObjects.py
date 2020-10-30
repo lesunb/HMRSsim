@@ -17,7 +17,7 @@ class ObjectManagerOps(Enum):
 
 
 GrabPayload = NamedTuple('GrabPayload', object=str, op=str, reply_channel=Store)
-DropPayload = NamedTuple('DropPayload', [('object', str), ('op', str), ('skeleton', any), ('new_position', Tuple[float, float])])
+DropPayload = NamedTuple('DropPayload', object=str, op=str, skeleton=any, new_position=Tuple[float, float], reply_channel=Store)
 
 ManagerTag = 'ManagerEventTag'
 
@@ -47,7 +47,9 @@ def process(kwargs):
             success, msg = remove_entity(payload.object)
             payload.reply_channel.put({'success': success, 'msg': msg})
         if payload.op == ObjectManagerOps.RECREATE:
-            recreate_entity(payload.object, payload.skeleton, payload.new_position)
+            success, msg = recreate_entity(payload.object, payload.skeleton, payload.new_position)
+            payload.reply_channel.put({'success': success, 'msg': msg})
+
 
 
 def remove_entity(obj_name):
@@ -85,3 +87,4 @@ def recreate_entity(obj_name, skeleton, newpos):
         __world.add_component(new_ent, c)
     global_inventory = __world.component_for_entity(1, Inventory).objects
     global_inventory[obj_name] = new_ent
+    return True, ''

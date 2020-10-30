@@ -17,9 +17,10 @@ from systems.ScriptEventsDES import init
 extra_instructions = [
     (gotoProcessor.GotoInstructionId, gotoProcessor.goInstruction),
     (mapProcessor.MapInstructionId, mapProcessor.mapInstruction),
-    (ClawProcessor.GrabInstructionTag, ClawProcessor.grabInstruction)
+    (ClawProcessor.GrabInstructionTag, ClawProcessor.grabInstruction),
+    (ClawProcessor.DropInstructionTag, ClawProcessor.dropInstrution)
 ]
-ScriptProcessor = init(extra_instructions)
+ScriptProcessor = init(extra_instructions, [ClawProcessor.ClawDoneTag])
 
 from main import Simulator, EVENT
 

@@ -13,9 +13,11 @@ ExecutePayload = NamedTuple('ExecuteScriptInstructionPayload', [('ent', int)])
 ExecuteInstructionTag = 'ExecuteInstruction'
 
 ExtraInstruction = Tuple[str, Callable[[int, List[str], scriptComponent.Script, FilterStore], scriptComponent.States]]
-def init(extra_instructions: List[ExtraInstruction]):
+def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
     instruction_set = {t[0]: t[1] for t in extra_instructions}
+    watchlist = [ExecuteInstructionTag, EndOfPathTag] + watch_list
     print(f'My instruction set: {instruction_set}')
+    print(f'My Whatchlist: {watchlist}')
 
     def process(kwargs):
         # Init
@@ -39,7 +41,6 @@ def init(extra_instructions: List[ExtraInstruction]):
             return script.state
 
         # Now we keep checking for pending events and executing them
-        watchlist = [ExecuteInstructionTag, EndOfPathTag]
         while True:
             ev = yield __event_store.get(lambda e: e.type in watchlist)
             payload = ev.payload
@@ -58,20 +59,18 @@ def init(extra_instructions: List[ExtraInstruction]):
                     payload = ExecutePayload(payload.ent)
                     new_event = EVENT(ExecuteInstructionTag, payload)
                     __event_store.put(new_event)
-            elif ev.type == EndOfPathTag:
-                ent, timestamp = payload
+            else:
+                ent = payload.ent
+                print(f'[ScriptSystem] Got event {ev.type} for ent {ent}')
                 if ev.type not in script.expecting:
                     print(f'WARN - Was not expecting {ev.type}')
                 else:
-                    script.expecting.remove(EndOfPathTag)
+                    script.expecting.remove(ev.type)
                     if not script.expecting:
                         r = unblockEntity(ent, script)
                         if r == scriptComponent.States.READY:
                             payload = ExecutePayload(ent=ent)
                             new_event = EVENT(ExecuteInstructionTag, payload)
                             __event_store.put(new_event)
-
-            else:
-                print(f'Got event {ev.type}')
 
     return process
