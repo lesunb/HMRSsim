@@ -12,7 +12,7 @@ class MovementProcessor(esper.Processor):
         self.maxx = maxx
         self.maxy = maxy
 
-    def process(self, dt):
+    def process(self, env):
         # This will iterate over every Entity that has BOTH of these components:
         for ent, (vel, pos) in self.world.get_components(Velocity, Position):
             # Update the Renderable Component's position by it's Velocity:
@@ -27,5 +27,6 @@ class MovementProcessor(esper.Processor):
                 new_y = min(self.maxy - pos.h, new_y)
                 pos.x = new_x
                 pos.y = new_y
+                pos.center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
             else:
-                pos.changed = False
+                pos.changed = False or pos.changed

@@ -3,3 +3,6 @@ class Velocity:
         self.x = x
         self.y = y
         self.alpha = alpha
+
+    def __str__(self):
+        return "Velocity Component"
