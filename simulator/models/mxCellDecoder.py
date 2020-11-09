@@ -5,6 +5,7 @@ from typing import Tuple
 
 import utils.helpers as helpers
 from . import Wall, WallCorner, WallU, Room, Shape
+from components.Skeleton import Skeleton
 
 
 def parse_mxCell(el, batch, windowOptions):
@@ -31,6 +32,8 @@ def parse_mxCell(el, batch, windowOptions):
         obj = obj[0:2]
     # Adds the cell id before returning
     obj[1]['id'] = el.attrib['id']
+    pos = obj[0][0]
+    obj[0].append(Skeleton(id=el.attrib['id'], style=el.attrib['style']))
     return obj
 
 
@@ -38,4 +41,5 @@ def parse_object(el, batch, windowOptions):
     windowSize, lineWidth = windowOptions
     obj = Shape.from_object(el, batch, windowSize, lineWidth)
     obj[1]['id'] = el.attrib['id']
+    obj[0].append(Skeleton(id=el.attrib['id'], style=el[0].attrib['style'], value=el.attrib.get('label', '')))
     return obj

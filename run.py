@@ -14,6 +14,8 @@ import systems.ManageObjects as ObjectManager
 import systems.ClawDESProcessor as ClawProcessor
 from systems.ScriptEventsDES import init
 
+import systems.SeerPlugin as Seer
+
 extra_instructions = [
     (gotoProcessor.GotoInstructionId, gotoProcessor.goInstruction),
     (mapProcessor.MapInstructionId, mapProcessor.mapInstruction),
@@ -48,7 +50,8 @@ des_processors = [
     gotoProcessor.process,
     mapProcessor.process,
     energySystem.process,
-    ScriptProcessor
+    ScriptProcessor,
+    Seer.process
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:
