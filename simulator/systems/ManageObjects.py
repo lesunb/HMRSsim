@@ -10,6 +10,7 @@ from components.Pickable import Pickable
 
 from models.mxCellDecoder import parse_object
 
+import logging
 
 class ObjectManagerOps(Enum):
     REMOVE = 'remove'
@@ -36,13 +37,14 @@ def process(kwargs):
     __world = kwargs.get('WORLD', None)
     __batch = kwargs.get('BATCH', None)
     __window_options = kwargs.get('WINDOW_OPTIONS', None)
+    logger = logging.getLogger(__name__)
     if __event_store is None:
         raise Exception("Can't find eventStore")
 
     while True:
         event = yield __event_store.get(lambda ev: ev.type == ManagerTag)
         payload = event.payload
-        print(f'Object Manager received event {event}')
+        logger.debug(f'Object Manager received event {event}')
         if payload.op == ObjectManagerOps.REMOVE:
             success, msg = remove_entity(payload.object)
             payload.reply_channel.put({'success': success, 'msg': msg})

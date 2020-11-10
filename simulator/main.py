@@ -7,6 +7,9 @@ import simpy
 import pathlib
 import pyglet
 import esper
+import logging
+import logging.config
+import yaml
 
 from typing import NamedTuple
 
@@ -15,6 +18,12 @@ import map_parser
 from components.Map import Map
 from components.Script import Script
 from components.Inventory import Inventory
+
+fileName = pathlib.Path.cwd().joinpath('loggerConfig.yml')
+stream = open(fileName)
+loggerConfig = yaml.safe_load(stream)
+logging.config.dictConfig(loggerConfig)
+logger = logging.getLogger(__name__)
 
 EVENT = NamedTuple('Event', type=str, payload=object)
 
@@ -47,19 +56,18 @@ class Simulator:
         # Global inventory
         self.interactive = self.world.component_for_entity(1, Inventory).objects
 
-        print(f"==> Simulation objects")
+        logger.info(f"==> Simulation objects")
         for oid, objId in self.objects:
             entity = self.draw2ent.get(objId)
-            print(f"OBJ #{oid} (draw {objId}). Type {entity[1]['type']}")
-            # print(f"Object has components {world.components_for_entity(oid)}")
+            logger.info(f"OBJ #{oid} (draw {objId}). Type {entity[1]['type']}")
             if self.world.has_component(oid, Map):
                 ent_map = self.world.component_for_entity(oid, Map)
-                print("\tAvailable paths:")
+                logger.info("\tAvailable paths:")
                 for idx, key in enumerate(ent_map.paths.keys()):
-                    print(f"\t{idx}. {key}")
+                    logger.info(f"\t{idx}. {key}")
             if self.world.has_component(oid, Script):
                 script = self.world.component_for_entity(oid, Script)
-                print(script)
+                logger.info(script)
 
         self.EXIT = False
         self.ENV = simpy.Environment()

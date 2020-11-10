@@ -1,4 +1,5 @@
 import esper
+import logging
 from random import choice
 from collision import Vector, collide
 from components.Velocity import Velocity
@@ -14,6 +15,7 @@ EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
 class CollisionProcessor(esper.Processor):
     def __init__(self):
         super().__init__()
+        self.logger = logging.getLogger(__name__)
 
     def process(self, kwargs):
         eventStore = kwargs.get('EVENT_STORE', None)
@@ -34,13 +36,13 @@ class CollisionProcessor(esper.Processor):
                     vel.x = 0
                     vel.y = 0
                     vel.alpha = 0
-                    # print(choice(COLORS) +
+                    # self.logger.debug(choice(COLORS) +
                     #       f'colision detected between {ent} and {otherEnt}')
                     if eventStore:
                         if col.event_tag == 'genericColision':
-                            print(f'Collision! {ent} - {otherEnt}')
+                            self.logger.debug(f'Collision! {ent} - {otherEnt}')
                         event = EVENT(col.event_tag, (ent, otherEnt))
-                        # print(f'Firing event ent --> otherEnt: {event}')
+                        # self.logger.debug(f'Firing event ent --> otherEnt: {event}')
                         eventStore.put(event)
 
     @staticmethod

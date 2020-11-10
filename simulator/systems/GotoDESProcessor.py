@@ -1,4 +1,6 @@
 import esper
+import logging
+
 from typing import NamedTuple, List
 from simpy import FilterStore
 
@@ -16,6 +18,7 @@ GotoInstructionId = 'Go'
 
 
 def process(kwargs):
+    logger = logging.getLogger(__name__)
     event_store = kwargs.get('EVENT_STORE', None)
     world = kwargs.get('WORLD', None)
     if event_store is None:
@@ -33,7 +36,7 @@ def process(kwargs):
         entity_pos = world.component_for_entity(payload.entity, Position)
         source = (entity_pos.x, entity_pos.y)
         if target == source:
-            print("WARN - Already at destination")
+            logger.warning("WARN - Already at destination")
         # Now we create a path and add it to the entity
         new_path = Path([source, target])
         world.add_component(payload.entity, new_path)

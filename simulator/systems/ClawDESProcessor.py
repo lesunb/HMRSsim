@@ -16,6 +16,7 @@ from collision import collide
 from primitives import Ellipse
 from utils import helpers
 
+import logging
 import systems.ManageObjects as ObjectManager
 
 
@@ -44,12 +45,13 @@ def process(kwargs):
     _EVENT_STORE = kwargs.get('EVENT_STORE', None)
     _WORLD = kwargs.get('WORLD', None)
     _ENV = kwargs.get('ENV', None)
+    logger = logging.getLogger(__name__)
     if _EVENT_STORE is None:
         raise Exception("Can't find eventStore")
     while True:
         event = yield _EVENT_STORE.get(lambda ev: ev.type == ClawTag)
         op = event.payload.op
-        print(f'Claw Received op {op}')
+        logger.debug(f'Claw Received op {op}')
         if op == ClawOps.GRAB:
             pick_object(event.payload.obj, event.payload.me)
         elif op == ClawOps.DROP:

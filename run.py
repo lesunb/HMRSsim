@@ -1,4 +1,3 @@
-import pyglet
 import sys
 
 from systems.MovementProcessor import MovementProcessor
@@ -13,6 +12,7 @@ import systems.EnergyConsumptionDESProcessor as energySystem
 import systems.ManageObjects as ObjectManager
 import systems.ClawDESProcessor as ClawProcessor
 from systems.ScriptEventsDES import init
+from main import Simulator, EVENT
 
 import systems.SeerPlugin as Seer
 
@@ -24,7 +24,6 @@ extra_instructions = [
 ]
 ScriptProcessor = init(extra_instructions, [ClawProcessor.ClawDoneTag])
 
-from main import Simulator, EVENT
 
 # Create a simulation with config
 simulator = Simulator(sys.argv[1])
@@ -58,28 +57,6 @@ for p in normal_processors:
     simulator.add_system(p)
 for p in des_processors:
     simulator.add_DES_system(p)
-
-# pyglet related stuff
-KEYS = pyglet.window.key
-buff = []
-@window.event
-def on_text(text):
-    pass
-
-@window.event
-def on_key_press(key, mod):
-    if key == KEYS.P:
-        print('Removing')
-        payload = ClawProcessor.GRAB_ClawPayload(ClawProcessor.ClawOps.GRAB, 'medicine', 2)
-        event = EVENT(ClawProcessor.ClawTag, payload)
-        eventStore.put(event)
-    if key == KEYS.D:
-        print('Re-creating')
-        payload = ClawProcessor.GRAB_ClawPayload(ClawProcessor.ClawOps.DROP, 'medicine', 2)
-        event = EVENT(ClawProcessor.ClawTag, payload)
-
-        eventStore.put(event)
-
 
 @window.event
 def on_draw():

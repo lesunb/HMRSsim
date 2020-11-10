@@ -1,5 +1,7 @@
 import importlib
 import os
+import logging
+
 
 available_components = {}
 # Changes dir to the components directory
@@ -14,7 +16,8 @@ for component in os.listdir('./components'):
 
 
 def init_component(component_name, args):
-    print(f'Initing component {component_name} with values {args}')
+    logger = logging.getLogger(__name__)
+    logger.info(f'Initing component {component_name} with values {args}')
     if component_name not in available_components:
         raise Exception(f"Component {component_name} is not available")
     module = available_components[component_name]

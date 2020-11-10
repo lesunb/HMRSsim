@@ -1,3 +1,5 @@
+import logging
+
 from typing import NamedTuple, List
 
 from simpy import FilterStore
@@ -15,6 +17,7 @@ MapEventTag = 'MapEvent'
 MapInstructionId = 'Map'
 
 def process(kwargs):
+    logger = logging.getLogger(__name__)
     event_store = kwargs.get('EVENT_STORE', None)
     world = kwargs.get('WORLD', None)
     if event_store is None:
@@ -28,11 +31,11 @@ def process(kwargs):
         entity_map = world.component_for_entity(payload.entity, Map)
         path_to_follow = entity_map.paths.get(payload.route, None)
         if path_to_follow is None:
-            print(f"Path {payload.route} not found!")
+            logger.debug(f"Path {payload.route} not found!")
             continue
         path_component = Path(points=path_to_follow)
-        # print(f"Path to follow is {path_to_follow} ({isinstance(path_component, Path)})")
-        print(f"Adding path {payload.route} to entity {payload.entity}")
+        # logger.debug(f"Path to follow is {path_to_follow} ({isinstance(path_component, Path)})")
+        logger.debug(f"Adding path {payload.route} to entity {payload.entity}")
         world.add_component(payload.entity, path_component)
 
 # Functions that handle instructions
