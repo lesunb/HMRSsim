@@ -15,6 +15,7 @@ from components.Path import Path
 from components.Map import Map
 from components.Inventory import Inventory
 from components.Pickable import Pickable
+from components.Skeleton import Skeleton
 
 
 def build_simulation_from_map(file, line_width=10):
@@ -42,6 +43,8 @@ def build_simulation_from_map(file, line_width=10):
     simulation = world.create_entity()  # Simulation is always the first entity
     draw_map, objects, interactive = build_simulation_objects(content_root, batch, world, ((width, height), line_width))
     world.add_component(simulation, Inventory(interactive))
+    skeleton_style = "{{\"width\":{:d},\"height\":{:d}}}".format(width, height)
+    world.add_component(simulation, Skeleton(id=window_name, style=skeleton_style, model=True))
     return {
         'world': world,
         'window': window,

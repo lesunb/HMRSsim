@@ -1,4 +1,5 @@
 import sys
+import json
 
 from systems.MovementProcessor import MovementProcessor
 from systems.CollisionProcessor import CollisionProcessor
@@ -34,6 +35,14 @@ eventStore = simulator.KWARGS['EVENT_STORE']
 exitEvent = simulator.EXIT_EVENT
 env = simulator.ENV
 
+
+def my_seer_consumer():
+    with open('report.json', 'w') as fd:
+        while True:
+            message = Seer.message_buffer.get()
+            fd.write(json.dumps(message) + '\n')
+            Seer.message_buffer.task_done()
+
 # Defines and initializes esper.Processor for the simulation
 normal_processors = [
     MovementProcessor(minx=0, miny=0, maxx=width, maxy=height),
@@ -50,7 +59,7 @@ des_processors = [
     mapProcessor.process,
     energySystem.process,
     ScriptProcessor,
-    Seer.process
+    Seer.init(my_seer_consumer, 0.5)
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:
