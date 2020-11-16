@@ -2,7 +2,7 @@ import threading
 import logging
 import json
 from queue import Queue
-from typing import Callable
+from typing import Callable, List
 
 from simpy import Environment
 from esper import World
@@ -13,17 +13,20 @@ from components.Position import Position
 message_buffer = Queue()
 
 
-def default_consumer():
+def consumer_manager(consumers: List[Callable], also_log=False):
     logger = logging.getLogger(__name__ + '.consumer')
     while True:
         message = message_buffer.get()  # Blocking function
-        logger.info(message)
+        if also_log:
+            logger.info(message)
+        for c in consumers:
+            c(message)
         message_buffer.task_done()
 
 
-def init(consumer: Callable, scan_interval: float):
+def init(consumers: List[Callable], scan_interval: float):
     # Init consumer thread
-    threading.Thread(target=consumer, daemon=True).start()
+    threading.Thread(target=consumer_manager, args=[consumers, True], daemon=True).start()
     # The producer thread
 
     def process(kwargs):
