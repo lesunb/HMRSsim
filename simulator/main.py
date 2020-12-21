@@ -19,7 +19,7 @@ from components.Map import Map
 from components.Script import Script
 from components.Inventory import Inventory
 
-fileName = pathlib.Path.cwd().joinpath('simulator/loggerConfig.yml')
+fileName = pathlib.Path.cwd().joinpath('loggerConfig.yml')
 stream = open(fileName)
 loggerConfig = yaml.safe_load(stream)
 logging.config.dictConfig(loggerConfig)

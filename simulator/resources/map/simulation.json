@@ -1,5 +1,5 @@
 {
-    "context": "simulator/resources/map",
+    "context": "resources/map",
     "map": "hospital_scenario.drawio",
     "FPS": 60,
     "DLW": 10

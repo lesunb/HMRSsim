@@ -5,7 +5,7 @@ import logging
 
 available_components = {}
 # Changes dir to the components directory
-for component in os.listdir('simulator/components'):
+for component in os.listdir('./components'):
     file_name, extension = os.path.splitext(component)
     if not extension == '.py':
         continue
