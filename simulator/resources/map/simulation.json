@@ -2,5 +2,6 @@
     "context": "resources/map",
     "map": "hospital_scenario.drawio",
     "FPS": 60,
-    "DLW": 10
+    "DLW": 10,
+    "duration": 7
 }

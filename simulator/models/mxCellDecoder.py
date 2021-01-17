@@ -7,7 +7,8 @@ import utils.helpers as helpers
 from . import Wall, WallCorner, WallU, Room, Shape
 from components.Skeleton import Skeleton
 
-
+# TODO: Make this method extensible with new parser funtions for different shapes
+# Hold parse functions on a dict
 def parse_mxCell(el, batch, windowOptions):
     """ Parses an mxCell extracted from .drawio XML (the simulation map)
         TODO: Complete description...

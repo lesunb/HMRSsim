@@ -3,7 +3,6 @@ import json
 
 from systems.MovementProcessor import MovementProcessor
 from systems.CollisionProcessor import CollisionProcessor
-from systems.RenderProcessor import RenderProcessor
 from systems.PathProcessor import PathProcessor
 
 import systems.GotoDESProcessor as gotoProcessor
@@ -25,17 +24,24 @@ extra_instructions = [
 ]
 ScriptProcessor = init(extra_instructions, [ClawProcessor.ClawDoneTag])
 
+# File to output the report
+fd = open('report.json', 'w')
+# Clean up function to be executed after the simulation exists
+
+
+def clean():
+    fd.close()
+    print("Closed fd.")
+
 
 # Create a simulation with config
-simulator = Simulator(sys.argv[1])
+simulator = Simulator(sys.argv[1], clean)
 # Some simulator objects
 width, height = simulator.window_dimensions
 window = simulator.window
 eventStore = simulator.KWARGS['EVENT_STORE']
 exitEvent = simulator.EXIT_EVENT
 env = simulator.ENV
-# File to output the report
-fd = open('report.json', 'w')
 
 
 def my_seer_consumer(message):
@@ -46,7 +52,6 @@ def my_seer_consumer(message):
 normal_processors = [
     MovementProcessor(minx=0, miny=0, maxx=width, maxy=height),
     CollisionProcessor(),
-    RenderProcessor(),
     PathProcessor()
 ]
 # Defines DES processors
@@ -58,7 +63,7 @@ des_processors = [
     mapProcessor.process,
     energySystem.process,
     ScriptProcessor,
-    Seer.init([my_seer_consumer], 0.5)
+    Seer.init([my_seer_consumer], 0.5, True)
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:

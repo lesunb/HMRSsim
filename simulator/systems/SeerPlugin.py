@@ -13,7 +13,7 @@ from components.Position import Position
 message_buffer = Queue()
 
 
-def consumer_manager(consumers: List[Callable], also_log=False):
+def consumer_manager(consumers: List[Callable], also_log: bool):
     logger = logging.getLogger(__name__ + '.consumer')
     while True:
         message = message_buffer.get()  # Blocking function
@@ -24,9 +24,10 @@ def consumer_manager(consumers: List[Callable], also_log=False):
         message_buffer.task_done()
 
 
-def init(consumers: List[Callable], scan_interval: float):
+def init(consumers: List[Callable], scan_interval: float, also_log=False):
     # Init consumer thread
-    threading.Thread(target=consumer_manager, args=[consumers, True], daemon=True).start()
+    threading.Thread(target=consumer_manager, args=[consumers, also_log], daemon=True).start()
+
     # The producer thread
 
     def process(kwargs):
@@ -49,6 +50,7 @@ def init(consumers: List[Callable], scan_interval: float):
         }
         message_buffer.put(base)
         # Scan simulation situation every scan_interval seconds and report
+        last_round: dict = {}
         while True:
             yield env.timeout(scan_interval)
 
@@ -61,7 +63,8 @@ def init(consumers: List[Callable], scan_interval: float):
                 # Or if any of them is missing (was deleted)
                 if ent == 1:  # Entity 1 is the entire model
                     continue
-                if not position.changed:
+                elif last_round.get(ent, (0, None))[0] != 0 and not position.changed:
+                    last_round[ent] = (2, skeleton.id)
                     continue
 
                 data = {
@@ -74,6 +77,17 @@ def init(consumers: List[Callable], scan_interval: float):
                 }
 
                 new_message[skeleton.id] = data
+                last_round[ent] = (2, skeleton.id)
+                position.changed = False
+            # Check for deleted entities
+            deleted = []
+            for k, v in last_round.items():
+                if v[0] == 2:
+                    last_round[k] = (1, v[1])
+                elif v[0] == 1:
+                    deleted.append(v[1])
+                    last_round[k] = (0, v[1])
+            new_message['deleted'] = deleted
             # Add message to queue
             message_buffer.put(new_message)
 

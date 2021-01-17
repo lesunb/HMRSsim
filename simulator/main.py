@@ -33,7 +33,7 @@ class Simulator:
     class Simulator abstracts the simulator and its controls.
     Simulations are defined via config objects, which is a json file.
     """
-    def __init__(self, config=None):
+    def __init__(self, config=None, cleanup=lambda: print("Simulator Exited")):
         """
         Loads simulation parameters from config.
         Creates simulation objects from map, populating them with components.
@@ -81,6 +81,7 @@ class Simulator:
             "BATCH": self.batch,
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
+        self.cleanup = cleanup
 
     def add_DES_system(self, system):
         """
@@ -106,14 +107,14 @@ class Simulator:
         """
         # Other processors
         while not self.EXIT:
-            pyglet.clock.tick()
+            # pyglet.clock.tick()
             self.world.process(self.KWARGS)
             # For many windows
-            for w in pyglet.app.windows:
-                w.switch_to()
-                w.dispatch_events()
-                w.dispatch_event('on_draw')
-                w.flip()
+            # for w in pyglet.app.windows:
+            #     w.switch_to()
+            #     w.dispatch_events()
+            #     w.dispatch_event('on_draw')
+            #     w.flip()
             # ticks on the clock
             if self.KWARGS["_KILLSWITCH"] is not None:
                 switch = yield self.KWARGS["_KILLSWITCH"] | self.ENV.timeout(1.0 / self.FPS, False)
@@ -133,3 +134,4 @@ class Simulator:
         else:
             self.ENV.process(self.simulation_loop())
             self.ENV.run(until=self.EXIT_EVENT)
+        self.cleanup()
