@@ -26,9 +26,9 @@ ScriptProcessor = init(extra_instructions, [ClawProcessor.ClawDoneTag])
 
 # File to output the report
 fd = open('report.json', 'w')
+
+
 # Clean up function to be executed after the simulation exists
-
-
 def clean():
     fd.close()
     print("Closed fd.")
@@ -38,7 +38,7 @@ def clean():
 simulator = Simulator(sys.argv[1], clean)
 # Some simulator objects
 width, height = simulator.window_dimensions
-window = simulator.window
+# window = simulator.window
 eventStore = simulator.KWARGS['EVENT_STORE']
 exitEvent = simulator.EXIT_EVENT
 env = simulator.ENV
@@ -72,20 +72,20 @@ for p in des_processors:
     simulator.add_DES_system(p)
 
 
-@window.event
-def on_draw():
-    # Clear the window to background color
-    window.clear()
-    # Draw the batch of Renderables:
-    simulator.batch.draw()
-
-
-@window.event
-def on_close():
-    global EXIT
-    print(f'Exiting from window')
-    EXIT = False
-    exitEvent.succeed()
+# @window.event
+# def on_draw():
+#     # Clear the window to background color
+#     window.clear()
+#     # Draw the batch of Renderables:
+#     simulator.batch.draw()
+#
+#
+# @window.event
+# def on_close():
+#     global EXIT
+#     print(f'Exiting from window')
+#     EXIT = False
+#     exitEvent.succeed()
 
 
 if __name__ == "__main__":

@@ -12,10 +12,12 @@ from components.BatteryComponent import Battery
 from utils.helpers import parse_style, translate_coordinates
 
 
-def from_object(el, batch, windowSize, lineWidth=10):
+# def from_object(el, batch, windowSize, lineWidth=10):
+def from_object(el, windowSize, lineWidth=10):
     options = el.attrib
 
-    components, style, draw = from_mxCell(el[0], batch, windowSize, lineWidth)
+    # components, style, draw = from_mxCell(el[0], windowSize, lineWidth)
+    components, style = from_mxCell(el[0], windowSize, lineWidth)
     if 'collidable' not in options:
         options['collidable'] = True
     if 'movable' not in options:
@@ -24,10 +26,10 @@ def from_object(el, batch, windowSize, lineWidth=10):
         points = json.loads(options['POI'])
         points = list(map((lambda p: translate_coordinates(p, windowSize, 0)), points))
         components.append(POI(points=points))
-    if 'label' in options and options['label'] != '':
-        pos = list(filter(lambda c: isinstance(c, Position), components))[0]
-        label = Label(label=options['label'], pos=pos.center, batch=batch)
-        components.append(label)
+    # if 'label' in options and options['label'] != '':
+    #     pos = list(filter(lambda c: isinstance(c, Position), components))[0]
+        # label = Label(label=options['label'], pos=pos.center)
+        # components.append(label)
     if 'battery' in options:
         bat_info = json.loads(options['battery'])
         bat = Battery(charge=float(bat_info['initialCharge']), lookupTable=bat_info['lookupTable'])
@@ -36,7 +38,7 @@ def from_object(el, batch, windowSize, lineWidth=10):
     options.update(style)
     pos = components[0]
     center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
-    components.append(Renderable(sprite=draw, primitive=True, center=center))
+    # components.append(Renderable(sprite=draw, primitive=True, center=center))
     if options['type'] == 'robot':
         components.append(Velocity(x=0, y=0))
     if 'collision_tag' in options:
@@ -85,8 +87,9 @@ def from_mxCell(el, batch, windowSize, lineWidth=10):
                                       batch=batch,
                                       x=center[0], y=center[1],
                                       anchor_x='center', anchor_y='center')
-    batch_draw = draw.add_to_batch(batch)
+    # batch_draw = draw.add_to_batch(batch)
     col_points = list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), col_points))
     collision_box = Poly(Vector(center[0], center[1]), col_points)
 
-    return [pos, Collidable(shape=collision_box)], style, batch_draw
+    # return [pos, Collidable(shape=collision_box)], style, batch_draw
+    return [pos, Collidable(shape=collision_box)], style

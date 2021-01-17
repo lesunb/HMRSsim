@@ -48,8 +48,8 @@ class Simulator:
 
         simulation = map_parser.build_simulation_from_map(file)
         self.world: esper.World = simulation['world']
-        self.window = simulation['window']
-        self.batch = simulation['batch']
+        # self.window = simulation['window']
+        # self.batch = simulation['batch']
         _, self.window_dimensions, _ = simulation['window_props']
         self.draw2ent = simulation['draw_map']
         self.objects = simulation['objects']
@@ -78,7 +78,7 @@ class Simulator:
             "_KILLSWITCH": self.ENV.event() if self.duration > 0 else None,
             "EVENT_STORE": simpy.FilterStore(self.ENV),
             # Pyglet specific things (for the re-create entity)
-            "BATCH": self.batch,
+            # "BATCH": self.batch,
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
         self.cleanup = cleanup
@@ -115,7 +115,7 @@ class Simulator:
             #     w.dispatch_events()
             #     w.dispatch_event('on_draw')
             #     w.flip()
-            # ticks on the clock
+            # # ticks on the clock
             if self.KWARGS["_KILLSWITCH"] is not None:
                 switch = yield self.KWARGS["_KILLSWITCH"] | self.ENV.timeout(1.0 / self.FPS, False)
                 if self.KWARGS["_KILLSWITCH"] in switch:

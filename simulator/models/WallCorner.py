@@ -6,7 +6,8 @@ from components.Position import Position
 from utils.helpers import *
 
 
-def from_mxCell(el, batch, windowSize, lineWidth=10):
+# def from_mxCell(el, batch, windowSize, lineWidth=10):
+def from_mxCell(el, windowSize, lineWidth=10):
   # Parse style
   style = parse_style(el.attrib['style'])
   if style.get('shape', "") != 'mxgraph.floorplan.wallCorner':
@@ -61,15 +62,15 @@ def from_mxCell(el, batch, windowSize, lineWidth=10):
     points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), points)
     col_points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), col_points)
     
-  drawing = primitives.Line(list(points), style)
-  drawing.add_to_batch(batch)
+  # drawing = primitives.Line(list(points), style)
+  # drawing.add_to_batch(batch)
 
-  label = el.attrib.get('value', '')
-  if label:
-    label = pyglet.text.HTMLLabel(label,
-                                  batch=batch,
-                                  x=center[0], y=center[1],
-                                  anchor_x='center', anchor_y='center')
+  # label = el.attrib.get('value', '')
+  # if label:
+  #   label = pyglet.text.HTMLLabel(label,
+  #                                 batch=batch,
+  #                                 x=center[0], y=center[1],
+  #                                 anchor_x='center', anchor_y='center')
 
   col_points = map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), col_points)
   box = Concave_Poly(Vector(center[0], center[1]), list(col_points))

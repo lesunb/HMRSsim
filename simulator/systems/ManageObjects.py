@@ -73,7 +73,7 @@ def remove_entity(obj_name):
 
 
 def recreate_entity(obj_name, skeleton, newpos):
-    new_obj = parse_object(skeleton, __batch, __window_options)
+    new_obj = parse_object(skeleton, __window_options)
     components, attributes = new_obj
     # Change position
     pos = components[0]

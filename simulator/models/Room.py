@@ -7,7 +7,8 @@ from components.Position import Position
 from utils.helpers import *
 
 
-def from_mxCell(el, batch, windowSize, lineWidth=10):
+# def from_mxCell(el, batch, windowSize, lineWidth=10):
+def from_mxCell(el, windowSize, lineWidth=10):
     # Parse style
     style = parse_style(el.attrib['style'])
     if style.get('shape', "") != 'mxgraph.floorplan.room':
@@ -68,13 +69,13 @@ def from_mxCell(el, batch, windowSize, lineWidth=10):
         points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), points)
 
     drawing = primitives.Line(list(points), style)
-    drawing.add_to_batch(batch)
+    # drawing.add_to_batch(batch)
 
-    label = el.attrib.get('value', '')
-    if label:
-        label = pyglet.text.HTMLLabel(label,
-                                      batch=batch,
-                                      x=center[0], y=center[1],
-                                      anchor_x='center', anchor_y='center')
+    # label = el.attrib.get('value', '')
+    # if label:
+    #     label = pyglet.text.HTMLLabel(label,
+    #                                   batch=batch,
+    #                                   x=center[0], y=center[1],
+    #                                   anchor_x='center', anchor_y='center')
 
     return ([pos, Collidable(shape=boxes)], style)
