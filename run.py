@@ -26,8 +26,6 @@ ScriptProcessor = init(extra_instructions, [ClawProcessor.ClawDoneTag])
 
 # File to output the report
 fd = open('report.json', 'w')
-
-
 # Clean up function to be executed after the simulation exists
 def clean():
     fd.close()
@@ -56,14 +54,14 @@ normal_processors = [
 ]
 # Defines DES processors
 des_processors = [
-    Seer.init([my_seer_consumer], 0.1, True),
-    (ClawProcessor.process,),
-    (ObjectManager.process,),
-    (StopCollision.process,),
-    (gotoProcessor.process,),
-    (mapProcessor.process,),
-    (energySystem.process,),
-    (ScriptProcessor,),
+    ClawProcessor.process,
+    ObjectManager.process,
+    StopCollision.process,
+    gotoProcessor.process,
+    mapProcessor.process,
+    energySystem.process,
+    ScriptProcessor,
+    Seer.init([my_seer_consumer], 0.5, True)
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:
