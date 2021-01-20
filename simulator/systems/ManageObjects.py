@@ -8,7 +8,7 @@ from components.Renderable import Renderable
 from components.Inventory import Inventory
 from components.Pickable import Pickable
 
-from models.mxCellDecoder import parse_object
+from mxCellDecoder import parse_object
 
 import logging
 

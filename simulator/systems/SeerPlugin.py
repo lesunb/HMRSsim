@@ -23,7 +23,7 @@ def consumer_manager(consumers: List[Callable], also_log: bool):
             c(message)
         message_buffer.task_done()
 
-
+# TODO: Add support for a custom message builder
 def init(consumers: List[Callable], scan_interval: float, also_log=False):
     # Init consumer thread
     threading.Thread(target=consumer_manager, args=[consumers, also_log], daemon=True).start()
