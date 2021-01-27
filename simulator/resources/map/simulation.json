@@ -1,7 +1,7 @@
 {
     "context": "resources/map",
-    "map": "hospital_scenario.drawio",
+    "map": "robot.drawio",
     "FPS": 60,
     "DLW": 10,
-    "duration": 7
+    "duration": 10
 }

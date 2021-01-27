@@ -17,6 +17,8 @@ def consumer_manager(consumers: List[Callable], also_log: bool):
     logger = logging.getLogger(__name__ + '.consumer')
     while True:
         message = message_buffer.get()  # Blocking function
+        if message == 'simulator finished':
+            break
         if also_log:
             logger.info(message)
         for c in consumers:
@@ -26,7 +28,10 @@ def consumer_manager(consumers: List[Callable], also_log: bool):
 # TODO: Add support for a custom message builder
 def init(consumers: List[Callable], scan_interval: float, also_log=False):
     # Init consumer thread
-    threading.Thread(target=consumer_manager, args=[consumers, also_log], daemon=True).start()
+    # TODO: Remove daemon. Handle simulator exit gracefully.
+    #  Maybe push a "END" message to the message_buffer.
+    thread = threading.Thread(target=consumer_manager, args=[consumers, also_log])
+    thread.start()
 
     # The producer thread
 
@@ -52,15 +57,11 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
         # Scan simulation situation every scan_interval seconds and report
         last_round: dict = {}
         while True:
-            yield env.timeout(scan_interval)
 
             new_message = {
                 "timestamp": env.now
             }
             for ent, (skeleton, position) in world.get_components(Skeleton, Position):
-                # TODO: keep map of entities sent on the last time?
-                # So we can see if a new one is found
-                # Or if any of them is missing (was deleted)
                 if ent == 1:  # Entity 1 is the entire model
                     continue
                 elif last_round.get(ent, (0, None))[0] != 0 and not position.changed:
@@ -90,5 +91,10 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
             new_message['deleted'] = deleted
             # Add message to queue
             message_buffer.put(new_message)
+            yield env.timeout(scan_interval)
 
-    return process
+    def clean():
+        message_buffer.put('simulator finished')
+        thread.join()
+
+    return process, clean

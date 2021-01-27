@@ -81,7 +81,7 @@ class Simulator:
             # "BATCH": self.batch,
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
-        self.cleanup = cleanup
+        self.cleanups = [cleanup]
 
     def add_DES_system(self, system):
         """
@@ -91,7 +91,9 @@ class Simulator:
         Such systems must have a generator function with the following signature:
             def process(kwargs: dict) -> None:
         """
-        self.ENV.process(system(kwargs=self.KWARGS))
+        self.ENV.process(system[0](kwargs=self.KWARGS))
+        if len(system) == 2:
+            self.cleanups.append(system[1])
 
     def add_system(self, system):
         """
@@ -109,6 +111,7 @@ class Simulator:
         while not self.EXIT:
             # pyglet.clock.tick()
             self.world.process(self.KWARGS)
+            # logger.debug(f'[ENV TIME {self.ENV.now}] Processed world.')
             # For many windows
             # for w in pyglet.app.windows:
             #     w.switch_to()
@@ -134,4 +137,6 @@ class Simulator:
         else:
             self.ENV.process(self.simulation_loop())
             self.ENV.run(until=self.EXIT_EVENT)
-        self.cleanup()
+        while self.cleanups:
+            next_function = self.cleanups.pop()
+            next_function()

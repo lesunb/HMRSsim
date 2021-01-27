@@ -56,14 +56,14 @@ normal_processors = [
 ]
 # Defines DES processors
 des_processors = [
-    ClawProcessor.process,
-    ObjectManager.process,
-    StopCollision.process,
-    gotoProcessor.process,
-    mapProcessor.process,
-    energySystem.process,
-    ScriptProcessor,
-    Seer.init([my_seer_consumer], 0.5, True)
+    Seer.init([my_seer_consumer], 0.5, True),
+    (ClawProcessor.process,),
+    (ObjectManager.process,),
+    (StopCollision.process,),
+    (gotoProcessor.process,),
+    (mapProcessor.process,),
+    (energySystem.process,),
+    (ScriptProcessor,),
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:
