@@ -29,8 +29,9 @@ def parse_style(style):
   return s
 
 def translate_coordinates(coordinates, dimens, height):
-  y = dimens[1] - coordinates[1] - height
-  return (coordinates[0], y)
+  return coordinates
+  # y = dimens[1] - coordinates[1] - height
+  # return (coordinates[0], y)
 
 def get_rel_points(center, points):
   return list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), points))

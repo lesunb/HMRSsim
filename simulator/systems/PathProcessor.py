@@ -34,7 +34,7 @@ class PathProcessor(esper.Processor):
                     vel.x = 0
                     vel.y = 0
                     # self.logger.debug("Removing Path component from", ent)
-                    pos.changed = False or pos.changed
+                    pos.changed = False # or pos.changed
                     self.world.remove_component(ent, Path)
                     # Adds an EndOfPath event, in case anyone is listening
                     end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, env.now))

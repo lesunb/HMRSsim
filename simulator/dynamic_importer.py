@@ -5,6 +5,7 @@ import logging
 
 available_components = {}
 # Changes dir to the components directory
+# TODO: Add an include option to add more component folder on simulation.json
 for component in os.listdir('./components'):
     file_name, extension = os.path.splitext(component)
     if not extension == '.py':

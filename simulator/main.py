@@ -33,7 +33,7 @@ class Simulator:
     class Simulator abstracts the simulator and its controls.
     Simulations are defined via config objects, which is a json file.
     """
-    def __init__(self, config=None):
+    def __init__(self, config=None, cleanup=lambda: print("Simulator Exited")):
         """
         Loads simulation parameters from config.
         Creates simulation objects from map, populating them with components.
@@ -48,8 +48,8 @@ class Simulator:
 
         simulation = map_parser.build_simulation_from_map(file)
         self.world: esper.World = simulation['world']
-        self.window = simulation['window']
-        self.batch = simulation['batch']
+        # self.window = simulation['window']
+        # self.batch = simulation['batch']
         _, self.window_dimensions, _ = simulation['window_props']
         self.draw2ent = simulation['draw_map']
         self.objects = simulation['objects']
@@ -78,9 +78,10 @@ class Simulator:
             "_KILLSWITCH": self.ENV.event() if self.duration > 0 else None,
             "EVENT_STORE": simpy.FilterStore(self.ENV),
             # Pyglet specific things (for the re-create entity)
-            "BATCH": self.batch,
+            # "BATCH": self.batch,
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
+        self.cleanups = [cleanup]
 
     def add_DES_system(self, system):
         """
@@ -90,7 +91,9 @@ class Simulator:
         Such systems must have a generator function with the following signature:
             def process(kwargs: dict) -> None:
         """
-        self.ENV.process(system(kwargs=self.KWARGS))
+        self.ENV.process(system[0](kwargs=self.KWARGS))
+        if len(system) == 2:
+            self.cleanups.append(system[1])
 
     def add_system(self, system):
         """
@@ -106,15 +109,16 @@ class Simulator:
         """
         # Other processors
         while not self.EXIT:
-            pyglet.clock.tick()
+            # pyglet.clock.tick()
             self.world.process(self.KWARGS)
+            # logger.debug(f'[ENV TIME {self.ENV.now}] Processed world.')
             # For many windows
-            for w in pyglet.app.windows:
-                w.switch_to()
-                w.dispatch_events()
-                w.dispatch_event('on_draw')
-                w.flip()
-            # ticks on the clock
+            # for w in pyglet.app.windows:
+            #     w.switch_to()
+            #     w.dispatch_events()
+            #     w.dispatch_event('on_draw')
+            #     w.flip()
+            # # ticks on the clock
             if self.KWARGS["_KILLSWITCH"] is not None:
                 switch = yield self.KWARGS["_KILLSWITCH"] | self.ENV.timeout(1.0 / self.FPS, False)
                 if self.KWARGS["_KILLSWITCH"] in switch:
@@ -133,3 +137,6 @@ class Simulator:
         else:
             self.ENV.process(self.simulation_loop())
             self.ENV.run(until=self.EXIT_EVENT)
+        while self.cleanups:
+            next_function = self.cleanups.pop()
+            next_function()

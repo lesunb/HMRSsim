@@ -4,11 +4,13 @@
 from typing import Tuple
 
 import utils.helpers as helpers
-from . import Wall, WallCorner, WallU, Room, Shape
 from components.Skeleton import Skeleton
+import dynamic_models
+
+available_models = dynamic_models.export_available_models()
 
 
-def parse_mxCell(el, batch, windowOptions):
+def parse_mxCell(el, windowOptions):
     """ Parses an mxCell extracted from .drawio XML (the simulation map)
         TODO: Complete description...
     """
@@ -18,18 +20,10 @@ def parse_mxCell(el, batch, windowOptions):
     windowSize, lineWidth = windowOptions
     cell_style = helpers.parse_style(el.attrib['style'])
     style = cell_style.get('shape', '')
-    obj = None
-    if style == 'mxgraph.floorplan.wallCorner':
-        obj = WallCorner.from_mxCell(el, batch, windowSize, lineWidth)
-    elif style == 'mxgraph.floorplan.wallU':
-        obj = WallU.from_mxCell(el, batch, windowSize, lineWidth)
-    elif style == 'mxgraph.floorplan.room':
-        obj = Room.from_mxCell(el, batch, windowSize, lineWidth)
-    elif style == 'mxgraph.floorplan.wall':
-        obj = Wall.from_mxCell(el, batch, windowSize, lineWidth)
+    if style in available_models:
+        obj = available_models[style].__dict__['from_mxCell'](el, windowSize, lineWidth)
     else:
-        obj = Shape.from_mxCell(el, batch, windowSize, lineWidth)
-        obj = obj[0:2]
+        obj = available_models['default'].__dict__['from_mxCell'](el, windowSize, lineWidth)
     # Adds the cell id before returning
     obj[1]['id'] = el.attrib['id']
     pos = obj[0][0]
@@ -37,9 +31,10 @@ def parse_mxCell(el, batch, windowOptions):
     return obj
 
 
-def parse_object(el, batch, windowOptions):
+# def parse_object(el, batch, windowOptions):
+def parse_object(el, windowOptions, shape='default'):
     windowSize, lineWidth = windowOptions
-    obj = Shape.from_object(el, batch, windowSize, lineWidth)
+    obj = available_models[shape].__dict__['from_object'](el, windowSize, lineWidth)
     obj[1]['id'] = el.attrib['id']
     obj[0].append(Skeleton(id=el.attrib['id'], style=el[0].attrib['style'], value=el.attrib.get('label', '')))
     return obj
