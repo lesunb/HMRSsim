@@ -32,10 +32,11 @@ def sprite(batch, image="redsquare.png", x=0, y=0):
 def mapFromDrawio(drawioxml):
     tree = ET.parse(drawioxml)
     root = tree.getroot()
-    content = root[0][0] # pegar o mxGraphModel
 
     # os elementos estarao compactados no text e a lista nao tera nenhum Element
     if len(list(root[0])) == 0: 
         content = ET.fromstring(inflate(root[0].text, True))
-   
+    else:
+        content = root[0][0] # pegar o mxGraphModel
+
     return (root[0].attrib.get('name', "Window 1"), content)
