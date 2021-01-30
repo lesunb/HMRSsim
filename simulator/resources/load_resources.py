@@ -32,5 +32,10 @@ def sprite(batch, image="redsquare.png", x=0, y=0):
 def mapFromDrawio(drawioxml):
     tree = ET.parse(drawioxml)
     root = tree.getroot()
-    content = ET.fromstring(inflate(root[0].text, True))
+    content = root[0]
+
+    # os elementos estarao compactados no text e a lista nao tera nenhum Element
+    if len(list(content)) == 0: 
+        content = ET.fromstring(inflate(content.text, True))
+    
     return (root[0].attrib.get('name', "Window 1"), content)
