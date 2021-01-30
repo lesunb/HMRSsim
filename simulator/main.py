@@ -19,7 +19,7 @@ from components.Map import Map
 from components.Script import Script
 from components.Inventory import Inventory
 
-fileName = pathlib.Path.cwd().joinpath('loggerConfig.yml')
+fileName = pathlib.Path.cwd().joinpath('simulator/loggerConfig.yml')
 stream = open(fileName)
 loggerConfig = yaml.safe_load(stream)
 logging.config.dictConfig(loggerConfig)
@@ -39,12 +39,19 @@ class Simulator:
         Creates simulation objects from map, populating them with components.
         """
         self.CONFIG = 'simulation.json' if config is None else config
-        with open(self.CONFIG) as fd:
-            config = json.load(fd)
+
+        if isinstance(config, dict):
             self.FPS = config.get('FPS', 60)
             self.DEFAULT_LINE_WIDTH = config.get('DLW', 10)
             file = pathlib.Path(config.get('context', '.')) / config.get('map', 'map.drawio')
             self.duration = config.get('duration', -1)
+        else:  # refatorar
+            with open(self.CONFIG) as fd:
+                config = json.load(fd)
+                self.FPS = config.get('FPS', 60)
+                self.DEFAULT_LINE_WIDTH = config.get('DLW', 10)
+                file = pathlib.Path(config.get('context', '.')) / config.get('map', 'map.drawio')
+                self.duration = config.get('duration', -1)
 
         simulation = map_parser.build_simulation_from_map(file)
         self.world: esper.World = simulation['world']
