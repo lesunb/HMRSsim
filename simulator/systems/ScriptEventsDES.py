@@ -18,8 +18,8 @@ def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
     logger = logging.getLogger(__name__)
     instruction_set = {t[0]: t[1] for t in extra_instructions}
     watchlist = [ExecuteInstructionTag, EndOfPathTag] + watch_list
-    logger.info(f'My instruction set: {instruction_set}')
-    logger.info(f'My Whatchlist: {watchlist}')
+    logger.debug(f'My instruction set: {instruction_set}')
+    logger.debug(f'My Whatchlist: {watchlist}')
 
     def process(kwargs):
         # Init

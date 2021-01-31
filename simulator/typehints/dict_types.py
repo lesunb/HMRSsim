@@ -2,6 +2,8 @@ import typing
 import esper
 import simpy
 
+from typehints.build_types import WindowOptions
+
 
 class SystemArgs(typing.TypedDict):
     """Type of Keyword Arguments passed to systems in the process method."""
@@ -9,6 +11,7 @@ class SystemArgs(typing.TypedDict):
     WORLD: esper.World
     _KILLSWITCH: typing.Union[simpy.Event, None]
     EVENT_STORE: simpy.FilterStore
+    WINDOW_OPTIONS: WindowOptions
 
 
 class Config(typing.TypedDict):

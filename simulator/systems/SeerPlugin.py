@@ -15,12 +15,14 @@ message_buffer = Queue()
 
 def consumer_manager(consumers: List[Callable], also_log: bool):
     logger = logging.getLogger(__name__ + '.consumer')
+    logging.addLevelName(25, 'SEER')
+    logger.setLevel('SEER')
     while True:
         message = message_buffer.get()  # Blocking function
         if message == 'simulator finished':
             break
         if also_log:
-            logger.info(message)
+            logger.log(25, message)
         for c in consumers:
             c(message)
         message_buffer.task_done()

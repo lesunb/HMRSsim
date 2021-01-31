@@ -6,7 +6,7 @@ import dynamic_models
 import utils.helpers as helpers
 
 from components.Skeleton import Skeleton
-from map_parser import WindowOptions
+from typehints.build_types import WindowOptions
 from xml.etree.ElementTree import Element
 
 available_models = dynamic_models.export_available_models()

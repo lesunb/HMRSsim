@@ -1,7 +1,6 @@
 """Parse of the drawio compressed XML into simulation entities and components.
 """
 import esper
-import typing
 
 import utils.helpers as helpers
 import resources.load_resources as loader
@@ -11,13 +10,12 @@ from dynamic_builders import export_available_builders
 from components.Inventory import Inventory
 from components.Skeleton import Skeleton
 from xml.etree.ElementTree import Element
+from typehints.build_types import WindowOptions
 
 available_builders = export_available_builders()
 """Dict of available object typehints (e.g. robot, map-path, etc).
    Dict key is the TYPE tag. Value is the build_object function.
 """
-
-WindowOptions = typing.Tuple[typing.Tuple[int, int], int]
 
 
 def build_simulation_from_map(file: str, line_width=10):

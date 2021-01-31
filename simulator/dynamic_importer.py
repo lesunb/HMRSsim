@@ -24,7 +24,7 @@ def init_component(component_name: str, args: typing.List[typing.Any]):
            args -- List of arguments to be passed to __init__ method of the component
     """
     logger = logging.getLogger(__name__)
-    logger.info(f'Initing component {component_name} with values {args}')
+    logger.debug(f'Initing component {component_name} with values {args}')
     if component_name not in available_components:
         raise Exception(f"Component {component_name} is not available")
     module = available_components[component_name]

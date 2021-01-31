@@ -69,7 +69,7 @@ des_processors = [
 for p in normal_processors:
     simulator.add_system(p)
 for p in des_processors:
-    simulator.add_DES_system(p)
+    simulator.add_des_system(p)
 
 
 # @window.event

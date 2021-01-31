@@ -67,6 +67,7 @@ class Simulator:
         Load simulation parameters from config.
         Create simulation objects from map, populating them with components.
         """
+        logger.info('========== SIMULATION LOADING ==========')
         self.CONFIG = 'simulation.json' if config is None else config
         if type(self.CONFIG) == str:
             with open(self.CONFIG) as fd:
@@ -83,24 +84,11 @@ class Simulator:
         self.world: esper.World = simulation['world']
         # self.window = simulation['window']
         # self.batch = simulation['batch']
-        _, self.window_dimensions, _ = simulation['window_props']
+        self.simulation_name, self.window_dimensions, _ = simulation['window_props']
         self.draw2ent = simulation['draw_map']
         self.objects = simulation['objects']
         # Global inventory
         self.interactive = self.world.component_for_entity(1, Inventory).objects
-
-        logger.info(f"==> Simulation objects")
-        for oid, objId in self.objects:
-            entity = self.draw2ent.get(objId)
-            logger.info(f"OBJ #{oid} (draw {objId}). Type {entity[1]['type']}")
-            if self.world.has_component(oid, Map):
-                ent_map = self.world.component_for_entity(oid, Map)
-                logger.info("\tAvailable paths:")
-                for idx, key in enumerate(ent_map.paths.keys()):
-                    logger.info(f"\t{idx}. {key}")
-            if self.world.has_component(oid, Script):
-                script = self.world.component_for_entity(oid, Script)
-                logger.info(script)
 
         self.EXIT: bool = False
         self.ENV = simpy.Environment()
@@ -112,11 +100,28 @@ class Simulator:
             "EVENT_STORE": simpy.FilterStore(self.ENV),
             # Pyglet specific things (for the re-create entity)
             # "BATCH": self.batch,
-            # "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
+            "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
         self.cleanups: typing.List[CleanupFunction] = [cleanup]
+        self.generate_simulation_build_report()
 
-    def add_DES_system(self, system: DESSystem):
+    def generate_simulation_build_report(self):
+        logger.info('===== SIMULATION LOADING COMPLETE =====')
+        logger.info(f'Simulation {self.simulation_name}')
+        logger.info(f'{len(self.draw2ent)} entities created.')
+        logger.info(f'{len(self.objects)} typed objects transformed into entities')
+        logger.info(f'===> ENTITIES CREATED')
+        for k, v in self.draw2ent.items():
+            logger.info(f'• {k} --> esper entity {v[0]}. (type {v[1].get("type", "None")})')
+            ent = v[0]
+            components = self.world.components_for_entity(ent)
+            logger.info(f'Entity has {len(components)} components.')
+            for c in components:
+                logger.info(f'\t- {c}')
+        logger.info(f'===> Interactive objects')
+        logger.info(self.interactive)
+
+    def add_des_system(self, system: DESSystem):
         """
         Adds a Discrete system to the simulation environment.
         Discrete systems use simpy's DES mechanisms to wait events that trigger their processing,
