@@ -60,4 +60,4 @@ def from_mxCell(el, windowSize, lineWidth=10):
         for box in boxes:
             box.angle = rotate
 
-    return ([pos, Collidable(shape=boxes)], style)
+    return [pos, Collidable(shape=boxes)], style

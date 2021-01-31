@@ -1,22 +1,28 @@
-import importlib
-import os
+"""Extracts components that can be imported dynamically into the simulation.
+
+   EXPORTS:
+   available_components: dict -- dict of components that can be dynamically imported.
+                                 key is component file name. value is the module.
+   init_component -- instantiate a component and return it.
+
+"""
 import logging
+import typing
 
+from utils.helpers import list_folder
 
-available_components = {}
-# Changes dir to the components directory
 # TODO: Add an include option to add more component folder on simulation.json
-for component in os.listdir('./components'):
-    file_name, extension = os.path.splitext(component)
-    if not extension == '.py':
-        continue
-    if file_name.startswith('__') and file_name.endswith('__'):
-        continue
-    module = importlib.import_module(f'components.{file_name}')
-    available_components[file_name] = module
+available_components = list_folder('./components')
 
 
-def init_component(component_name, args):
+def init_component(component_name: str, args: typing.List[typing.Any]):
+    """Instantiates a component and returns it.
+
+       KEYWORD ARGUMENTS:
+           component_name -- name of the component to instantiate.
+                             Must be one of the available components.
+           args -- List of arguments to be passed to __init__ method of the component
+    """
     logger = logging.getLogger(__name__)
     logger.info(f'Initing component {component_name} with values {args}')
     if component_name not in available_components:
