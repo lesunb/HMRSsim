@@ -13,11 +13,10 @@ import yaml
 import typing
 import map_parser
 
-from components.Map import Map
-from components.Script import Script
 from components.Inventory import Inventory
+from dynamic_importer import init_component, ComponentInitError
 
-from typehints.dict_types import SystemArgs, Config
+from typehints.dict_types import SystemArgs, Config, EntityDefinition
 
 fileName = pathlib.Path.cwd().joinpath('loggerConfig.yml')
 stream = open(fileName)
@@ -74,6 +73,7 @@ class Simulator:
                 config = json.load(fd)
         else:
             self.CONFIG = 'dict object'
+        logger.info(f'Loading simulation from {self.CONFIG}')
 
         self.FPS = config.get('FPS', 60)
         self.DEFAULT_LINE_WIDTH = config.get('DLW', 10)
@@ -89,6 +89,15 @@ class Simulator:
         self.objects = simulation['objects']
         # Global inventory
         self.interactive = self.world.component_for_entity(1, Inventory).objects
+
+        extra_entities = config.get('extraEntities', None)
+        if extra_entities is not None:
+            logger.info(f'Loading extra entities from config')
+            extras = 0
+            for entity_definition in extra_entities:
+                ent_id = entity_definition.get('entId', f'extraEntity_{extras}')
+                extras += 1
+                self.add_entity(entity_definition, ent_id)
 
         self.EXIT: bool = False
         self.ENV = simpy.Environment()
@@ -139,6 +148,22 @@ class Simulator:
         An argument kwargs: SystemArgs will be passed to these processors.
         """
         self.world.add_processor(system)
+
+    def add_entity(self, entity_definition: EntityDefinition, ent_id: str):
+        """Add an entity from json to world."""
+        initialized_components = []
+        for component_name, args in entity_definition['components'].items():
+            try:
+                initialized_components.append(init_component(component_name, args))
+            except ComponentInitError:
+                logger.error(f'Failed to create component {component_name} for entity from json.')
+                return
+        ent = self.world.create_entity(*initialized_components)
+        self.draw2ent[ent_id] = [ent, {}]
+        if entity_definition.get('isInteractive', False):
+            self.interactive[entity_definition.get('name', ent_id)] = ent
+        if entity_definition.get('isObject', False):
+            self.objects.append((ent, ent_id))
 
     def simulation_loop(self):
         """

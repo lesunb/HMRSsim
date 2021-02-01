@@ -1,7 +1,17 @@
 {
     "context": "resources/map",
-    "map": "hospital_scenario.drawio",
+    "map": "robot.drawio",
     "FPS": 60,
     "DLW": 10,
-    "duration": 10
+    "duration": 5,
+    "extraEntities": [
+        {
+            "entId": "testEnt",
+            "components": {
+                "Position": [440, 80, 0, 32, 32],
+                "Skeleton": ["test", "ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#0050ef;strokeColor=#001DBC;fontColor=#ffffff;", "TEST"]
+                ""
+            }
+        }
+    ]
 }

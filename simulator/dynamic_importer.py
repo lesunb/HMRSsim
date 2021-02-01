@@ -29,3 +29,7 @@ def init_component(component_name: str, args: typing.List[typing.Any]):
         raise Exception(f"Component {component_name} is not available")
     module = available_components[component_name]
     return module.__dict__[component_name](*args)
+
+
+class ComponentInitError(Exception):
+    pass

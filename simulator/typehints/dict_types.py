@@ -14,6 +14,14 @@ class SystemArgs(typing.TypedDict):
     WINDOW_OPTIONS: WindowOptions
 
 
+class EntityDefinition(typing.TypedDict):
+    entId: str
+    components: typing.Dict[str, list]
+    isObject: bool
+    isInteractive: bool
+    name: typing.Optional[str]
+
+
 class Config(typing.TypedDict):
     """Options for the Simulation config
 
@@ -26,3 +34,4 @@ class Config(typing.TypedDict):
     FPS: typing.Optional[int]
     DLW: typing.Optional[int]
     duration: typing.Optional[int]
+    extraEntities: typing.Optional[typing.List[EntityDefinition]]

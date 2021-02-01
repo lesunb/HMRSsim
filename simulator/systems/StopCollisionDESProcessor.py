@@ -42,7 +42,7 @@ def process(kwargs):
 
         # If following path, remove it
         if world.has_component(ent, Path):
-            end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, env.now))
+            end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, str(env.now)))
             event_store.put(end_of_path)
             world.remove_component(ent, Path)
 
