@@ -1,6 +1,8 @@
 import esper
 import logging
 from typing import NamedTuple
+from typehints.dict_types import SystemArgs
+
 from simpy import FilterStore
 
 from main import EVENT
@@ -18,7 +20,7 @@ class PathProcessor(esper.Processor):
         super().__init__()
         self.logger = logging.getLogger(__name__)
 
-    def process(self, kwargs):
+    def process(self, kwargs: SystemArgs):
         event_store: FilterStore = kwargs.get('EVENT_STORE', None)
         env = kwargs.get('ENV', None)
         for ent, (pos, path, vel) in self.world.get_components(Position, Path, Velocity):

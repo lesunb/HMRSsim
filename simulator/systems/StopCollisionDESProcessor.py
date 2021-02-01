@@ -2,13 +2,15 @@ import esper
 import simpy
 from components.Position import Position
 from components.Path import Path
+from typehints.dict_types import SystemArgs
 
 from main import EVENT
 from systems.PathProcessor import EndOfPathTag, EndOfPathPayload
 StopEventTag = 'stopEvent'
 GenericCollisionTag = 'genericCollision'
 
-def process(kwargs):
+
+def process(kwargs: SystemArgs):
     event_store = kwargs.get('EVENT_STORE', None)
     world: esper.World = kwargs.get('WORLD', None)
     env: simpy.Environment = kwargs.get('ENV', None)

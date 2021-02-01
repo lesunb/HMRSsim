@@ -1,4 +1,6 @@
 from typing import NamedTuple, List, Tuple, Callable
+from typehints.dict_types import SystemArgs
+
 from esper import World
 from simpy import AnyOf, FilterStore, Environment
 import logging
@@ -12,8 +14,9 @@ import systems.GotoDESProcessor as gotoProcessor
 
 ExecutePayload = NamedTuple('ExecuteScriptInstructionPayload', [('ent', int)])
 ExecuteInstructionTag = 'ExecuteInstruction'
-
 ExtraInstruction = Tuple[str, Callable[[int, List[str], scriptComponent.Script, FilterStore], scriptComponent.States]]
+
+
 def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
     logger = logging.getLogger(__name__)
     instruction_set = {t[0]: t[1] for t in extra_instructions}
@@ -21,7 +24,7 @@ def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
     logger.debug(f'My instruction set: {instruction_set}')
     logger.debug(f'My Whatchlist: {watchlist}')
 
-    def process(kwargs):
+    def process(kwargs: SystemArgs):
         # Init
         __event_store = kwargs.get('EVENT_STORE', None)
         __world: World = kwargs.get('WORLD', None)

@@ -2,6 +2,8 @@ import esper
 import logging
 
 from typing import NamedTuple, List
+from typehints.dict_types import SystemArgs
+
 from simpy import FilterStore
 
 import components.Script as scriptComponent
@@ -17,7 +19,7 @@ GotoEventTag = 'GoToEvent'
 GotoInstructionId = 'Go'
 
 
-def process(kwargs):
+def process(kwargs: SystemArgs):
     logger = logging.getLogger(__name__)
     event_store = kwargs.get('EVENT_STORE', None)
     world = kwargs.get('WORLD', None)

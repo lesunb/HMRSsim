@@ -6,6 +6,8 @@ from components.Velocity import Velocity
 from components.Collidable import Collidable
 from components.Position import Position
 from typing import NamedTuple
+from typehints.dict_types import SystemArgs
+
 
 from colorama import init, Fore
 init()
@@ -17,7 +19,7 @@ class CollisionProcessor(esper.Processor):
         super().__init__()
         self.logger = logging.getLogger(__name__)
 
-    def process(self, kwargs):
+    def process(self, kwargs: SystemArgs):
         eventStore = kwargs.get('EVENT_STORE', None)
         for ent, (col, pos, vel) in self.world.get_components(Collidable, Position, Velocity):
             # update the position of the shape

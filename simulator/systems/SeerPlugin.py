@@ -3,6 +3,7 @@ import logging
 import json
 from queue import Queue
 from typing import Callable, List
+from typehints.dict_types import SystemArgs
 
 from simpy import Environment
 from esper import World
@@ -37,7 +38,7 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
 
     # The producer thread
 
-    def process(kwargs):
+    def process(kwargs: SystemArgs):
         event_store = kwargs.get('EVENT_STORE', None)
         world: World = kwargs.get('WORLD', None)
         env: Environment = kwargs.get('ENV', None)

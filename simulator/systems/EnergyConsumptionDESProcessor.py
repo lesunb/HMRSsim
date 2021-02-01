@@ -1,4 +1,5 @@
 from typing import NamedTuple
+from typehints.dict_types import SystemArgs
 
 from simpy import Environment
 from esper import World
@@ -16,10 +17,10 @@ CHANGE_ACTION_PAYLOAD = NamedTuple('ChangeActionPayload', [('entity', int), ('ne
 CHANGE_ACTION_TAG = 'ChangeActionEvent'
 
 
-def process(kwargs):
+def process(kwargs: SystemArgs):
     event_store = kwargs.get('EVENT_STORE', None)
-    world: World = kwargs.get('WORLD', None)
-    env: Environment = kwargs.get('ENV', None)
+    world = kwargs.get('WORLD', None)
+    env = kwargs.get('ENV', None)
     if event_store is None:
         raise Exception("Can't find eventStore")
     if env is None:
