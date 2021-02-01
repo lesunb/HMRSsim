@@ -1,6 +1,7 @@
 import math
 import typing
-
+import os
+import importlib
 import primitives
 from collision import Vector, Poly
 
@@ -29,8 +30,9 @@ def parse_style(style):
   return s
 
 def translate_coordinates(coordinates, dimens, height):
-  y = dimens[1] - coordinates[1] - height
-  return (coordinates[0], y)
+  return coordinates
+  # y = dimens[1] - coordinates[1] - height
+  # return (coordinates[0], y)
 
 def get_rel_points(center, points):
   return list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), points))
@@ -62,3 +64,16 @@ def collision_from_points(shape: ShapeType, center: typing.Tuple[int, int]) -> P
     points = shape._get_points()
     col_points = list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), points))
     return Poly(tuple2vector(center), col_points)
+
+
+def list_folder(path: str) -> typing.Dict:
+    available = {}
+    for component in os.listdir(path):
+        file_name, extension = os.path.splitext(component)
+        if not extension == '.py':
+            continue
+        if file_name.startswith('__') and file_name.endswith('__'):
+            continue
+        module = importlib.import_module(f'{path[2:]}.{file_name}')
+        available[file_name] = module
+    return available

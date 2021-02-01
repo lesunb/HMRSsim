@@ -10,7 +10,7 @@ class Position:
         self.w = w
         self.h = h
         self.angle = angle
-        self.changed = True
+        self.changed = False
         self.movable = movable
         self.center = (x + w // 2, y + h // 2)
 

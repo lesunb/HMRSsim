@@ -9,4 +9,4 @@ class Collidable:
         self.event_tag = collision_tag
 
     def __str__(self):
-        return "Collidable Component"
+        return f"Collidable[{len(self.shapes)} shapes. Tag={self.event_tag}]"

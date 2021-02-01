@@ -5,4 +5,4 @@ class Velocity:
         self.alpha = alpha
 
     def __str__(self):
-        return "Velocity Component"
+        return f"Velocity[x={self.x}, y={self.y}, alpha={self.alpha}]"

@@ -1,4 +1,6 @@
 from typing import NamedTuple, Tuple
+from typehints.dict_types import SystemArgs
+
 from enum import Enum
 from simpy import FilterStore, Store
 from esper import World
@@ -8,9 +10,10 @@ from components.Renderable import Renderable
 from components.Inventory import Inventory
 from components.Pickable import Pickable
 
-from models.mxCellDecoder import parse_object
+from mxCellDecoder import parse_object
 
 import logging
+
 
 class ObjectManagerOps(Enum):
     REMOVE = 'remove'
@@ -28,14 +31,13 @@ __batch: Batch
 __window_options = Tuple[Tuple[int, int], int]
 
 
-def process(kwargs):
+def process(kwargs: SystemArgs):
     global __world
     global __event_store
     global __batch
     global __window_options
     __event_store = kwargs.get('EVENT_STORE', None)
     __world = kwargs.get('WORLD', None)
-    __batch = kwargs.get('BATCH', None)
     __window_options = kwargs.get('WINDOW_OPTIONS', None)
     logger = logging.getLogger(__name__)
     if __event_store is None:
@@ -51,7 +53,6 @@ def process(kwargs):
         if payload.op == ObjectManagerOps.RECREATE:
             success, msg = recreate_entity(payload.object, payload.skeleton, payload.new_position)
             payload.reply_channel.put({'success': success, 'msg': msg})
-
 
 
 def remove_entity(obj_name):
@@ -73,7 +74,7 @@ def remove_entity(obj_name):
 
 
 def recreate_entity(obj_name, skeleton, newpos):
-    new_obj = parse_object(skeleton, __batch, __window_options)
+    new_obj = parse_object(skeleton, __window_options)
     components, attributes = new_obj
     # Change position
     pos = components[0]

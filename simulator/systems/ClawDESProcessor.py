@@ -1,9 +1,11 @@
 from enum import Enum
 
 from typing import NamedTuple, List
+from typehints.dict_types import SystemArgs
 from esper import World
 from simpy import FilterStore, Store, Environment
 from main import EVENT
+from typehints.dict_types import SystemArgs
 
 from components.Position import Position
 from components.Claw import Claw
@@ -38,7 +40,7 @@ _WORLD: World
 _ENV: Environment
 
 
-def process(kwargs):
+def process(kwargs: SystemArgs):
     global _EVENT_STORE
     global _WORLD
     global _ENV

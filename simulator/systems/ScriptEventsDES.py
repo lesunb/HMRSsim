@@ -1,6 +1,8 @@
 from typing import NamedTuple, List, Tuple, Callable
+from typehints.dict_types import SystemArgs
+
 from esper import World
-from simpy import AnyOf, FilterStore
+from simpy import AnyOf, FilterStore, Environment
 import logging
 
 from main import EVENT
@@ -12,20 +14,21 @@ import systems.GotoDESProcessor as gotoProcessor
 
 ExecutePayload = NamedTuple('ExecuteScriptInstructionPayload', [('ent', int)])
 ExecuteInstructionTag = 'ExecuteInstruction'
-
 ExtraInstruction = Tuple[str, Callable[[int, List[str], scriptComponent.Script, FilterStore], scriptComponent.States]]
+
+
 def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
     logger = logging.getLogger(__name__)
     instruction_set = {t[0]: t[1] for t in extra_instructions}
     watchlist = [ExecuteInstructionTag, EndOfPathTag] + watch_list
-    logger.info(f'My instruction set: {instruction_set}')
-    logger.info(f'My Whatchlist: {watchlist}')
+    logger.debug(f'My instruction set: {instruction_set}')
+    logger.debug(f'My Whatchlist: {watchlist}')
 
-    def process(kwargs):
+    def process(kwargs: SystemArgs):
         # Init
         __event_store = kwargs.get('EVENT_STORE', None)
         __world: World = kwargs.get('WORLD', None)
-        env = kwargs.get('ENV', None)
+        env: Environment = kwargs.get('ENV', None)
         if __event_store is None:
             raise Exception("Can't find eventStore")
         # On the first run, we put all the scripts in the world in the event queue
@@ -46,7 +49,11 @@ def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
         while True:
             ev = yield __event_store.get(lambda e: e.type in watchlist)
             payload = ev.payload
-            script = __world.component_for_entity(payload.ent, scriptComponent.Script)
+            try:
+                script = __world.component_for_entity(payload.ent, scriptComponent.Script)
+            except KeyError:
+                logger.warning(f'[ENV TIME {env.now}] Got event {ev.type} for an entity without Script')
+                continue
             if ev.type == ExecuteInstructionTag:
                 if script.state != scriptComponent.States.READY:
                     logger.warning(f'Request to execute script not ready')
@@ -65,7 +72,7 @@ def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
                 ent = payload.ent
                 logger.debug(f'Got event {ev.type} for ent {ent}')
                 if ev.type not in script.expecting:
-                    logger.warning(f'WARN - Was not expecting {ev.type}')
+                    logger.warning(f'Was not expecting {ev.type}')
                 else:
                     script.expecting.remove(ev.type)
                     if not script.expecting:
