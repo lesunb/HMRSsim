@@ -1,7 +1,9 @@
 import math
 import utils.helpers as helpers
+from typehints.component_types import Component
 
-class Position:
+
+class Position(Component):
     """Position components hold the position of an Entity in the esper World.
     """
     def __init__(self, x=0.0, y=0.0, angle=0.0, w=0.0, h=0.0, movable=True):

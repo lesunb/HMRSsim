@@ -1,6 +1,7 @@
+from typehints.component_types import Component
 
 
-class Collidable:
+class Collidable(Component):
     def __init__(self, shape, collision_tag='genericCollision'):
         if isinstance(shape, list):
             self.shapes = shape

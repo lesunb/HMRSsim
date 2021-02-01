@@ -1,4 +1,7 @@
-class Skeleton:
+from typehints.component_types import Component
+
+
+class Skeleton(Component):
 
     def __init__(self, id: str, style="", value="", relative=None, model=False):
         self.id = id

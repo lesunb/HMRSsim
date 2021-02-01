@@ -1,5 +1,7 @@
+from typehints.component_types import Component
 
-class Battery:
+
+class Battery(Component):
 
     def __init__(self, charge, lookupTable=None):
         self.charge = charge

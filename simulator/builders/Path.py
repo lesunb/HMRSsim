@@ -14,5 +14,5 @@ def build_object(cell, world, window_options, draw2entity):
         logger.warning(f"Path origin ({obj}) not found. Trying target.")
     else:
         logger.debug(f"Adding path to entity {ent}")
-        world.add_component(ent, Path(points))
+        world.add_compPonent(ent, Path(points))
     return {}, [], {}

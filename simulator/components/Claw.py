@@ -1,5 +1,7 @@
+from typehints.component_types import Component
 
-class Claw:
+
+class Claw(Component):
 
     def __init__(self, max_range, max_weight):
         self.max_range = int(max_range)

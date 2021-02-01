@@ -1,6 +1,8 @@
+from typehints.component_types import Component
+import utils.helpers as helpers
 
-import utils.helpers as helpers 
-class Path:
+
+class Path(Component):
 
   @staticmethod
   def from_mxCell(el, windowHeight):

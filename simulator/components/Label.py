@@ -1,7 +1,8 @@
 import pyglet
+from typehints.component_types import Component
 
 
-class Label:
+class Label(Component):
 
     def __init__(self, label, pos, batch):
         self.labelTag = pyglet.text.HTMLLabel(label,

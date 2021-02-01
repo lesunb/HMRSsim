@@ -8,8 +8,13 @@ from components.POI import POI
 from components.BatteryComponent import Battery
 from utils.helpers import parse_style, translate_coordinates
 
+from typing import Tuple, List
+from typehints.component_types import Component
+
 MODEL = 'default'
-def from_object(el, windowSize, lineWidth=10):
+
+
+def from_object(el, windowSize, lineWidth=10) -> Tuple[List[Component], dict]:
     options = el.attrib
 
     components, style = from_mxCell(el[0], windowSize, lineWidth)
@@ -36,7 +41,7 @@ def from_object(el, windowSize, lineWidth=10):
     return components, options
 
 
-def from_mxCell(el, batch, windowSize, lineWidth=10):
+def from_mxCell(el, windowSize, lineWidth=10) -> Tuple[List[Component], dict]:
     # Parse style
     style = parse_style(el.attrib['style'])
     # Get parent

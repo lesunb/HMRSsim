@@ -3,7 +3,7 @@
     "map": "robot.drawio",
     "FPS": 60,
     "DLW": 10,
-    "duration": 5,
+    "duration": 3,
     "extraEntities": [
         {
             "entId": "testEnt",
