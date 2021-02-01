@@ -1,6 +1,8 @@
 """Parse of the drawio compressed XML into simulation entities and components.
 """
 import esper
+import logging
+import os
 
 import utils.helpers as helpers
 import resources.load_resources as loader
@@ -18,16 +20,28 @@ available_builders = export_available_builders()
 """
 
 
-def build_simulation_from_map(file: str, line_width=10):
-    # Load map from .drawio file
-    window_name, map_content = loader.map_from_drawio(file)
+def build_simulation_from_map(file: str, skip_map=False, line_width=10):
+    """Creates the base for the simulation.
+
+        If a map is provided, the simulation comes from the map.
+        Otherwise, and empty simulation is created.
+    """
+    logger = logging.getLogger(__name__)
+    if os.path.isfile(file) and not skip_map:
+        window_name, map_content = loader.map_from_drawio(file)
+    else:
+        if not skip_map:
+            logger.error(f'Map file {file} does not exist. Creating empty simulation instead')
+        window_name = 'Default'
+        map_content = Element([], tag='not found', attrib={})
+
     width = int(map_content.attrib.get('pageWidth', 500))
     height = int(map_content.attrib.get('pageHeight', 500))
 
     background_color = helpers.hex_to_rgb('#FFFFFF')
     if 'background' in map_content.attrib:
         background_color = helpers.hex_to_rgb(map_content.attrib['background'])
-    content_root = map_content[0]
+    content_root = map_content[0] if len(map_content) > 0 else None
     # Create pyglet window
     # window = pyglet.window.Window(width=width,
     #                               height=height,
@@ -41,7 +55,13 @@ def build_simulation_from_map(file: str, line_width=10):
 
     world = esper.World()
     simulation = world.create_entity()  # Simulation is always the first entity
-    draw_map, objects, interactive = build_simulation_objects(content_root, world, ((width, height), line_width))
+    if content_root:
+        draw_map, objects, interactive = build_simulation_objects(content_root, world, ((width, height), line_width))
+    else:
+        draw_map = {}
+        objects = []
+        interactive = {}
+
     world.add_component(simulation, Inventory(interactive))
     skeleton_style = "{{\"width\":{:d},\"height\":{:d}}}".format(width, height)
     world.add_component(simulation, Skeleton(id=window_name, style=skeleton_style, model=True))

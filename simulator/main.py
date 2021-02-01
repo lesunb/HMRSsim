@@ -79,8 +79,12 @@ class Simulator:
         self.DEFAULT_LINE_WIDTH = config.get('DLW', 10)
         self.DURATION = config.get('duration', -1)
 
-        file = pathlib.Path(config.get('context', '.')) / config.get('map', 'map.drawio')
-        simulation = map_parser.build_simulation_from_map(file)
+        if 'map' in config:
+            file = pathlib.Path(config.get('context', '.')) / config.get('map')
+            simulation = map_parser.build_simulation_from_map(file)
+        else:
+            logger.info('No map found in the configuration. Creating empty simulation.')
+            simulation = map_parser.build_simulation_from_map("", True)
         self.world: esper.World = simulation['world']
         # self.window = simulation['window']
         # self.batch = simulation['batch']

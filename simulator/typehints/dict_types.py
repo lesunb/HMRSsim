@@ -30,7 +30,7 @@ class Config(typing.TypedDict):
             map: str -- Name of simulation map file. Must be under assets folder. Default is 'map.drawio'
     """
     context: str
-    map: str
+    map: typing.Optional[str]
     FPS: typing.Optional[int]
     DLW: typing.Optional[int]
     duration: typing.Optional[int]
