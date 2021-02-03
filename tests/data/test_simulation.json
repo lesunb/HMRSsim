@@ -1,6 +1,6 @@
 {
     "context": "tests/data",
-    "map": "room10x10.drawio",
+    "map": "room3.drawio",
     "FPS": 60,
     "DLW": 10,
     "duration": 10
