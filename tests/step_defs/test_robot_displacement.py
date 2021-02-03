@@ -50,5 +50,5 @@ def pass_time():
 @then("the robot is in 'room3'")
 def check_position(simulation, target_path):
     position = get_component(simulation, Position, '15')
-    assert target_path['x'] == position.x
-    assert target_path['y'] == position.y
+    assert target_path['x'] == position.center[0]
+    assert target_path['y'] == position.center[1]
