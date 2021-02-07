@@ -39,5 +39,11 @@ def map_from_drawio(drawioxml):
     """
     tree = ET.parse(drawioxml)
     root = tree.getroot()
-    content = ET.fromstring(inflate(root[0].text, True))
+    if root[0].text is None:
+        # Assume the file is uncompressed already
+        content = root[0]
+        if content.tag == 'diagram':
+            content = content[0]
+    else:
+        content = ET.fromstring(inflate(root[0].text, True))
     return root[0].attrib.get('name', "Window 1"), content
