@@ -1,7 +1,7 @@
 {
     "context": "resources/map",
-    "map": "paths.drawio",
+    "map": "poi_test.drawio",
     "FPS": 60,
     "DLW": 10,
-    "duration": 2
+    "duration": 4
 }

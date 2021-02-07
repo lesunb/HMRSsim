@@ -22,7 +22,7 @@ def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
     instruction_set = {t[0]: t[1] for t in extra_instructions}
     watchlist = [ExecuteInstructionTag, EndOfPathTag] + watch_list
     logger.debug(f'My instruction set: {instruction_set}')
-    logger.debug(f'My Whatchlist: {watchlist}')
+    logger.debug(f'My Watchlist: {watchlist}')
 
     def process(kwargs: SystemArgs):
         # Init
@@ -70,7 +70,7 @@ def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
                     __event_store.put(new_event)
             else:
                 ent = payload.ent
-                logger.debug(f'Got event {ev.type} for ent {ent}')
+                logger.debug(f'[{env.now}] Got event {ev.type} for ent {ent}')
                 if ev.type not in script.expecting:
                     logger.warning(f'Was not expecting {ev.type}')
                 else:

@@ -9,7 +9,6 @@ from components.Path import Path
 from main import EVENT
 
 import components.Script as scriptComponent
-from systems.GotoDESProcessor import GotoPayload, GotoEventTag
 from systems.PathProcessor import EndOfPathTag
 
 MapPayload = NamedTuple('MapPayload', entity=int, route=str)

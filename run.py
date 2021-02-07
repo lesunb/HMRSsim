@@ -56,7 +56,7 @@ normal_processors = [
 ]
 # Defines DES processors
 des_processors = [
-    Seer.init([my_seer_consumer], 0.05, True),
+    Seer.init([my_seer_consumer], 0.05, False),
     (ClawProcessor.process,),
     (ObjectManager.process,),
     (StopCollision.process,),
