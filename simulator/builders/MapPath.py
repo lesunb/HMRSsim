@@ -6,7 +6,7 @@ TYPE = 'map-path'
 
 def build_object(cell, world, window_options, draw2entity):
     mxCell = cell[0]
-    points = Path.from_mxCell(mxCell, window_options[0][1])
+    points = Path.from_mxCell(mxCell)
     objId = cell.attrib.get('origin', '')
     key = cell.attrib.get('key', '')
     if key == '':

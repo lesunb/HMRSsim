@@ -6,7 +6,7 @@ from components.Position import Position
 from components.Velocity import Velocity
 from components.POI import POI
 from components.BatteryComponent import Battery
-from utils.helpers import parse_style, translate_coordinates
+from utils.helpers import parse_style
 
 from typing import Tuple, List
 from typehints.component_types import Component
@@ -24,7 +24,6 @@ def from_object(el, windowSize, lineWidth=10) -> Tuple[List[Component], dict]:
         options['movable'] = True
     if 'POI' in options:
         points = json.loads(options['POI'])
-        points = list(map((lambda p: translate_coordinates(p, windowSize, 0)), points))
         components.append(POI(points=points))
     if 'battery' in options:
         bat_info = json.loads(options['battery'])
@@ -54,7 +53,6 @@ def from_mxCell(el, windowSize, lineWidth=10) -> Tuple[List[Component], dict]:
     width = float(geometry.attrib['width'])
     height = float(geometry.attrib['height'])
     # Create drawing
-    (x, y) = translate_coordinates((x, y), windowSize, height)
     pos = Position(x=x, y=y, w=width, h=height, movable=False)
 
     rotate = 0

@@ -21,7 +21,6 @@ def from_mxCell(el, windowSize, lineWidth=10):
   width = float(geometry.attrib['width'])
   height = float(geometry.attrib['height'])
   # Create drawing
-  (x, y) = translate_coordinates((x, y), windowSize, height)
   pos = Position(x=x, y=y, w=width, h=height, movable=False)
   center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
   points = [

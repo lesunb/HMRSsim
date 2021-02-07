@@ -1,7 +1,7 @@
 from collision import Poly, Vector
 from components.Collidable import Collidable
 from components.Position import Position
-from utils.helpers import parse_style, translate_coordinates
+from utils.helpers import parse_style
 
 MODEL = 'mxgraph.floorplan.wall'
 
@@ -20,7 +20,6 @@ def from_mxCell(el, windowSize, lineWidth=10):
     width = float(geometry.attrib['width'])
     height = float(geometry.attrib['height'])
     # Create drawing
-    (x, y) = translate_coordinates((x, y), windowSize, height)
     pos = Position(x=x, y=y, w=width, h=height, movable=False)
 
     rotate = 0
