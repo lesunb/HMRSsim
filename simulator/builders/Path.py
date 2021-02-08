@@ -13,7 +13,7 @@ def build_object(cell: Element, world: esper.World, window_options, draw2entity:
     logger = logging.getLogger(__name__)
     mxCell = cell[0]
 
-    points = from_mxCell(mxCell, draw2entity, world)
+    points = path_from_mxCell(mxCell, draw2entity, world)
     obj = mxCell.attrib.get('source', None)
     (ent, _) = draw2entity.get(obj, (None, None))
     if ent is None:
@@ -24,7 +24,7 @@ def build_object(cell: Element, world: esper.World, window_options, draw2entity:
     return {}, [], {}
 
 
-def from_mxCell(cell: Element, draw2entity, world: esper.World):
+def path_from_mxCell(cell: Element, draw2entity, world: esper.World):
     """Extracts the points of a path from XML."""
     logger = logging.getLogger(__name__)
     points = []

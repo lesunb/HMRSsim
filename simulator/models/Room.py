@@ -1,5 +1,5 @@
-import typing
-from typehints.component_types import Component
+from typing import List, Tuple
+from typehints.component_types import Component, ShapeDefinition
 from xml.etree.ElementTree import Element
 from components.Collidable import Collidable
 from components.Position import Position
@@ -8,7 +8,7 @@ from utils.helpers import *
 MODEL = 'mxgraph.floorplan.room'
 
 
-def from_mxCell(el: Element, window_size: typing.Tuple[float, float], line_width=10) -> typing.Tuple[typing.List[Component], dict]:
+def from_mxCell(el: Element, line_width=10) -> Tuple[List[Component], dict]:
     # Parse style
     style = parse_style(el.attrib['style'])
     if style.get('shape', "") != 'mxgraph.floorplan.room':
@@ -35,7 +35,7 @@ def from_mxCell(el: Element, window_size: typing.Tuple[float, float], line_width
     ]
     # Collision points
     # TODO: Verify corners
-    boxes = [
+    boxes: List[ShapeDefinition] = [
         (
             (pos.x + line_width // 2, pos.y + pos.h // 2),
             [(pos.x, pos.y), (pos.x, pos.y + pos.h), (pos.x + line_width, pos.y + pos.h), (pos.x + line_width, pos.y)]
@@ -56,12 +56,10 @@ def from_mxCell(el: Element, window_size: typing.Tuple[float, float], line_width
         )
     ]
 
-    boxes = list(map(lambda x: Poly(tuple2vector(x[0]), get_rel_points(x[0], x[1])), boxes))
     if style.get('rotation', '') != '':
         rotate = int(style['rotation'])
         if rotate < 0:
             rotate = 360 - rotate
-        for box in boxes:
-            box.angle = rotate
+        boxes = list(map(lambda sd: rotate_shape_definition(sd, rotate, center), boxes))
 
-    return [pos, Collidable(shape=boxes)], style
+    return [pos, Collidable(boxes)], style

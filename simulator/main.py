@@ -125,9 +125,9 @@ class Simulator:
         logger.info(f'{len(self.objects)} typed objects transformed into entities')
         logger.info(f'===> TYPED OBJECTS')
         for k, v in self.draw2ent.items():
-            if v[1].get('type', None) is None:
-                continue
-            logger.info(f'• {k} --> esper entity {v[0]}. (type {v[1]["type"]})')
+            # if v[1].get('type', None) is None:
+            #     continue
+            logger.info(f'• {k} --> esper entity {v[0]}. (type {v[1].get("type", "")})')
             ent = v[0]
             components = self.world.components_for_entity(ent)
             logger.info(f'Entity has {len(components)} components.')

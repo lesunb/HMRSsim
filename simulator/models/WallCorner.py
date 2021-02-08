@@ -1,64 +1,58 @@
-from collision import Concave_Poly, Vector    # If we change Collision and Collision system we might use Poly (optimized). But they need to handle more than 1 shape per entity
 from components.Collidable import Collidable
 from components.Position import Position
 from utils.helpers import *
 
+from typehints.component_types import Component, ShapeDefinition
+from typing import Tuple, List
+
 MODEL = 'mxgraph.floorplan.wallCorner'
-def from_mxCell(el, windowSize, lineWidth=10):
-  # Parse style
-  style = parse_style(el.attrib['style'])
-  if style.get('shape', "") != 'mxgraph.floorplan.wallCorner':
-    raise Exception("Cannot create Wall from {}: shape is not mxgraph.floorplan.wallCorner".format(el))
-  # Get parent
-  parent_element = el.attrib['parent']
-  direction = style.get('direction', 'east')
-  style['parent'] = parent_element
 
-  # Get geometry
-  geometry = el[0]
-  x = float(geometry.attrib.get('x', '0'))
-  y = float(geometry.attrib.get('y', '0'))
-  width = float(geometry.attrib['width'])
-  height = float(geometry.attrib['height'])
-  # Create drawing
-  pos = Position(x=x, y=y, w=width, h=height, movable=False)
-  center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
-  points = [
-    (pos.x, pos.y),
-    (pos.x, pos.y + pos.h),
-    (pos.x - lineWidth // 2, pos.y + pos.h),
-    (pos.x + pos.w, pos.y + pos.h)
-  ]
 
-  # Collision box
-  col_points = [
-    (pos.x - lineWidth // 2, pos.y),
-    (pos.x - lineWidth // 2, pos.y + pos.h + lineWidth // 2),
-    (pos.x + pos.w, pos.y + pos.h + lineWidth // 2),
-    (pos.x + pos.w, pos.y + pos.h - lineWidth // 2),
-    (pos.x + lineWidth // 2, pos.y + pos.h - lineWidth // 2),
-    (pos.x + lineWidth // 2, pos.y)   
-  ]
-  # Get the right corner
-  if direction == 'north':
-    points = map(lambda x: rotate_around_point(x, math.radians(-90), center), points)
-    col_points = map(lambda x: rotate_around_point(x, math.radians(-90), center), col_points)
-  elif direction == 'south':
-    points = map(lambda x: rotate_around_point(x, math.radians(90), center), points)
-    col_points = map(lambda x: rotate_around_point(x, math.radians(90), center), col_points)
-  elif direction == 'west':
-    points = map(lambda x: rotate_around_point(x, math.radians(180), center), points)
-    col_points = map(lambda x: rotate_around_point(x, math.radians(180), center), col_points)
+def from_mxCell(el, line_width=10) -> Tuple[List[Component], dict]:
+    # Parse style
+    style = parse_style(el.attrib['style'])
+    if style.get('shape', "") != 'mxgraph.floorplan.wallCorner':
+        raise Exception("Cannot create Wall from {}: shape is not mxgraph.floorplan.wallCorner".format(el))
+    # Get parent
+    parent_element = el.attrib['parent']
+    direction = style.get('direction', 'east')
+    style['parent'] = parent_element
 
-  # Check for rotation
-  if style.get('rotation', '') != '':
-    rotate = int(style['rotation'])
-    if rotate < 0:
-      rotate = 360 + rotate
-    points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), points)
-    col_points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), col_points)
+    # Get geometry
+    geometry = el[0]
+    x = float(geometry.attrib.get('x', '0'))
+    y = float(geometry.attrib.get('y', '0'))
+    width = float(geometry.attrib['width'])
+    height = float(geometry.attrib['height'])
+    # Create drawing
+    pos = Position(x=x, y=y, w=width, h=height, movable=False)
+    center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
 
-  col_points = map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), col_points)
-  box = Concave_Poly(Vector(center[0], center[1]), list(col_points))
+    boxes: List[ShapeDefinition] = [
+        (
+            (pos.x + line_width // 2, pos.y + pos.h // 2),
+            [(pos.x, pos.y), (pos.x + line_width, pos.y), (pos.x + line_width, pos.y + pos.h), (pos.x, pos.y + pos.h)]
+        ),
+        (
+            (pos.x + pos.w // 2, pos.y + line_width // 2),
+            [(pos.x, pos.y), (pos.x + pos.w, pos.y), (pos.x + pos.w, pos.y + line_width), (pos.x, pos.y + line_width)]
+        )
+    ]
 
-  return [pos, Collidable(shape=box)], style
+    # Get the right corner
+    if direction == 'north':
+        boxes = list(map(lambda sd: rotate_shape_definition(sd, 90, pos.center), boxes))
+    elif direction == 'south':
+        # FIXME: This rotation is off by 5 units for some reason.
+        boxes = list(map(lambda sd: rotate_shape_definition(sd, -90, pos.center), boxes))
+    elif direction == 'west':
+        boxes = list(map(lambda sd: rotate_shape_definition(sd, 180, pos.center), boxes))
+
+    # Check for rotation
+    if style.get('rotation', '') != '':
+        rotate = int(style['rotation'])
+        if rotate < 0:
+            rotate = 360 + rotate
+        boxes = list(map(lambda sd: rotate_shape_definition(sd, rotate, pos.center), boxes))
+
+    return [pos, Collidable(boxes)], style

@@ -70,7 +70,7 @@ def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
                     __event_store.put(new_event)
             else:
                 ent = payload.ent
-                logger.debug(f'[{env.now}] Got event {ev.type} for ent {ent}')
+                logger.debug(f'[{env.now}] Got event {ev.type} for ent {ent} - {ev.payload}')
                 if ev.type not in script.expecting:
                     logger.warning(f'Was not expecting {ev.type}')
                 else:

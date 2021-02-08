@@ -13,7 +13,7 @@ TYPE = 'map-path'
 def build_object(cell, world: esper.World, window_options, draw2entity):
     logger = logging.getLogger(__name__)
     mxCell = cell[0]
-    points = from_mxCell(mxCell, draw2entity, world)
+    points = path_from_mxCell(mxCell, draw2entity, world)
     key = cell.attrib.get('key', '')
     if key == '':
         logger.warning(f"Map entry without key. Using default value")
@@ -33,7 +33,7 @@ def build_object(cell, world: esper.World, window_options, draw2entity):
     return {}, [], {}
 
 
-def from_mxCell(cell: Element, draw2entity, world: esper.World):
+def path_from_mxCell(cell: Element, draw2entity, world: esper.World):
     """Extracts the points of a path from XML."""
     logger = logging.getLogger(__name__)
     points = []

@@ -5,7 +5,7 @@ from utils.helpers import parse_style
 
 MODEL = 'mxgraph.floorplan.wall'
 
-def from_mxCell(el, windowSize, lineWidth=10):
+def from_mxCell(el, lineWidth=10):
     # Parse style
     style = parse_style(el.attrib['style'])
     if style.get('shape') != 'mxgraph.floorplan.wall':
@@ -32,6 +32,4 @@ def from_mxCell(el, windowSize, lineWidth=10):
     # Create collision box
     col_points = pos._get_box()
     center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
-    col_points = list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), col_points))
-    collision_box = Poly(Vector(center[0], center[1]), col_points)
-    return ([pos, Collidable(shape=collision_box)], style)
+    return [pos, Collidable([(center, col_points)])], style

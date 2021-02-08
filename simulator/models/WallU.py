@@ -1,14 +1,15 @@
-import pyglet
-import primitives as primitives
-
-from collision import Concave_Poly
 from components.Collidable import Collidable
 from components.Position import Position
-from utils.helpers import *
+from utils.helpers import rotate_shape_definition, parse_style
+
+from typing import List, Tuple
+from typehints.component_types import ShapeDefinition, Component
 
 
 MODEL = 'mxgraph.floorplan.wallU'
-def from_mxCell(el, windowSize, lineWidth=10):
+
+
+def from_mxCell(el, line_width=10) -> Tuple[List[Component], dict]:
     # Parse style
     style = parse_style(el.attrib['style'])
     if style.get('shape', "") != 'mxgraph.floorplan.wallU':
@@ -24,35 +25,26 @@ def from_mxCell(el, windowSize, lineWidth=10):
     height = float(geometry.attrib['height'])
     # Create drawing
     pos = Position(x=x, y=y, w=width, h=height, movable=False)
-    center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
-    points = [
-        (pos.x, pos.y),
-        (pos.x, pos.y + pos.h),
-        (pos.x - lineWidth // 2, pos.y + pos.h),
-        (pos.x + pos.w + lineWidth // 2, pos.y + pos.h),
-        (pos.x + pos.w, pos.y + pos.h),
-        (pos.x + pos.w, pos.y)
-    ]
-
     # Collision box
-    col_points = [
-        (pos.x - lineWidth // 2, pos.y),
-        (pos.x - lineWidth // 2, pos.y + pos.h + lineWidth // 2),
-        (pos.x + pos.w, pos.y + pos.h + lineWidth // 2),
-        (pos.x + pos.w + lineWidth // 2, pos.y),
-        (pos.x + pos.w - lineWidth // 2, pos.y),
-        (pos.x + pos.w - lineWidth // 2, pos.y + pos.h - lineWidth // 2),
-        (pos.x + lineWidth // 2, pos.y + pos.h - lineWidth // 2),
-        (pos.x + lineWidth // 2, pos.y)
+    boxes: List[ShapeDefinition] = [
+        (
+            (pos.x + line_width // 2, pos.y + pos.h // 2),
+            [(pos.x, pos.y), (pos.x + line_width, pos.y), (pos.x + line_width, pos.y + pos.h), (pos.x, pos.y + pos.h)]
+        ),
+        (
+            (pos.x + pos.w // 2, pos.y + line_width // 2),
+            [(pos.x, pos.y), (pos.x + pos.w, pos.y), (pos.x + pos.w, pos.y + line_width), (pos.x, pos.y + line_width)]
+        ),
+        (
+            (pos.x + pos.w - (line_width // 2), pos.y + pos.h // 2),
+            [(pos.x + pos.w - line_width, pos.y), (pos.x + pos.w, pos.y), (pos.x + pos.w, pos.y + pos.h), (pos.x + pos.w - line_width, pos.y + pos.h)]
+        )
     ]
 
     if style.get('rotation', '') != '':
         rotate = int(style['rotation'])
         if rotate < 0:
             rotate = 360 + rotate
-        col_points = map(lambda x: rotate_around_point(x, math.radians(rotate), center), col_points)
+        boxes = list(map(lambda sd: rotate_shape_definition(sd, rotate, pos.center), boxes))
 
-    col_points = map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), col_points)
-    box = Concave_Poly(Vector(center[0], center[1]), list(col_points))
-
-    return ([pos, Collidable(shape=box)], style)
+    return [pos, Collidable(boxes)], style

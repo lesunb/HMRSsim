@@ -4,7 +4,6 @@ import esper
 import logging
 import os
 
-import utils.helpers as helpers
 import resources.load_resources as loader
 import mxCellDecoder as mxCellDecoder
 
@@ -39,9 +38,9 @@ def build_simulation_from_map(file: str, skip_map=False, line_width=10):
     width = int(map_content.attrib.get('pageWidth', 500))
     height = int(map_content.attrib.get('pageHeight', 500))
 
-    background_color = helpers.hex_to_rgb('#FFFFFF')
+    background_color = '#FFFFFF'
     if 'background' in map_content.attrib:
-        background_color = helpers.hex_to_rgb(map_content.attrib['background'])
+        background_color = map_content.attrib['background']
     content_root = map_content[0] if len(map_content) > 0 else None
     # Create pyglet window
     # window = pyglet.window.Window(width=width,
@@ -110,7 +109,8 @@ def build_simulation_objects(content_root: Element, world: esper.World, window_o
         if cell.tag == 'object':
             type = cell.attrib['type']
             try:
-                pending_updates = available_builders[type].__dict__['build_object'](cell, world, window_options, draw2entity)
+                pending_updates = \
+                    available_builders[type].__dict__['build_object'](cell, world, window_options, draw2entity)
                 draw2entity.update(pending_updates[0])
                 objects += pending_updates[1]
                 interactive.update(pending_updates[2])
@@ -128,7 +128,8 @@ def build_simulation_objects(content_root: Element, world: esper.World, window_o
         if cell.tag == 'object':
             type = cell.attrib['type']
             try:
-                pending_updates = available_builders[type].__dict__['build_object'](cell, world, window_options, draw2entity)
+                pending_updates = \
+                    available_builders[type].__dict__['build_object'](cell, world, window_options, draw2entity)
                 draw2entity.update(pending_updates[0])
                 objects += pending_updates[1]
                 interactive.update(pending_updates[2])

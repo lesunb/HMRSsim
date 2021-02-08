@@ -1,40 +1,36 @@
 import math
-import typing
 import os
 import importlib
 import primitives
-from collision import Vector, Poly
+from collision import Vector
+from typehints.component_types import ShapeDefinition, Point
+from typing import Union, List, Dict
 
-ShapeType = typing.Union[primitives.Rectangle, primitives.Ellipse]
+ShapeType = Union[primitives.Rectangle, primitives.Ellipse]
 
-def hex_to_rgb(hex_color):
-  """Transforms a color from hecadecimal string (e.g. #FF0000)
-  To rgba, with values from 0.0 to 255.0, which is pyglet standard.
-  """
-  r = hex_color[1:3]
-  g = hex_color[3:5]
-  b = hex_color[5:]
-  return (int(r, 16) / 255, int(g, 16) / 255, int(b, 16) / 255, 0.0)
 
 def parse_style(style):
-  s = {}
-  items = style.split(';')
-  for item in items:
-    if item == "":
-      continue
-    elif '=' not in item:
-      s[item] = True
-      continue
-    [key, value] = item.split('=')
-    s[key] = value
-  return s
+    s = {}
+    items = style.split(';')
+    for item in items:
+        if item == "":
+            continue
+        elif '=' not in item:
+            s[item] = True
+            continue
+        [key, value] = item.split('=')
+        s[key] = value
+    return s
 
-def get_rel_points(center, points):
-  return list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), points))
 
-def tuple2vector(x):
-  return Vector(x[0], x[1])
-  
+def get_rel_points(center: Point, points: List[Point]) -> List[Vector]:
+    return list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), points))
+
+
+def tuple2vector(x: Point) -> Vector:
+    return Vector(x[0], x[1])
+
+
 def rotate_around_point(xy, radians, origin=(0, 0)):
     """Rotate a point around a given point.
     
@@ -55,13 +51,15 @@ def rotate_around_point(xy, radians, origin=(0, 0)):
     return qx, qy
 
 
-def collision_from_points(shape: ShapeType, center: typing.Tuple[int, int]) -> Poly:
-    points = shape._get_points()
-    col_points = list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), points))
-    return Poly(tuple2vector(center), col_points)
+def rotate_shape_definition(definition: ShapeDefinition, angle: float, center: Point) -> ShapeDefinition:
+    if angle < 0:
+        angle = 360 + angle
+    new_center = rotate_around_point(definition[0], math.radians(angle), center)
+    new_points = list(map(lambda p: rotate_around_point(p, math.radians(angle), center), definition[1]))
+    return new_center, new_points
 
 
-def list_folder(path: str) -> typing.Dict:
+def list_folder(path: str) -> Dict:
     available = {}
     for component in os.listdir(path):
         file_name, extension = os.path.splitext(component)

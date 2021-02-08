@@ -14,10 +14,10 @@ from typehints.component_types import Component
 MODEL = 'default'
 
 
-def from_object(el, windowSize, lineWidth=10) -> Tuple[List[Component], dict]:
+def from_object(el, line_width=10) -> Tuple[List[Component], dict]:
     options = el.attrib
 
-    components, style = from_mxCell(el[0], windowSize, lineWidth)
+    components, style = from_mxCell(el[0], line_width)
     if 'collidable' not in options:
         options['collidable'] = True
     if 'movable' not in options:
@@ -40,7 +40,7 @@ def from_object(el, windowSize, lineWidth=10) -> Tuple[List[Component], dict]:
     return components, options
 
 
-def from_mxCell(el, windowSize, lineWidth=10) -> Tuple[List[Component], dict]:
+def from_mxCell(el, lineWidth=10) -> Tuple[List[Component], dict]:
     # Parse style
     style = parse_style(el.attrib['style'])
     # Get parent
@@ -69,7 +69,4 @@ def from_mxCell(el, windowSize, lineWidth=10) -> Tuple[List[Component], dict]:
     else:
         col_points = pos._get_box()
 
-    col_points = list(map(lambda x: Vector(x[0] - center[0], x[1] - center[1]), col_points))
-    collision_box = Poly(Vector(center[0], center[1]), col_points)
-
-    return [pos, Collidable(shape=collision_box)], style
+    return [pos, Collidable([(center, col_points)])], style

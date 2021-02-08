@@ -20,8 +20,8 @@ class ObjectManagerOps(Enum):
     RECREATE = 'recreate'
 
 
-GrabPayload = NamedTuple('GrabPayload', object=str, op=str, reply_channel=Store)
-DropPayload = NamedTuple('DropPayload', object=str, op=str, skeleton=any, new_position=Tuple[float, float], reply_channel=Store)
+GrabPayload = NamedTuple('GrabPayload', object=str, op=ObjectManagerOps, reply_channel=Store)
+DropPayload = NamedTuple('DropPayload', object=str, op=ObjectManagerOps, skeleton=any, new_position=Tuple[float, float], reply_channel=Store)
 
 ManagerTag = 'ManagerEventTag'
 
