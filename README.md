@@ -2,15 +2,12 @@
 [![Build Status](https://travis-ci.org/gabrielsr/hmrssim.svg?branch=master)](https://travis-ci.org/gabrielsr/hmrssim)
 [![codecov](https://codecov.io/gh/gabrielsr/hmrssim/branch/master/graph/badge.svg)](https://codecov.io/gh/gabrielsr/hmrssim)
 
-
 Heterogeneous Multi-Robots Systems Simulator
 ======================================================
 
 Env Depencies
 -------------
 python 3, pip
-
-Used IDE: vscode, plugin python
 
 Instal pipenv
 ------------- 
@@ -42,33 +39,17 @@ $ pipenv shell
 
 Run
 ---
+> ⚠ You need to include the `simulator/` folder in your PYTHONPATH.
 
-Select the exec shell
-
-```console
-$ pipenv shell
+Simulations are defined in by config objects. You can pass the config to the Simulator class either by a dict object, or by passing the path to a json file.  
+```python
+simulator = Simulator(config)
 ```
 
-Then, Execute Simulation
-
-```console
-$ python ./simulator/run.py
-```
-
-Test
-----
-
-Tests should be put on /tests folder and are executed with the following command.
-
-```console
- $ pytest -v --cov .
-```
-
-Linter
-------
-
-```console
- $ flake8 --statistics
+The file that build a simulation and runs it is `run.py`
+To execute the simulation, run
+```bash
+$ python run.py [path/to/config.json]
 ```
 
 Dependency

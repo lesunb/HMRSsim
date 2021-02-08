@@ -2,13 +2,15 @@ import esper
 import simpy
 from components.Position import Position
 from components.Path import Path
+from typehints.dict_types import SystemArgs
 
 from main import EVENT
 from systems.PathProcessor import EndOfPathTag, EndOfPathPayload
 StopEventTag = 'stopEvent'
 GenericCollisionTag = 'genericCollision'
 
-def process(kwargs):
+
+def process(kwargs: SystemArgs):
     event_store = kwargs.get('EVENT_STORE', None)
     world: esper.World = kwargs.get('WORLD', None)
     env: simpy.Environment = kwargs.get('ENV', None)
@@ -42,7 +44,7 @@ def process(kwargs):
 
         # If following path, remove it
         if world.has_component(ent, Path):
-            end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, env.now))
+            end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, str(env.now)))
             event_store.put(end_of_path)
             world.remove_component(ent, Path)
 

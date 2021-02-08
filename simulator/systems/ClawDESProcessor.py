@@ -4,6 +4,7 @@ from typing import NamedTuple, List
 from esper import World
 from simpy import FilterStore, Store, Environment
 from main import EVENT
+from typehints.dict_types import SystemArgs
 
 from components.Position import Position
 from components.Claw import Claw
@@ -14,7 +15,6 @@ from components.Script import Script, States
 
 from collision import collide
 from primitives import Ellipse
-from utils import helpers
 
 import logging
 import systems.ManageObjects as ObjectManager
@@ -37,11 +37,11 @@ _EVENT_STORE: FilterStore
 _WORLD: World
 _ENV: Environment
 
-
-def process(kwargs):
+def process(kwargs: SystemArgs):
     global _EVENT_STORE
     global _WORLD
     global _ENV
+
     _EVENT_STORE = kwargs.get('EVENT_STORE', None)
     _WORLD = kwargs.get('WORLD', None)
     _ENV = kwargs.get('ENV', None)
@@ -65,8 +65,8 @@ def pick_object(obj_name: str, me: int):
     msg: str = f'Object {obj_name} not found.'
     # Create boundaries, if necessary
     if claw.boundaries is None:
-        span = Ellipse(pos.center, claw.max_range, claw.max_range)
-        col = Collidable(shape=helpers.collision_from_points(span, pos.center))
+        points = Ellipse(pos.center, claw.max_range, claw.max_range)._get_points()
+        col = Collidable([(pos.center, points)])
         claw.boundaries = col
     # For every pickable component, see if it's within range
     for _, (pick, col) in _WORLD.get_components(Pickable, Collidable):

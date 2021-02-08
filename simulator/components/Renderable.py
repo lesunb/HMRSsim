@@ -1,4 +1,7 @@
-class Renderable:
+from typehints.component_types import Component
+
+
+class Renderable(Component):
     def __init__(self, sprite, primitive=False, center=None):
         self.sprite = sprite
         self.w = sprite.width if not primitive else None 

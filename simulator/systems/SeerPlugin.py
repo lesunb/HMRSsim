@@ -3,6 +3,7 @@ import logging
 import json
 from queue import Queue
 from typing import Callable, List
+from typehints.dict_types import SystemArgs
 
 from simpy import Environment
 from esper import World
@@ -15,15 +16,17 @@ message_buffer = Queue()
 
 def consumer_manager(consumers: List[Callable], also_log: bool):
     logger = logging.getLogger(__name__ + '.consumer')
+    logging.addLevelName(25, 'SEER')
+    logger.setLevel('SEER')
     while True:
         message = message_buffer.get()  # Blocking function
-        if message == 'simulator finished':
-            break
         if also_log:
-            logger.info(message)
+            logger.log(25, message)
         for c in consumers:
             c(message)
         message_buffer.task_done()
+        if 'theEnd' in message:
+            break
 
 # TODO: Add support for a custom message builder
 def init(consumers: List[Callable], scan_interval: float, also_log=False):
@@ -35,7 +38,7 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
 
     # The producer thread
 
-    def process(kwargs):
+    def process(kwargs: SystemArgs):
         event_store = kwargs.get('EVENT_STORE', None)
         world: World = kwargs.get('WORLD', None)
         env: Environment = kwargs.get('ENV', None)
@@ -94,7 +97,7 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
             yield env.timeout(scan_interval)
 
     def clean():
-        message_buffer.put('simulator finished')
+        message_buffer.put({"theEnd": True})
         thread.join()
 
     return process, clean

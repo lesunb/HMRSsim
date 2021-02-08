@@ -1,4 +1,5 @@
 from enum import Enum
+from typehints.component_types import Component
 
 from typing import List
 
@@ -8,7 +9,8 @@ class States(Enum):
     BLOQUED = 'bloqued'
     DONE = 'done'
 
-class Script:
+
+class Script(Component):
 
     def __init__(self, instructions: List[str], delay: int):
         self.curr_instruction = 0
@@ -19,7 +21,7 @@ class Script:
         self.expecting = []
 
     def __str__(self):
-        r = f'Script[{self.curr_instruction}/{len(self.instructions)} - {self.state}]:\n'
-        r += '\n'.join(self.instructions)
-        r += '\n' + ("-" * 10)
+        r = f'Script[{self.curr_instruction}/{len(self.instructions)} - {self.state}]:\n\t'
+        r += '\n\t'.join(self.instructions)
+        r += '\n\t' + ("-" * 10)
         return r

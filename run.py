@@ -56,7 +56,7 @@ normal_processors = [
 ]
 # Defines DES processors
 des_processors = [
-    Seer.init([my_seer_consumer], 0.5, True),
+    Seer.init([my_seer_consumer], 0.05, False),
     (ClawProcessor.process,),
     (ObjectManager.process,),
     (StopCollision.process,),
@@ -69,7 +69,7 @@ des_processors = [
 for p in normal_processors:
     simulator.add_system(p)
 for p in des_processors:
-    simulator.add_DES_system(p)
+    simulator.add_des_system(p)
 
 
 # @window.event

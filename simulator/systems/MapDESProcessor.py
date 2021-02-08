@@ -9,7 +9,6 @@ from components.Path import Path
 from main import EVENT
 
 import components.Script as scriptComponent
-from systems.GotoDESProcessor import GotoPayload, GotoEventTag
 from systems.PathProcessor import EndOfPathTag
 
 MapPayload = NamedTuple('MapPayload', entity=int, route=str)
@@ -28,7 +27,7 @@ def process(kwargs):
         # TODO: Verify if entity is close to path start
         event = yield event_store.get(lambda ev: ev.type == MapEventTag)
         payload: MapPayload = event.payload
-        entity_map = world.component_for_entity(payload.entity, Map)
+        entity_map = world.component_for_entity(1, Map)
         path_to_follow = entity_map.paths.get(payload.route, None)
         if path_to_follow is None:
             logger.debug(f"Path {payload.route} not found!")

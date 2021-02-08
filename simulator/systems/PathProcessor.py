@@ -1,6 +1,8 @@
 import esper
 import logging
 from typing import NamedTuple
+from typehints.dict_types import SystemArgs
+
 from simpy import FilterStore
 
 from main import EVENT
@@ -18,14 +20,14 @@ class PathProcessor(esper.Processor):
         super().__init__()
         self.logger = logging.getLogger(__name__)
 
-    def process(self, kwargs):
+    def process(self, kwargs: SystemArgs):
         event_store: FilterStore = kwargs.get('EVENT_STORE', None)
         env = kwargs.get('ENV', None)
         for ent, (pos, path, vel) in self.world.get_components(Position, Path, Velocity):
-            # self.logger.debug(f"Processing {ent}")
+            # self.logger.debug(f"[{env.now}] Processing {ent}")
             point = path.points[path.curr_point]
             pos_center = pos.center
-            # logg(f"[Path] Point {point} is {path.curr_point}th point")
+            # self.logger.debug(f"[{env.now}] Entity {ent} path - {path} - {pos} - {vel}")
             if pos_center[0] == point[0] and pos_center[1] == point[1]:
                 # self.logger.debug("Going to next point")
                 path.curr_point += 1
@@ -37,7 +39,7 @@ class PathProcessor(esper.Processor):
                     pos.changed = False # or pos.changed
                     self.world.remove_component(ent, Path)
                     # Adds an EndOfPath event, in case anyone is listening
-                    end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, env.now))
+                    end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, str(env.now)))
                     # self.logger.debug(f'[{env.now}] PathProcessor adding EndOfPath event {end_of_path}')
                     event_store.put(end_of_path)
                     return

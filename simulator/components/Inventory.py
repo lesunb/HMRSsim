@@ -1,5 +1,7 @@
+from typehints.component_types import Component
 
-class Inventory:
+
+class Inventory(Component):
 
     def __init__(self, objects=None):
         if objects is None:
