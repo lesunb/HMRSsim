@@ -53,5 +53,6 @@ def from_mxCell(cell: Element, draw2entity, world: esper.World):
         points.append(target_pos.center)
     return points
 
+
 def parse_mxPoint(el):
     return float(el.attrib['x']), float(el.attrib['y'])

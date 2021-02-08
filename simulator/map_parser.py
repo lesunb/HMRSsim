@@ -55,7 +55,7 @@ def build_simulation_from_map(file: str, skip_map=False, line_width=10):
     # pyglet.gl.glClear(pyglet.gl.GL_COLOR_BUFFER_BIT | pyglet.gl.GL_DEPTH_BUFFER_BIT)
 
     world = esper.World()
-    simulation = world.create_entity()  # Simulation is always the first entity
+    simulation = world.create_entity(Inventory())  # Simulation is always the first entity
     if content_root:
         draw_map, objects, interactive = build_simulation_objects(content_root, world, ((width, height), line_width))
     else:

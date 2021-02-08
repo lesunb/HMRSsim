@@ -37,8 +37,8 @@ Arguments:
 CleanupFunction = typing.Optional[typing.Callable[[], None]]
 ConfigFormat = typing.Optional[typing.Union[str, Config]]
 
-SimpyGenerator = typing.Callable[[typing.Generator[simpy.Event, typing.Any, typing.Any]], simpy.Process]
-SystemProcessFunction = typing.Callable[[SystemArgs], SimpyGenerator]
+SimpyEvent = typing.Generator[simpy.Event, typing.Any, typing.Any]
+SystemProcessFunction = typing.Callable[[SystemArgs], SimpyEvent]
 DESSystem = typing.Tuple[SystemProcessFunction, typing.Optional[CleanupFunction]]
 
 
@@ -123,9 +123,11 @@ class Simulator:
         logger.info(f'Simulation {self.simulation_name}')
         logger.info(f'{len(self.draw2ent)} entities created.')
         logger.info(f'{len(self.objects)} typed objects transformed into entities')
-        logger.info(f'===> ENTITIES CREATED')
+        logger.info(f'===> TYPED OBJECTS')
         for k, v in self.draw2ent.items():
-            logger.info(f'• {k} --> esper entity {v[0]}. (type {v[1].get("type", "None")})')
+            if v[1].get('type', None) is None:
+                continue
+            logger.info(f'• {k} --> esper entity {v[0]}. (type {v[1]["type"]})')
             ent = v[0]
             components = self.world.components_for_entity(ent)
             logger.info(f'Entity has {len(components)} components.')
@@ -141,7 +143,8 @@ class Simulator:
         rather than being executed at every simulation step.
         DES systems can also inform a cleanup function. It will be executed when the simulator exits.
         """
-        self.ENV.process(system[0](kwargs=self.KWARGS))
+        process_function: SystemProcessFunction = system[0]
+        self.ENV.process(process_function(self.KWARGS))
         if len(system) == 2:
             self.cleanups.append(system[1])
 
