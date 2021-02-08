@@ -41,10 +41,10 @@ def from_mxCell(el, line_width=10) -> Tuple[List[Component], dict]:
 
     # Get the right corner
     if direction == 'north':
-        boxes = list(map(lambda sd: rotate_shape_definition(sd, 90, pos.center), boxes))
+        boxes = list(map(lambda sd: mirror_shape_definition_vertically(sd, pos.center), boxes))
     elif direction == 'south':
-        # FIXME: This rotation is off by 5 units for some reason.
-        boxes = list(map(lambda sd: rotate_shape_definition(sd, -90, pos.center), boxes))
+        # Mirror along vertical axis
+        boxes = list(map(lambda sd: mirror_shape_definition_horizontally(sd, pos.center), boxes))
     elif direction == 'west':
         boxes = list(map(lambda sd: rotate_shape_definition(sd, 180, pos.center), boxes))
 
