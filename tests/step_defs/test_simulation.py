@@ -24,7 +24,7 @@ def room():
 
 @given("a robot in 1,1", target_fixture="robot_position")
 def robot(simulation):
-    robot_position = get_component(simulation, Position, '6')
+    robot_position = get_component(simulation, Position, 'robot')
     robot_position.x = 1
     robot_position.y = 1
     return robot_position

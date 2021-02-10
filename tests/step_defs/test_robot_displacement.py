@@ -1,11 +1,13 @@
-from tests.aux.testaux import get_component
+from tests.aux.testaux import get_component, store_gotoPos_event, get_path_last_point
 import pytest
 from pytest_bdd import scenarios, given, when, then
 from main import Simulator
 from components.Path import Path
 from components.Position import Position
+from components.POI import POI
 from systems.PathProcessor import PathProcessor
 from systems.MovementProcessor import MovementProcessor
+import systems.GotoDESProcessor as gotoProcessor
 
 scenarios('../features/robot_displacement.feature')
 
@@ -25,30 +27,30 @@ def map(config):
     simulation = Simulator(config)
     return simulation
 
-@given("a 'room3' as a POI in 2,2")
-def room3_poi():
-    pass #como definir um poi no mapa?
+@given("a 'room3' as a POI in 2,2", target_fixture="poi")
+def poi(simulation):
+    store_gotoPos_event(simulation, 'robot', [2,2])
+    simulation.add_des_system(gotoProcessor.process)
 
 @pytest.fixture
 @given("a path to 'room3'")
 def target_path(simulation):
-    path = get_component(simulation, Path, '15')
-    target_path = path.points[-1]
-    return { 'x': target_path[0], 'y': target_path[1]}
+    path = get_component(simulation, Path, 'robot')
+    return get_path_last_point(path)
 
 @when("the robot receives a move-to 'room3'")
 def movement(simulation, target_path):
     width, height = simulation.window_dimensions
     simulation.add_system(PathProcessor())
     simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height))
-    simulation.run()
 
 @when("after some time")
-def pass_time():
-    pass
+def pass_time(simulation):
+    simulation.run()
 
 @then("the robot is in 'room3'")
 def check_position(simulation, target_path):
-    position = get_component(simulation, Position, '15')
+    # TODO: fazer o assert do POI, só está verificando do target_path
+    position = get_component(simulation, Position, 'robot')
     assert target_path['x'] == position.center[0]
     assert target_path['y'] == position.center[1]
