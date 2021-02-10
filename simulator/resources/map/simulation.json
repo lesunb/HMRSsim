@@ -1,6 +1,6 @@
 {
     "context": "resources/map",
-    "map": "room.drawio",
+    "map": "tilted_walls.drawio",
     "FPS": 60,
     "DLW": 10,
     "duration": 1

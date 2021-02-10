@@ -72,6 +72,7 @@ def mirror_shape_definition_vertically(definition: ShapeDefinition, shape_center
     new_points = list(map(lambda p: (p[0], (shape_center[1] - p[1]) + shape_center[1]), definition[1]))
     return new_def_center, new_points
 
+
 def list_folder(path: str) -> Dict:
     available = {}
     for component in os.listdir(path):
