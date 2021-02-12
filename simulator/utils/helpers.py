@@ -58,7 +58,10 @@ def rotate_shape_definition(definition: ShapeDefinition, angle: float, center: P
     new_points = list(map(lambda p: rotate_around_point(p, math.radians(angle), center), definition[1]))
     return new_center, new_points
 
-
+def clean_path(path: str) -> str:
+    path = path.replace('./', '').replace('/', '.')
+    return path
+    
 def list_folder(path: str) -> Dict:
     available = {}
     for component in os.listdir(path):
@@ -67,6 +70,6 @@ def list_folder(path: str) -> Dict:
             continue
         if file_name.startswith('__') and file_name.endswith('__'):
             continue
-        module = importlib.import_module(f'{path[2:]}.{file_name}')
+        module = importlib.import_module(f'{clean_path(path)}.{file_name}')
         available[file_name] = module
     return available
