@@ -39,7 +39,8 @@ def map_from_drawio(drawioxml):
     """
     tree = ET.parse(drawioxml)
     root = tree.getroot()
-    if root[0].text is None:
+
+    if root[0].text is None or len(list(root[0])) > 0:
         # Assume the file is uncompressed already
         content = root[0]
         if content.tag == 'diagram':
