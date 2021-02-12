@@ -9,6 +9,7 @@ flake8 = "*"
 pytest-cov = "*"
 autopep8 = "*"
 codacy-coverage = "*"
+pytest-bdd = "*"
 
 [packages]
 simpy = "*"
