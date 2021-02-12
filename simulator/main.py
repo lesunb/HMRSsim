@@ -17,8 +17,8 @@ from components.Inventory import Inventory
 from dynamic_importer import init_component, ComponentInitError
 
 from typehints.dict_types import SystemArgs, Config, EntityDefinition
-
-fileName = pathlib.Path.cwd().joinpath('loggerConfig.yml')
+from utils.config import working_directory
+fileName = pathlib.Path.cwd().joinpath(f'{working_directory}/loggerConfig.yml')
 stream = open(fileName)
 loggerConfig = yaml.safe_load(stream)
 logging.config.dictConfig(loggerConfig)
