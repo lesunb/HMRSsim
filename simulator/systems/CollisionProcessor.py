@@ -42,11 +42,9 @@ class CollisionProcessor(esper.Processor):
                     vel.x = 0
                     vel.y = 0
                     vel.alpha = 0
-                    self.logger.debug(choice(COLORS) +
-                          f'colision detected between {ent} and {otherEnt}')
                     if eventStore:
-                        if col.event_tag == 'genericColision':
-                            self.logger.debug(f'Collision! {ent} - {otherEnt}')
+                        if col.event_tag == 'genericCollision':
+                            self.logger.debug(choice(COLORS) + f'Collision! {ent} - {otherEnt}')
                         event = EVENT(col.event_tag, (ent, otherEnt))
                         # self.logger.debug(f'Firing event ent --> otherEnt: {event}')
                         eventStore.put(event)

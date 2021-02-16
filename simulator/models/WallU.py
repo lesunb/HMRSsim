@@ -43,8 +43,7 @@ def from_mxCell(el, line_width=10) -> Tuple[List[Component], dict]:
 
     if style.get('rotation', '') != '':
         rotate = int(style['rotation'])
-        if rotate < 0:
-            rotate = 360 + rotate
-        boxes = list(map(lambda sd: rotate_shape_definition(sd, rotate, pos.center), boxes))
+        rotate = (rotate + 360) % 360
+        boxes = list(map(lambda sd: rotate_shape_definition(sd, -rotate, pos.center), boxes))
 
     return [pos, Collidable(boxes)], style

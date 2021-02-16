@@ -1,3 +1,4 @@
+import logging
 import esper
 import simpy
 from components.Position import Position
@@ -11,6 +12,7 @@ GenericCollisionTag = 'genericCollision'
 
 
 def process(kwargs: SystemArgs):
+    logger = logging.getLogger(__name__)
     event_store = kwargs.get('EVENT_STORE', None)
     world: esper.World = kwargs.get('WORLD', None)
     env: simpy.Environment = kwargs.get('ENV', None)
@@ -27,7 +29,7 @@ def process(kwargs: SystemArgs):
         other_pos = world.component_for_entity(otherEnt, Position)
         (mx, my) = pos.center
         (ox, oy) = other_pos.center
-
+        logger.debug(f'Collision! ent {ent}@({pos}) hit {otherEnt}@({other_pos})')
         if mx < ox:
             # I'm on the left of the other entity
             pos.x = other_pos.x - 1
@@ -43,6 +45,8 @@ def process(kwargs: SystemArgs):
         # TODO: Handle case when they are in the same Y coordinate?...
 
         # If following path, remove it
+        # This can cause failure of other systems.
+        # We need to communicate the control system, instead of doing this.
         if world.has_component(ent, Path):
             end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, str(env.now)))
             event_store.put(end_of_path)

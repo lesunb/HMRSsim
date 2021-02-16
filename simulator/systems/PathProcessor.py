@@ -27,15 +27,14 @@ class PathProcessor(esper.Processor):
             # self.logger.debug(f"[{env.now}] Processing {ent}")
             point = path.points[path.curr_point]
             pos_center = pos.center
-            # self.logger.debug(f"[{env.now}] Entity {ent} path - {path} - {pos} - {vel}")
             if pos_center[0] == point[0] and pos_center[1] == point[1]:
-                # self.logger.debug("Going to next point")
+                self.logger.debug(f"[{env.now}] Entity {ent} moved point in path path - {point}[idx={path.curr_point}] - {pos.center} - {vel}")
                 path.curr_point += 1
                 if path.curr_point == len(path.points):
                     # end of path
                     vel.x = 0
                     vel.y = 0
-                    # self.logger.debug("Removing Path component from", ent)
+                    self.logger.debug(f"Removing Path component from {ent} (pos={pos.center}). Last point of path is {path.points[-1]}")
                     pos.changed = False # or pos.changed
                     self.world.remove_component(ent, Path)
                     # Adds an EndOfPath event, in case anyone is listening
@@ -43,17 +42,14 @@ class PathProcessor(esper.Processor):
                     # self.logger.debug(f'[{env.now}] PathProcessor adding EndOfPath event {end_of_path}')
                     event_store.put(end_of_path)
                     return
-                point = path.points[path.curr_point]
-                # self.logger.debug(f"Point {point} is {path.curr_point}th point")
-
-            dx = point[0] - pos_center[0]
-            if dx > 0:
-                vel.x = min(path.speed, dx)
             else:
-                vel.x = max(- path.speed, dx)
-            dy = point[1] - pos_center[1]
-            if dy > 0:
-                vel.y = min(path.speed, dy)
-            else:
-                vel.y = max(- path.speed, dy)
-
+                dx = point[0] - pos_center[0]
+                if dx > 0:
+                    vel.x = min(path.speed, dx)
+                else:
+                    vel.x = max(- path.speed, dx)
+                dy = point[1] - pos_center[1]
+                if dy > 0:
+                    vel.y = min(path.speed, dy)
+                else:
+                    vel.y = max(- path.speed, dy)

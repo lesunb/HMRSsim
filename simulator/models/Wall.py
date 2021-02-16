@@ -24,9 +24,8 @@ def from_mxCell(el, lineWidth=10):
 
     rotate = 0
     if 'rotation' in style:
-        rotate = int(style['rotation'])
-        if rotate < 0:
-            rotate = 360 + rotate
+        rotate = float(style['rotation'])
+        rotate = (360 + rotate) % 360
     pos.angle = rotate
 
     # Create collision box

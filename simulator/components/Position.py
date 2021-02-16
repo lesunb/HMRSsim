@@ -29,5 +29,5 @@ class Position(Component):
         center = (x + width // 2, y + height // 2)
         points = [(x, y), (x+width, y), (x+width, y+height), (x, y+height)]
         if self.angle != 0:
-            points = map(lambda x: helpers.rotate_around_point(x, math.radians(self.angle), center), points)
+            points = map(lambda x: helpers.rotate_around_point(x, math.radians( -self.angle), center), points)
         return points
