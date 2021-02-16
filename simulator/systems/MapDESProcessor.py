@@ -34,7 +34,7 @@ def process(kwargs):
             continue
         path_component = Path(points=path_to_follow)
         # logger.debug(f"Path to follow is {path_to_follow} ({isinstance(path_component, Path)})")
-        logger.debug(f"Adding path {payload.route} to entity {payload.entity}")
+        logger.debug(f"Adding path {payload.route} to entity {payload.entity} - {path_component}")
         world.add_component(payload.entity, path_component)
 
 # Functions that handle instructions

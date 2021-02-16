@@ -64,11 +64,6 @@ def remove_entity(obj_name):
         return False, 'This object does not belong to the global_inventory.'
     ent = global_inventory[obj_name]
     del global_inventory[obj_name]
-    if not __world.has_component(ent, Renderable):
-        return True, ''
-    r = __world.component_for_entity(ent, Renderable)
-    if r.is_primitive:
-        r.sprite.delete()
     __world.delete_entity(ent)
     return True, ''
 
