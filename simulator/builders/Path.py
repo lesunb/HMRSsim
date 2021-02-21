@@ -55,4 +55,4 @@ def path_from_mxCell(cell: Element, draw2entity, world: esper.World):
 
 
 def parse_mxPoint(el):
-    return float(el.attrib['x']), float(el.attrib['y'])
+    return float(el.attrib.get('x', 0)), float(el.attrib.get('y', 0))
