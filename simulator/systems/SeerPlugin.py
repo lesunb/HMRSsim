@@ -20,13 +20,13 @@ def consumer_manager(consumers: List[Callable], also_log: bool):
     logger.setLevel('SEER')
     while True:
         message = message_buffer.get()  # Blocking function
-        if message == 'simulator finished':
-            break
         if also_log:
             logger.log(25, message)
         for c in consumers:
             c(message)
         message_buffer.task_done()
+        if 'theEnd' in message:
+            break
 
 # TODO: Add support for a custom message builder
 def init(consumers: List[Callable], scan_interval: float, also_log=False):
@@ -97,7 +97,7 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
             yield env.timeout(scan_interval)
 
     def clean():
-        message_buffer.put('simulator finished')
+        message_buffer.put({"theEnd": True})
         thread.join()
 
     return process, clean

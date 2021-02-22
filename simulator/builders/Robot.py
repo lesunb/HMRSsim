@@ -5,6 +5,8 @@ import mxCellDecoder
 
 TYPE = 'robot'
 
+COMPONENT_DEPENDENCIES = []
+SYSTEM_DEPENDENCIES = []
 
 def build_object(cell, world, window_options, draw2entity):
     (components, style) = mxCellDecoder.parse_object(cell, window_options)

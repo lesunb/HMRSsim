@@ -1,5 +1,7 @@
+from typehints.component_types import Component
 
-class Pickable:
+
+class Pickable(Component):
 
     def __init__(self, weight, name, skeleton):
         self.weight = weight

@@ -1,7 +1,6 @@
 from enum import Enum
 
 from typing import NamedTuple, List
-from typehints.dict_types import SystemArgs
 from esper import World
 from simpy import FilterStore, Store, Environment
 from main import EVENT
@@ -16,7 +15,6 @@ from components.Script import Script, States
 
 from collision import collide
 from primitives import Ellipse
-from utils import helpers
 
 import logging
 import systems.ManageObjects as ObjectManager
@@ -39,11 +37,11 @@ _EVENT_STORE: FilterStore
 _WORLD: World
 _ENV: Environment
 
-
 def process(kwargs: SystemArgs):
     global _EVENT_STORE
     global _WORLD
     global _ENV
+
     _EVENT_STORE = kwargs.get('EVENT_STORE', None)
     _WORLD = kwargs.get('WORLD', None)
     _ENV = kwargs.get('ENV', None)
@@ -61,21 +59,25 @@ def process(kwargs: SystemArgs):
 
 
 def pick_object(obj_name: str, me: int):
+    logger = logging.getLogger(__name__)
     pos = _WORLD.component_for_entity(me, Position)
     claw = _WORLD.component_for_entity(me, Claw)
     success: bool = False
     msg: str = f'Object {obj_name} not found.'
-    # Create boundaries, if necessary
-    if claw.boundaries is None:
-        span = Ellipse(pos.center, claw.max_range, claw.max_range)
-        col = Collidable(shape=helpers.collision_from_points(span, pos.center))
-        claw.boundaries = col
+    # Squares are faster to create and test collision against.
+    points = [
+        (pos.center[0] - claw.max_range // 2, pos.center[1] - claw.max_range // 2),
+        (pos.center[0] + claw.max_range // 2, pos.center[1] - claw.max_range // 2),
+        (pos.center[0] + claw.max_range // 2, pos.center[1] + claw.max_range // 2),
+        (pos.center[0] - claw.max_range // 2, pos.center[1] + claw.max_range // 2)
+    ]
+    claw_col = Collidable([(pos.center, points)])
     # For every pickable component, see if it's within range
     for _, (pick, col) in _WORLD.get_components(Pickable, Collidable):
         if pick.name == obj_name:
             # This is the object we want. Let's see if it's in range and under limit weight
             for s1 in col.shapes:
-                if collide(claw.boundaries.shapes[0], s1):
+                if collide(claw_col.shapes[0], s1):
                     if pick.weight <= claw.max_weight:
                         # Take the object
                         reply_channel = Store(_ENV)
@@ -102,6 +104,9 @@ def pick_object(obj_name: str, me: int):
                 else:
                     msg = f'Pickable {obj_name} not within claw range!'
                     success = False
+    if not success:
+        return success, msg
+    # TODO: Need to warn control module about this
     response = RESPONSE_ClawPayload(op=ClawOps.GRAB, ent=me, success=success, msg=msg)
     event_to_put = EVENT(ClawDoneTag, response)
     _EVENT_STORE.put(event_to_put)

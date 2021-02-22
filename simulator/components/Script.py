@@ -1,4 +1,5 @@
 from enum import Enum
+from typehints.component_types import Component
 
 from typing import List
 
@@ -8,7 +9,8 @@ class States(Enum):
     BLOQUED = 'bloqued'
     DONE = 'done'
 
-class Script:
+
+class Script(Component):
 
     def __init__(self, instructions: List[str], delay: int):
         self.curr_instruction = 0

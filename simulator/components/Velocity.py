@@ -1,4 +1,7 @@
-class Velocity:
+from typehints.component_types import Component
+
+
+class Velocity(Component):
     def __init__(self, x=0.0, y=0.0, alpha=0.0):
         self.x = x
         self.y = y

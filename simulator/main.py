@@ -14,8 +14,7 @@ import typing
 import map_parser
 
 from components.Inventory import Inventory
-from dynamic_importer import init_component, ComponentInitError
-
+from utils.create_components import initialize_components
 from typehints.dict_types import SystemArgs, Config, EntityDefinition
 
 fileName = pathlib.Path.cwd().joinpath('loggerConfig.yml')
@@ -37,8 +36,8 @@ Arguments:
 CleanupFunction = typing.Optional[typing.Callable[[], None]]
 ConfigFormat = typing.Optional[typing.Union[str, Config]]
 
-SimpyGenerator = typing.Callable[[typing.Generator[simpy.Event, typing.Any, typing.Any]], simpy.Process]
-SystemProcessFunction = typing.Callable[[SystemArgs], SimpyGenerator]
+SimpyEvent = typing.Generator[simpy.Event, typing.Any, typing.Any]
+SystemProcessFunction = typing.Callable[[SystemArgs], SimpyEvent]
 DESSystem = typing.Tuple[SystemProcessFunction, typing.Optional[CleanupFunction]]
 
 
@@ -81,6 +80,7 @@ class Simulator:
 
         if 'map' in config:
             file = pathlib.Path(config.get('context', '.')) / config.get('map')
+            logger.info(f'Using simulation map {file}')
             simulation = map_parser.build_simulation_from_map(file)
         else:
             logger.info('No map found in the configuration. Creating empty simulation.')
@@ -121,11 +121,16 @@ class Simulator:
     def generate_simulation_build_report(self):
         logger.info('===== SIMULATION LOADING COMPLETE =====')
         logger.info(f'Simulation {self.simulation_name}')
+        logger.info(f'===> Simulation components')
+        for c in self.world.components_for_entity(1):
+            logger.info(c)
         logger.info(f'{len(self.draw2ent)} entities created.')
         logger.info(f'{len(self.objects)} typed objects transformed into entities')
-        logger.info(f'===> ENTITIES CREATED')
+        logger.info(f'===> TYPED OBJECTS')
         for k, v in self.draw2ent.items():
-            logger.info(f'• {k} --> esper entity {v[0]}. (type {v[1].get("type", "None")})')
+            if v[1].get('type', None) is None:
+                continue
+            logger.info(f'• {k} --> esper entity {v[0]}. (type {v[1].get("type", "")})')
             ent = v[0]
             components = self.world.components_for_entity(ent)
             logger.info(f'Entity has {len(components)} components.')
@@ -141,7 +146,8 @@ class Simulator:
         rather than being executed at every simulation step.
         DES systems can also inform a cleanup function. It will be executed when the simulator exits.
         """
-        self.ENV.process(system[0](kwargs=self.KWARGS))
+        process_function: SystemProcessFunction = system[0]
+        self.ENV.process(process_function(self.KWARGS))
         if len(system) == 2:
             self.cleanups.append(system[1])
 
@@ -155,13 +161,7 @@ class Simulator:
 
     def add_entity(self, entity_definition: EntityDefinition, ent_id: str):
         """Add an entity from json to world."""
-        initialized_components = []
-        for component_name, args in entity_definition['components'].items():
-            try:
-                initialized_components.append(init_component(component_name, args))
-            except ComponentInitError:
-                logger.error(f'Failed to create component {component_name} for entity from json.')
-                return
+        initialized_components = initialize_components(entity_definition.get('components', {}))
         ent = self.world.create_entity(*initialized_components)
         self.draw2ent[ent_id] = [ent, {}]
         if entity_definition.get('isInteractive', False):
@@ -201,6 +201,7 @@ class Simulator:
         After simulation loop terminates, ALL cleanup functions are executed,
         the last being the user defined one, if present.
         """
+        logger.info('============ SIMULATION EXECUTION ============')
         if self.DURATION > 0:
             self.ENV.process(self.simulation_loop())
             self.ENV.run(until=self.DURATION)

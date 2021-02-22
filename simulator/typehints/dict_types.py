@@ -34,4 +34,5 @@ class Config(typing.TypedDict):
     FPS: typing.Optional[int]
     DLW: typing.Optional[int]
     duration: typing.Optional[int]
+    simulationComponents: typing.Optional[typing.Dict[str, list]]
     extraEntities: typing.Optional[typing.List[EntityDefinition]]

@@ -4,15 +4,16 @@ import esper
 import logging
 import os
 
-import utils.helpers as helpers
 import resources.load_resources as loader
 import mxCellDecoder as mxCellDecoder
 
 from dynamic_builders import export_available_builders
+from utils.create_components import initialize_components
 from components.Inventory import Inventory
 from components.Skeleton import Skeleton
 from xml.etree.ElementTree import Element
-from typehints.build_types import WindowOptions
+from typehints.build_types import WindowOptions, DependencyNotFound
+from typing import List, Tuple
 
 available_builders = export_available_builders()
 """Dict of available object typehints (e.g. robot, map-path, etc).
@@ -20,7 +21,7 @@ available_builders = export_available_builders()
 """
 
 
-def build_simulation_from_map(file: str, skip_map=False, line_width=10):
+def build_simulation_from_map(file: str, skip_map=False, simulation_components=None, line_width=10):
     """Creates the base for the simulation.
 
         If a map is provided, the simulation comes from the map.
@@ -38,9 +39,9 @@ def build_simulation_from_map(file: str, skip_map=False, line_width=10):
     width = int(map_content.attrib.get('pageWidth', 500))
     height = int(map_content.attrib.get('pageHeight', 500))
 
-    background_color = helpers.hex_to_rgb('#FFFFFF')
+    background_color = '#FFFFFF'
     if 'background' in map_content.attrib:
-        background_color = helpers.hex_to_rgb(map_content.attrib['background'])
+        background_color = map_content.attrib['background']
     content_root = map_content[0] if len(map_content) > 0 else None
     # Create pyglet window
     # window = pyglet.window.Window(width=width,
@@ -54,7 +55,12 @@ def build_simulation_from_map(file: str, skip_map=False, line_width=10):
     # pyglet.gl.glClear(pyglet.gl.GL_COLOR_BUFFER_BIT | pyglet.gl.GL_DEPTH_BUFFER_BIT)
 
     world = esper.World()
-    simulation = world.create_entity()  # Simulation is always the first entity
+    simulation = world.create_entity(Inventory())  # Simulation is always the first entity
+    if simulation_components is not None:
+        initialized_components = initialize_components(simulation_components)
+        for c in initialized_components:
+            world.add_component(1, c)
+
     if content_root:
         draw_map, objects, interactive = build_simulation_objects(content_root, world, ((width, height), line_width))
     else:
@@ -90,9 +96,15 @@ def build_simulation_objects(content_root: Element, world: esper.World, window_o
             interactive: dict -- Maps what entities can be interacted with (e.g. picked up).
                                  Key is the entity name, value is the entity id
     """
+    logger = logging.getLogger(__name__)
     draw2entity = {}
-    objects = []
+    objects: List[Tuple[int, str]] = []
     interactive = {}
+    # If any object in the XML has dependencies that appear after it in the XML
+    # The builder can return a DependencyNotFound error, causing the cell to be deferred.
+    # Deferred cells are re-evaluated after the first pass is complete.
+    deferred: List[Element] = []
+    # 1st pass
     for cell in content_root:
         if cell.tag == 'mxCell' and 'style' in cell.attrib:
             (components, style) = mxCellDecoder.parse_mxCell(cell, window_options)
@@ -102,9 +114,32 @@ def build_simulation_objects(content_root: Element, world: esper.World, window_o
             draw2entity[style['id']] = [ent, style]
         if cell.tag == 'object':
             type = cell.attrib['type']
-            pending_updates = available_builders[type].__dict__['build_object'](cell, world, window_options, draw2entity)
-            draw2entity.update(pending_updates[0])
-            objects += pending_updates[1]
-            interactive.update(pending_updates[2])
+            try:
+                pending_updates = \
+                    available_builders[type].__dict__['build_object'](cell, world, window_options, draw2entity)
+                draw2entity.update(pending_updates[0])
+                objects += pending_updates[1]
+                interactive.update(pending_updates[2])
+            except DependencyNotFound as err:
+                deferred.append(cell)
+                logger.debug(f'Cell {cell.tag} deferred - {err}')
+    # 2nd pass
+    for cell in deferred:
+        if cell.tag == 'mxCell' and 'style' in cell.attrib:
+            (components, style) = mxCellDecoder.parse_mxCell(cell, window_options)
+            ent = world.create_entity()
+            for c in components:
+                world.add_component(ent, c)
+            draw2entity[style['id']] = [ent, style]
+        if cell.tag == 'object':
+            type = cell.attrib['type']
+            try:
+                pending_updates = \
+                    available_builders[type].__dict__['build_object'](cell, world, window_options, draw2entity)
+                draw2entity.update(pending_updates[0])
+                objects += pending_updates[1]
+                interactive.update(pending_updates[2])
+            except DependencyNotFound as err:
+                logger.error(f'Cell {cell.tag} failed processing - {err}')
 
     return draw2entity, objects, interactive

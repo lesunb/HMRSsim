@@ -20,8 +20,8 @@ class ObjectManagerOps(Enum):
     RECREATE = 'recreate'
 
 
-GrabPayload = NamedTuple('GrabPayload', object=str, op=str, reply_channel=Store)
-DropPayload = NamedTuple('DropPayload', object=str, op=str, skeleton=any, new_position=Tuple[float, float], reply_channel=Store)
+GrabPayload = NamedTuple('GrabPayload', object=str, op=ObjectManagerOps, reply_channel=Store)
+DropPayload = NamedTuple('DropPayload', object=str, op=ObjectManagerOps, skeleton=any, new_position=Tuple[float, float], reply_channel=Store)
 
 ManagerTag = 'ManagerEventTag'
 
@@ -64,11 +64,6 @@ def remove_entity(obj_name):
         return False, 'This object does not belong to the global_inventory.'
     ent = global_inventory[obj_name]
     del global_inventory[obj_name]
-    if not __world.has_component(ent, Renderable):
-        return True, ''
-    r = __world.component_for_entity(ent, Renderable)
-    if r.is_primitive:
-        r.sprite.delete()
     __world.delete_entity(ent)
     return True, ''
 
