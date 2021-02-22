@@ -11,10 +11,13 @@ from utils.Navigation import Node, POI
 
 class Map(Component):
 
-    def __init__(self, nodes: Dict[Point, Node] = {}, pois: List[POI] = [], point_width=20):
+    def __init__(self, nodes: Dict[Point, Node] = {}, pois: List[POI] = [], point_width=20, wander_max_dist=100):
         self.nodes = nodes
-        self.pois = pois
+        self.pois: Dict[str, Point] = {}
+        for p in pois:
+            self.pois[p.tag] = p.point
         self.point_width = point_width
+        self.wander_max_dist = wander_max_dist
 
     def __str__(self):
         return f'Map[{len(self.nodes)} nodes; {len(self.pois)} pois]\nNODES: {self.nodes}\nPOIS: {self.pois}'

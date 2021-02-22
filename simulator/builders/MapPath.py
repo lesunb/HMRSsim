@@ -21,11 +21,6 @@ def build_object(cell, world: esper.World, window_options, draw2entity):
     if len(points) <= 1:
         raise Exception(f'Map path has {len(points)} points. Minimum is 2.')
 
-    key = cell.attrib.get('key', '')
-    if key == '':
-        logger.warning(f"Map entry without key. Using default value")
-        key = 'Default'
-
     # Entity 1 is the simulation entity
     if world.has_component(1, Map):
         simulation_map = world.component_for_entity(1, Map)

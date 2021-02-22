@@ -1,11 +1,7 @@
 import primitives as primitives
-import json
-from collision import Poly, Vector
 from components.Collidable import Collidable
 from components.Position import Position
 from components.Velocity import Velocity
-from components.POI import POI
-from components.BatteryComponent import Battery
 from utils.helpers import parse_style
 
 from typing import Tuple, List
@@ -22,13 +18,6 @@ def from_object(el, line_width=10) -> Tuple[List[Component], dict]:
         options['collidable'] = True
     if 'movable' not in options:
         options['movable'] = True
-    if 'POI' in options:
-        points = json.loads(options['POI'])
-        components.append(POI(points=points))
-    if 'battery' in options:
-        bat_info = json.loads(options['battery'])
-        bat = Battery(charge=float(bat_info['initialCharge']), lookupTable=bat_info['lookupTable'])
-        components.append(bat)
 
     options.update(style)
     pos = components[0]

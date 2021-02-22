@@ -1,8 +1,6 @@
 import esper
 import logging
 from components.Map import Map
-from utils.Navigation import POI
-
 
 TYPE = 'POI'
 
@@ -31,5 +29,5 @@ def build_object(object, world: esper.World, window_options, draw2entity):
     else:
         tag = 'POI_' + str(len(simulation_map.pois))
         logger.warning(f'POI ({x}, {y}) with no TAG. Using {tag}')
-    simulation_map.pois.append(POI(tag=tag, point=(x, y)))
+    simulation_map.pois[tag] = (x, y)
     return {}, [], {}

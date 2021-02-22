@@ -4,7 +4,7 @@ import utils.helpers as helpers
 
 class Path(Component):
     def __init__(self, points, speed=5):
-        self.points = points
+        self.points = list(points)
         self.curr_point = 0
         self.speed = speed
 

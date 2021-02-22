@@ -201,6 +201,7 @@ class Simulator:
         After simulation loop terminates, ALL cleanup functions are executed,
         the last being the user defined one, if present.
         """
+        logger.info('============ SIMULATION EXECUTION ============')
         if self.DURATION > 0:
             self.ENV.process(self.simulation_loop())
             self.ENV.run(until=self.DURATION)

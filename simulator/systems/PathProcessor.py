@@ -9,9 +9,11 @@ from main import EVENT
 from components.Path import Path
 from components.Position import Position
 from components.Velocity import Velocity
+from typing import List
+from typehints.component_types import Point
 
 
-EndOfPathPayload = NamedTuple('EndOfPathPayload', [('ent', int), ('timestamp', str)])
+EndOfPathPayload = NamedTuple('EndOfPathPayload', [('ent', int), ('timestamp', str), ('path', List[Point])])
 EndOfPathTag = 'EndOfPath'
 
 
@@ -34,13 +36,15 @@ class PathProcessor(esper.Processor):
                     # end of path
                     vel.x = 0
                     vel.y = 0
-                    self.logger.debug(f"Removing Path component from {ent} (pos={pos.center}). Last point of path is {path.points[-1]}")
-                    pos.changed = False # or pos.changed
-                    self.world.remove_component(ent, Path)
+                    self.logger.debug(
+                        f"Removed Path component from {ent} (pos={pos.center}). Last point of path is {path.points[-1]}"
+                    )
                     # Adds an EndOfPath event, in case anyone is listening
-                    end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, str(env.now)))
+                    end_of_path = EVENT(EndOfPathTag, EndOfPathPayload(ent, str(env.now), path=path.points))
                     # self.logger.debug(f'[{env.now}] PathProcessor adding EndOfPath event {end_of_path}')
                     event_store.put(end_of_path)
+                    pos.changed = False
+                    self.world.remove_component(ent, Path)
                     return
             else:
                 dx = point[0] - pos_center[0]
