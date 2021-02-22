@@ -1,6 +1,6 @@
 {
     "context": "resources/map",
-    "map": "map_with_colliding_wall.drawio",
+    "map": "hospital_scenario.drawio",
     "FPS": 60,
     "DLW": 10,
     "duration": 2

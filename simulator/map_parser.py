@@ -8,6 +8,7 @@ import resources.load_resources as loader
 import mxCellDecoder as mxCellDecoder
 
 from dynamic_builders import export_available_builders
+from utils.create_components import initialize_components
 from components.Inventory import Inventory
 from components.Skeleton import Skeleton
 from xml.etree.ElementTree import Element
@@ -20,7 +21,7 @@ available_builders = export_available_builders()
 """
 
 
-def build_simulation_from_map(file: str, skip_map=False, line_width=10):
+def build_simulation_from_map(file: str, skip_map=False, simulation_components=None, line_width=10):
     """Creates the base for the simulation.
 
         If a map is provided, the simulation comes from the map.
@@ -55,6 +56,11 @@ def build_simulation_from_map(file: str, skip_map=False, line_width=10):
 
     world = esper.World()
     simulation = world.create_entity(Inventory())  # Simulation is always the first entity
+    if simulation_components is not None:
+        initialized_components = initialize_components(simulation_components)
+        for c in initialized_components:
+            world.add_component(1, c)
+
     if content_root:
         draw_map, objects, interactive = build_simulation_objects(content_root, world, ((width, height), line_width))
     else:

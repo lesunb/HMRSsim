@@ -6,7 +6,7 @@ from systems.CollisionProcessor import CollisionProcessor
 from systems.PathProcessor import PathProcessor
 
 import systems.GotoDESProcessor as gotoProcessor
-import systems.MapDESProcessor as mapProcessor
+import systems.NavigationSystem as mapProcessor
 import systems.StopCollisionDESProcessor as StopCollision
 import systems.EnergyConsumptionDESProcessor as energySystem
 import systems.ManageObjects as ObjectManager
@@ -18,7 +18,6 @@ import systems.SeerPlugin as Seer
 
 extra_instructions = [
     (gotoProcessor.GotoInstructionId, gotoProcessor.goInstruction),
-    (mapProcessor.MapInstructionId, mapProcessor.mapInstruction),
     (ClawProcessor.GrabInstructionTag, ClawProcessor.grabInstruction),
     (ClawProcessor.DropInstructionTag, ClawProcessor.dropInstrution)
 ]
@@ -61,9 +60,8 @@ des_processors = [
     (ObjectManager.process,),
     (StopCollision.process,),
     (gotoProcessor.process,),
-    (mapProcessor.process,),
     (energySystem.process,),
-    (ScriptProcessor,),
+    # (ScriptProcessor,),
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:
