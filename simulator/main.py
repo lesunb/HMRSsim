@@ -208,6 +208,10 @@ class Simulator:
         else:
             self.ENV.process(self.simulation_loop())
             self.ENV.run(until=self.EXIT_EVENT)
+        logger.info('============ SIMULATION EXECUTION FINISHED ============')
+        logger.info('============ CLEAN UP STAGE ============')
+        logger.info(f'{len(self.cleanups)} Clean up functions to execute')
         while self.cleanups:
             next_function = self.cleanups.pop()
+            logger.info(f'Executing clean-up function {next_function}')
             next_function()

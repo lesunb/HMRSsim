@@ -11,8 +11,10 @@ import systems.ManageObjects as ObjectManager
 import systems.ClawDESProcessor as ClawProcessor
 import systems.ScriptEventsDES as ScriptSystem
 import systems.GotoDESProcessor as NavigationSystem
-from main import Simulator, EVENT
 
+from utils.Firebase import db, NAMESPACE
+
+from main import Simulator, EVENT
 import systems.SeerPlugin as Seer
 
 extra_instructions = [
@@ -43,8 +45,15 @@ exitEvent = simulator.EXIT_EVENT
 env = simulator.ENV
 
 
-def my_seer_consumer(message):
+def my_seer_consumer(message, msg_idx):
+    """Saves Seer messages in a file"""
     fd.write(json.dumps(message) + '\n')
+
+
+def firebase_seer_consumer(message, msg_idx):
+    """Sends Seer messages to firebase"""
+    if msg_idx >= 0:
+        ans = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
 
 
 # Defines and initializes esper.Processor for the simulation
@@ -55,7 +64,7 @@ normal_processors = [
 ]
 # Defines DES processors
 des_processors = [
-    Seer.init([my_seer_consumer], 0.05, False),
+    Seer.init([firebase_seer_consumer], 0.05, False),
     (ClawProcessor.process,),
     (ObjectManager.process,),
     (energySystem.process,),

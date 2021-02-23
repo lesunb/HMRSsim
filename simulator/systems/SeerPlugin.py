@@ -19,20 +19,20 @@ def consumer_manager(consumers: List[Callable], also_log: bool):
     logging.addLevelName(25, 'SEER')
     logger.setLevel('SEER')
     while True:
-        message = message_buffer.get()  # Blocking function
+        message, msg_idx = message_buffer.get()  # Blocking function
         if also_log:
             logger.log(25, message)
         for c in consumers:
-            c(message)
+            c(message, msg_idx)
         message_buffer.task_done()
         if 'theEnd' in message:
             break
+    logger.log(25, f'Exiting consumer manager')
+    return
 
-# TODO: Add support for a custom message builder
+
 def init(consumers: List[Callable], scan_interval: float, also_log=False):
     # Init consumer thread
-    # TODO: Remove daemon. Handle simulator exit gracefully.
-    #  Maybe push a "END" message to the message_buffer.
     thread = threading.Thread(target=consumer_manager, args=[consumers, also_log])
     thread.start()
 
@@ -42,6 +42,7 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
         event_store = kwargs.get('EVENT_STORE', None)
         world: World = kwargs.get('WORLD', None)
         env: Environment = kwargs.get('ENV', None)
+        msg_idx = 0
         if event_store is None:
             raise Exception("Can't find eventStore")
         elif env is None:
@@ -56,7 +57,8 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
             "window_name": simulation_skeleton.id,
             "dimensions": size
         }
-        message_buffer.put(base)
+        message_buffer.put((base, msg_idx))
+        msg_idx += 1
         # Scan simulation situation every scan_interval seconds and report
         last_round: dict = {}
         while True:
@@ -93,11 +95,13 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
                     last_round[k] = (0, v[1])
             new_message['deleted'] = deleted
             # Add message to queue
-            message_buffer.put(new_message)
+            message_buffer.put((new_message, msg_idx))
+            msg_idx += 1
             yield env.timeout(scan_interval)
 
     def clean():
-        message_buffer.put({"theEnd": True})
+        message_buffer.put(({"theEnd": True}, -1))
+        logging.getLogger(__name__).debug(f'Executing Seer cleanup function')
         thread.join()
 
     return process, clean
