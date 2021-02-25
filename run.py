@@ -53,7 +53,11 @@ def my_seer_consumer(message, msg_idx):
 def firebase_seer_consumer(message, msg_idx):
     """Sends Seer messages to firebase"""
     if msg_idx >= 0:
-        ans = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
+        if msg_idx == 1:
+            for idx, j in enumerate(message):
+                db.child(NAMESPACE).child('live_report').child(msg_idx).child(idx).set({j: message[j]})
+        else:
+            ans = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
 
 
 # Defines and initializes esper.Processor for the simulation
