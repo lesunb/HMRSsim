@@ -3,8 +3,6 @@ from components.Collision import Collision
 from components.Path import Path
 from main import EVENT
 from systems.GotoDESProcessor import GotoPosEventTag, GotoPosPayload
-import json
-import systems.SeerPlugin as Seer
 
 def get_entity_id(simulation, drawio_object_id):
     """Gets the simulation entity id given the id of the drawio object"""
@@ -19,10 +17,25 @@ def get_style_id(simulation, drawio_style_id):
     id = simulation.draw2ent[str(drawio_style_id)][0]    
     return id
 
-def get_component(simulation, component, drawio_object_id):
-    id = get_entity_id(simulation, drawio_object_id)
-    component = simulation.world.component_for_entity(id, component)
-    return component
+def cast_id(simulation, drawio_id):
+    """Converts the object id present in the xml tree to the object id in the simulation."""
+    drawio_id = str(drawio_id)
+
+    for obj in simulation.objects:
+        if obj[1] == drawio_id:
+            return obj[0]
+
+    id = simulation.draw2ent.get(drawio_id, None)
+    if id:
+        return id[0]
+    return None
+
+def get_component(simulation, component, id):
+    entity_id = cast_id(simulation, id)
+    if simulation.world.has_component(entity_id, component):
+        return simulation.world.component_for_entity(entity_id, component)
+    else:
+        return None
 
 def add_component(simulation, component, drawio_object_id):
     id = get_entity_id(simulation, drawio_object_id)
@@ -46,30 +59,33 @@ def store_goto_position_event(simulation, entity_id, pos):
     event_store = simulation.KWARGS['EVENT_STORE']
     event_store.put(new_event)
 
-def store_collision_event(simulation, entity_id):
-    id = get_entity_id(simulation, entity_id)
-
-def get_style_component(simulation, component, drawio_id):
-    id = get_style_id(simulation, drawio_id)
-    component = simulation.world.component_for_entity(id, component)
-    return component
-
-# não esta funcionando com object
 def get_center(simulation, drawio_id):
-    position = get_style_component(simulation, Position, drawio_id)
+    position = get_component(simulation, Position, drawio_id)
     return position.center
 
 def create_path(simulation, robot_id, points):
-    path = Path(points)
-    add_component(simulation, path, robot_id)
+    path = get_component(simulation, Path, robot_id)
+    if path is None:
+        path = Path(points)
+        add_component(simulation, path, robot_id)
+    else:
+        for point in points:
+            path.points.append(point)
+
+def get_collision(simulation, entity_id, other_entity_id):
+    collision = get_component(simulation, Collision, entity_id) 
+    other_entity_id = cast_id(simulation, other_entity_id)
+    
+    if collision and other_entity_id in collision.collisions:  
+        return collision.collisions[other_entity_id]
+    return None
 
 def have_collided(simulation, entity_id, other_entity_id):
-    try:
-        collision = get_component(simulation, Collision, entity_id) # TODO: levando em consideração que apenas uma colisão ocorreu
-    except Exception:
-        return False
+    """Verifica se ocorreu 1 colisao"""
+    collision = get_component(simulation, Collision, entity_id) 
+    other_entity_id = cast_id(simulation, other_entity_id)
     
-    if collision.other_entity == get_style_id(simulation, other_entity_id):  # TODO: não está levando em consideraçao colisao entre dois objetos 
+    if collision and other_entity_id in collision.collisions: 
         return True
     return False
     
