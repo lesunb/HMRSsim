@@ -16,3 +16,13 @@ Scenario: A collision event is received when a collision occurs
     And a path from the robot to the collidable wall
     When after run simulation
     Then the robot collides with the wall
+
+Scenario: Two collision events is received when two collisions occurs
+    Given a map with a collidable wall
+    And a robot with ability to collide with the wall
+    And a robot with the ability to follow a path
+    And a path from the robot to the collidable wall
+    And a path from the robot to the second collidable wall
+    When after run simulation
+    Then the robot collides with the wall
+    Then the robot collides with the second wall

@@ -1,6 +1,6 @@
 from components.Position import Position
 from components.Path import Path
-from tests.aux.testaux import get_component, get_style_component, create_path, have_collided
+from tests.aux.testaux import get_component, create_path, have_collided
 import pytest
 from pytest_bdd import scenarios, given, when, then
 from main import Simulator
@@ -42,14 +42,24 @@ def ability_to_follow_path(simulation):
 @given("a path from the robot to the collidable wall")
 def path_to_collidable_wall(simulation):
     robot = get_component(simulation, Position, 'robot')
-    wall = get_style_component(simulation, Position, 'collidable_wall')
+    wall = get_component(simulation, Position, 'collidable_wall')
     points = [robot.center, wall.center]
     create_path(simulation, 'robot', points)
+
+@given("a path from the robot to the second collidable wall")
+def path_to_second_collidable_wall(simulation):
+    wall = get_component(simulation, Position, 'second_collidable_wall')
+    points = [wall.center]
+    create_path(simulation, 'robot', points) 
 
 @when("after run simulation")
 def run_simulation(simulation):
     simulation.run()
 
 @then("the robot collides with the wall")
-def collided_into_the_wall(simulation):  # Não eh possivel validar a posicao que colidiu
+def collided_into_the_wall(simulation):
     assert have_collided(simulation, 'robot', 'collidable_wall') == True
+
+@then("the robot collides with the second wall")
+def collided_into_second_wall(simulation):
+    assert have_collided(simulation, 'robot', 'second_collidable_wall') == True
