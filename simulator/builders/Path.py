@@ -41,7 +41,7 @@ def path_from_mxCell(cell: Element, draw2entity, world: esper.World):
                 points.append(parse_mxPoint(p))
         else:
             logger.error(f'Path object has unknown element {el} in cell geometry')
-            return Exception('Failed to create Path')
+            raise Exception('Failed to create Path')
     if lastPoint:
         points.append(lastPoint)
     # Check if there's a target object
@@ -55,4 +55,4 @@ def path_from_mxCell(cell: Element, draw2entity, world: esper.World):
 
 
 def parse_mxPoint(el):
-    return float(el.attrib['x']), float(el.attrib['y'])
+    return float(el.attrib.get('x', 0)), float(el.attrib.get('y', 0))

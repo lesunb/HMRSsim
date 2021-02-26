@@ -5,24 +5,23 @@ from systems.MovementProcessor import MovementProcessor
 from systems.CollisionProcessor import CollisionProcessor
 from systems.PathProcessor import PathProcessor
 
-import systems.GotoDESProcessor as gotoProcessor
-import systems.MapDESProcessor as mapProcessor
-import systems.StopCollisionDESProcessor as StopCollision
+
 import systems.EnergyConsumptionDESProcessor as energySystem
 import systems.ManageObjects as ObjectManager
 import systems.ClawDESProcessor as ClawProcessor
-from systems.ScriptEventsDES import init
+import systems.ScriptEventsDES as ScriptSystem
+import systems.GotoDESProcessor as NavigationSystem
 from main import Simulator, EVENT
 
 import systems.SeerPlugin as Seer
 
 extra_instructions = [
-    (gotoProcessor.GotoInstructionId, gotoProcessor.goInstruction),
-    (mapProcessor.MapInstructionId, mapProcessor.mapInstruction),
+    (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction),
     (ClawProcessor.GrabInstructionTag, ClawProcessor.grabInstruction),
     (ClawProcessor.DropInstructionTag, ClawProcessor.dropInstrution)
 ]
-ScriptProcessor = init(extra_instructions, [ClawProcessor.ClawDoneTag])
+ScriptProcessor = ScriptSystem.init(extra_instructions, [ClawProcessor.ClawDoneTag])
+NavigationSystemProcess = NavigationSystem.init()
 
 # File to output the report
 fd = open('report.json', 'w')
@@ -59,10 +58,8 @@ des_processors = [
     Seer.init([my_seer_consumer], 0.05, False),
     (ClawProcessor.process,),
     (ObjectManager.process,),
-    (StopCollision.process,),
-    (gotoProcessor.process,),
-    (mapProcessor.process,),
     (energySystem.process,),
+    (NavigationSystemProcess,),
     (ScriptProcessor,),
 ]
 # Add processors to the simulation, according to processor type

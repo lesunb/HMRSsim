@@ -14,8 +14,7 @@ import typing
 import map_parser
 
 from components.Inventory import Inventory
-from dynamic_importer import init_component, ComponentInitError
-
+from utils.create_components import initialize_components
 from typehints.dict_types import SystemArgs, Config, EntityDefinition
 from utils.config import working_directory
 fileName = pathlib.Path.cwd().joinpath(f'{working_directory}/loggerConfig.yml')
@@ -122,6 +121,9 @@ class Simulator:
     def generate_simulation_build_report(self):
         logger.info('===== SIMULATION LOADING COMPLETE =====')
         logger.info(f'Simulation {self.simulation_name}')
+        logger.info(f'===> Simulation components')
+        for c in self.world.components_for_entity(1):
+            logger.info(c)
         logger.info(f'{len(self.draw2ent)} entities created.')
         logger.info(f'{len(self.objects)} typed objects transformed into entities')
         logger.info(f'===> TYPED OBJECTS')
@@ -159,13 +161,7 @@ class Simulator:
 
     def add_entity(self, entity_definition: EntityDefinition, ent_id: str):
         """Add an entity from json to world."""
-        initialized_components = []
-        for component_name, args in entity_definition['components'].items():
-            try:
-                initialized_components.append(init_component(component_name, args))
-            except ComponentInitError:
-                logger.error(f'Failed to create component {component_name} for entity from json.')
-                return
+        initialized_components = initialize_components(entity_definition.get('components', {}))
         ent = self.world.create_entity(*initialized_components)
         self.draw2ent[ent_id] = [ent, {}]
         if entity_definition.get('isInteractive', False):
@@ -205,6 +201,7 @@ class Simulator:
         After simulation loop terminates, ALL cleanup functions are executed,
         the last being the user defined one, if present.
         """
+        logger.info('============ SIMULATION EXECUTION ============')
         if self.DURATION > 0:
             self.ENV.process(self.simulation_loop())
             self.ENV.run(until=self.DURATION)
