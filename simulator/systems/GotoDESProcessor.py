@@ -12,13 +12,14 @@ from simpy import FilterStore
 import components.Script as scriptComponent
 from components.Path import Path
 from components.Position import Position
+from components.Script import Script
 
 from systems.NavigationSystem import find_route
 
-from main import EVENT
+from typehints.component_types import EVENT, ERROR
 
 from systems.PathProcessor import EndOfPathTag
-from utils.Navigation import PathNotFound
+from utils.Navigation import PathNotFound, add_nodes_from_points
 
 GotoPoiPayload = NamedTuple('GotoPoiPayload', [('entity', int), ('target', str)])
 GotoPosPayload = NamedTuple('GotoPosPayload', [('entity', int), ('target', list)])
@@ -26,6 +27,11 @@ GotoPoiEventTag = 'GoToPoiEvent'
 GotoPosEventTag = 'GoToPosEvent'
 GotoInstructionId = 'Go'
 NavigationFunction = Callable[[Map, Point, Point], Path]
+
+PathErrorTag = 'PathError'
+PathErrorPayload = NamedTuple('PathErrorPayload', [('error', str), ('entity', int), ('best_path', Path)])
+PathNotFoundTag = 'PathNotFound'
+PoiNotFoundTag = 'PoiNotFound'
 
 
 def init(navigation_function: NavigationFunction = find_route):
@@ -46,7 +52,12 @@ def init(navigation_function: NavigationFunction = find_route):
                     target = world_map.pois[payload.target]
                 except KeyError:
                     logger.error(f'POI {payload.target} does not exist in map')
-                    # TODO: Fire event for control system
+                    new_event = ERROR(
+                        PathErrorTag,
+                        payload.entity,
+                        PathErrorPayload(PoiNotFoundTag, payload.entity, payload.target)
+                    )
+                    event_store.put(new_event)
                     continue
             else:
                 target = list(map(lambda p: float(p), payload.target))
@@ -59,14 +70,22 @@ def init(navigation_function: NavigationFunction = find_route):
             # Now we create a path and add it to the entity
             try:
                 new_path = navigation_function(world_map, source, target)
+                # Expand map with the points found
+                logger.debug(f'Update map with new path')
+                add_nodes_from_points(world_map, new_path.points)
+                logger.debug(f'Add Path component to entity {payload.entity} - {new_path}')
+                world.add_component(payload.entity, new_path)
             except PathNotFound as err:
                 logger.warning(f'Failed to go to point (entity {payload.entity}) - {err.message}')
-                # TODO: Check how to handle this
                 best_path = err.partial_path
+                new_event = ERROR(
+                    PathErrorTag,
+                    payload.entity,
+                    PathErrorPayload(PathNotFoundTag, payload.entity, best_path)
+                )
+                event_store.put(new_event)
                 logger.warning(f'Best path - {best_path}')
                 continue
-            logger.debug(f'Adding Path component to entity {payload.entity} - {new_path}')
-            world.add_component(payload.entity, new_path)
 
     return process
 
@@ -75,8 +94,6 @@ def init(navigation_function: NavigationFunction = find_route):
 # A function returns the state of the Script component after executing
 def goInstruction(ent: int, args: List[str], script: scriptComponent.Script,
                   event_store: FilterStore) -> scriptComponent.States:
-    logger = logging.getLogger(__name__)
-    # logger.debug(f'Go instruction with args {args}')
     if len(args) == 1:
         payload = GotoPoiPayload(ent, args[0])
         new_event = EVENT(GotoPoiEventTag, payload)
@@ -85,9 +102,24 @@ def goInstruction(ent: int, args: List[str], script: scriptComponent.Script,
         new_event = EVENT(GotoPosEventTag, payload)
     else:
         raise Exception('GO instruction failed. Go <poi> OR Go <x> <y>')
-    # logger.debug(f'New Go event - {new_event}')
     event_store.put(new_event)
     # Needs to block the script
-    script.state = scriptComponent.States.BLOQUED
+    script.state = scriptComponent.States.BLOCKED
     script.expecting.append(EndOfPathTag)
     return script.state
+
+
+def handle_PathError(payload: PathErrorPayload, kwargs: SystemArgs):
+    logger = logging.getLogger(__name__)
+
+    if payload.error == PathNotFoundTag:
+        world: esper.World = kwargs.get("WORLD")
+        logger.info(f'Add best path {payload.best_path} to entity {payload.entity}')
+        world.add_component(payload.entity, payload.best_path)
+        # Update the script
+        script = world.component_for_entity(payload.entity, Script)
+        script.state = scriptComponent.States.BLOCKED
+        script.expecting.append(EndOfPathTag)
+        script.logs.append(f'Add best path {payload.best_path}.')
+    else:
+        logger.error(f"Can't solve POI not found. Missing POI is {payload.best_path}")

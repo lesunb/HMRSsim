@@ -12,9 +12,11 @@ import systems.ClawDESProcessor as ClawProcessor
 import systems.ScriptEventsDES as ScriptSystem
 import systems.GotoDESProcessor as NavigationSystem
 
+from components.Script import Script
+
 from utils.Firebase import db, NAMESPACE
 
-from main import Simulator, EVENT
+from main import Simulator
 import systems.SeerPlugin as Seer
 
 extra_instructions = [
@@ -45,7 +47,7 @@ exitEvent = simulator.EXIT_EVENT
 env = simulator.ENV
 
 
-def my_seer_consumer(message, msg_idx):
+def my_seer_consumer(message, _):
     """Saves Seer messages in a file"""
     fd.write(json.dumps(message) + '\n')
 
@@ -57,7 +59,7 @@ def firebase_seer_consumer(message, msg_idx):
             for idx, j in enumerate(message):
                 db.child(NAMESPACE).child('live_report').child(msg_idx).child(idx).set({j: message[j]})
         else:
-            ans = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
+            _ = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
 
 
 # Defines and initializes esper.Processor for the simulation
@@ -97,6 +99,14 @@ for p in des_processors:
 #     EXIT = False
 #     exitEvent.succeed()
 
+# Create the error handlers dict
+error_handlers = {
+    NavigationSystem.PathErrorTag: NavigationSystem.handle_PathError
+}
+# Adding error handlers to the robot
+robot = simulator.objects[0][0]
+script = simulator.world.component_for_entity(robot, Script)
+script.error_handlers = error_handlers
 
 if __name__ == "__main__":
     # NOTE!  schedule_interval will automatically pass a "delta time" argument

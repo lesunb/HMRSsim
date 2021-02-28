@@ -1,7 +1,7 @@
 {
     "context": "resources/map",
-    "map": "hospital_scenario.drawio",
+    "map": "poi_test.drawio",
     "FPS": 60,
     "DLW": 10,
-    "duration": 6.5
+    "duration": 10
 }

@@ -5,12 +5,11 @@ from typehints.dict_types import SystemArgs
 
 from simpy import FilterStore
 
-from main import EVENT
 from components.Path import Path
 from components.Position import Position
 from components.Velocity import Velocity
 from typing import List
-from typehints.component_types import Point
+from typehints.component_types import Point, EVENT
 
 
 EndOfPathPayload = NamedTuple('EndOfPathPayload', [('ent', int), ('timestamp', str), ('path', List[Point])])
