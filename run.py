@@ -113,3 +113,5 @@ if __name__ == "__main__":
     #        to world.process, so you must make sure that your Processor classes
     #        account for this. See the example Processors above.
     simulator.run()
+    print("Robot's script logs")
+    print("\n".join(script.logs))

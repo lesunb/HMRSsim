@@ -15,6 +15,7 @@ def find_route(map_component: Map, source: Point, target: Point) -> Path:
     parent = {source: (-1, -1)}
     queue = Queue()
     queue.put(source)
+    # logger.debug(f'Look for route from {source} to {target} (norm {normalized_target})')
     while not queue.empty():
         # Typical search
         curr = queue.get()
@@ -22,7 +23,9 @@ def find_route(map_component: Map, source: Point, target: Point) -> Path:
         if curr != norm:
             parent[norm] = curr
         if norm == normalized_target:
-            parent[target] = normalized_target
+            if target != normalized_target:
+                parent[target] = normalized_target
+            # logger.debug(f'Returning path found')
             return extract_path(parent, target)
         for c in conn:
             if c not in parent:
@@ -49,7 +52,7 @@ def create_live_node(map_component: Map, source: Point, target: Point) -> (Point
     # 1st we check if node is in the map
     if normalized_source in map_component.nodes:
         nodes = map_component.nodes[normalized_source] \
-                + ([normalized_target] if distance(normalized_source, normalized_target) < map_component.wander_max_dist else [])
+                + ([normalized_target] if distance(normalized_source, normalized_target) <= map_component.wander_max_dist else [])
         return normalized_source, nodes
     # If not, then we "create" a new node tat connects to all others
     # Withing a certain range
@@ -65,7 +68,7 @@ def create_live_node(map_component: Map, source: Point, target: Point) -> (Point
 
 def extract_path(parent: dict, target: Point) -> Path:
     """Backtracks parent dict to find the path from source to target."""
-    reversed_path = [target]
+    reversed_path = []
     curr = target
     while curr != (-1, -1):
         reversed_path.append(curr)

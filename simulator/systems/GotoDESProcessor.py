@@ -45,6 +45,7 @@ def init(navigation_function: NavigationFunction = find_route):
         while True:
             # Gets next goto event
             event = yield event_store.get(lambda ev: ev.type in [GotoPoiEventTag, GotoPosEventTag])
+            # logger.debug(f'Event received {event}')
             payload: Union[GotoPoiPayload, GotoPosPayload] = event.payload
             if event.type == GotoPoiEventTag:
                 # Target point
@@ -60,7 +61,7 @@ def init(navigation_function: NavigationFunction = find_route):
                     event_store.put(new_event)
                     continue
             else:
-                target = list(map(lambda p: float(p), payload.target))
+                target = tuple(map(lambda p: float(p), payload.target))
             # Position of entity
             entity_pos = world.component_for_entity(payload.entity, Position)
             source = entity_pos.center
@@ -71,7 +72,7 @@ def init(navigation_function: NavigationFunction = find_route):
             try:
                 new_path = navigation_function(world_map, source, target)
                 # Expand map with the points found
-                logger.debug(f'Update map with new path')
+                # logger.debug(f'Update map with path {new_path}')
                 add_nodes_from_points(world_map, new_path.points)
                 logger.debug(f'Add Path component to entity {payload.entity} - {new_path}')
                 world.add_component(payload.entity, new_path)
@@ -118,8 +119,6 @@ def handle_PathError(payload: PathErrorPayload, kwargs: SystemArgs):
         world.add_component(payload.entity, payload.best_path)
         # Update the script
         script = world.component_for_entity(payload.entity, Script)
-        script.state = scriptComponent.States.BLOCKED
-        script.expecting.append(EndOfPathTag)
         script.logs.append(f'Add best path {payload.best_path}.')
     else:
         logger.error(f"Can't solve POI not found. Missing POI is {payload.best_path}")

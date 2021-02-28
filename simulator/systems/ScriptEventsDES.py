@@ -48,9 +48,10 @@ def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
                 if handler is None:
                     handler = error_handlers.get(script.default_error_tag, None)
                 if handler is not None:
+                    script.logs.append(f'[{env.now}] Error Received. {ev}\nHandler for the error above was found: {handler}')
                     handler(ev.payload, kwargs)
                 else:
-                    logger.error(f'No handler for error {ERROR} was found')
+                    logger.error(f'[{env.now}] No handler for error {ERROR} was found')
                     script.logs.append(f'Received error {ERROR}, no handler was found.')
             else:
                 try:
@@ -68,7 +69,7 @@ def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
                     next_state: scriptComponent.States
                     if i_type in instruction_set:
                         next_state = instruction_set[i_type](payload.ent, args, script, __event_store)
-                        script.logs.append(f'[{env.now}] Execute instruction {i_type}. In state {next_state}')
+                        script.logs.append(f'[{env.now}] Execute instruction {i_type} {args}. Current state {next_state}')
                     else:
                         logger.error(f'Unknown instruction {i_type}')
                         script.logs.append(f'[{env.now}] Executing instruction {i_type} Failed. Unknown instruction.')
@@ -98,6 +99,7 @@ def unblockEntity(script: scriptComponent.Script) -> scriptComponent.States:
     script.curr_instruction += 1
     if script.curr_instruction == len(script.instructions):
         script.state = scriptComponent.States.DONE
+        script.logs.append(f'End of script execution')
     else:
         script.state = scriptComponent.States.READY
     return script.state
