@@ -1,7 +1,7 @@
 from components.Position import Position
 from components.Collision import Collision
 from components.Path import Path
-from main import EVENT
+from typehints.component_types import EVENT
 from systems.GotoDESProcessor import GotoPoiEventTag, GotoPoiPayload, GotoPosEventTag, GotoPosPayload
 
 def get_entity_id(simulation, drawio_object_id):
