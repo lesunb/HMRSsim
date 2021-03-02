@@ -3,7 +3,7 @@ from enum import Enum
 from typing import NamedTuple, List
 from esper import World
 from simpy import FilterStore, Store, Environment
-from main import EVENT
+from typehints.component_types import EVENT
 from typehints.dict_types import SystemArgs
 
 from components.Position import Position
@@ -144,12 +144,12 @@ def drop_object(obj_name, me):
 
 def grabInstruction(ent: int, args: List[str], script: Script, event_store: FilterStore) -> States:
     _ENV.process(pick_object(obj_name=args[0], me=ent))
-    script.state = States.BLOQUED
+    script.state = States.BLOCKED
     script.expecting.append(ClawDoneTag)
     return script.state
 
 def dropInstrution(ent: int, args: List[str], script: Script, event_store: FilterStore) -> States:
     _ENV.process(drop_object(obj_name=args[0], me=ent))
-    script.state = States.BLOQUED
+    script.state = States.BLOCKED
     script.expecting.append(ClawDoneTag)
     return script.state

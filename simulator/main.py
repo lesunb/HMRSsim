@@ -1,6 +1,6 @@
 """
 Entrypoint for a simulator.
-Defines Simulator class and EVENT.
+Defines Simulator class.
 """
 import json
 import simpy
@@ -23,7 +23,7 @@ loggerConfig = yaml.safe_load(stream)
 logging.config.dictConfig(loggerConfig)
 logger = logging.getLogger(__name__)
 
-EVENT = typing.NamedTuple('Event', [('type', str), ('payload', typing.NamedTuple)])
+
 """Format for all DES events added to Stores.
 
 Events are created by systems to exchange messages with other systems.
@@ -208,6 +208,10 @@ class Simulator:
         else:
             self.ENV.process(self.simulation_loop())
             self.ENV.run(until=self.EXIT_EVENT)
+        logger.info('============ SIMULATION EXECUTION FINISHED ============')
+        logger.info('============ CLEAN UP STAGE ============')
+        logger.info(f'{len(self.cleanups)} Clean up functions to execute')
         while self.cleanups:
             next_function = self.cleanups.pop()
+            logger.info(f'Executing clean-up function {next_function}')
             next_function()

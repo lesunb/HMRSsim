@@ -20,4 +20,6 @@ class Map(Component):
         self.wander_max_dist = wander_max_dist
 
     def __str__(self):
-        return f'Map[{len(self.nodes)} nodes; {len(self.pois)} pois]\nNODES: {self.nodes}\nPOIS: {self.pois}'
+        return f'Map[{len(self.nodes)} nodes; {len(self.pois)} pois;' + \
+               f'point_width: {self.point_width}; wander_dist: {self.wander_max_dist}]' + \
+               f'\nNODES: {self.nodes}\nPOIS: {self.pois}'

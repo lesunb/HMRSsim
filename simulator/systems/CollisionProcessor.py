@@ -7,13 +7,12 @@ from components.Collidable import Collidable
 from components.Position import Position
 from typing import NamedTuple
 from typehints.dict_types import SystemArgs
-
+from typehints.component_types import EVENT
 
 from colorama import init, Fore
 init()
 
 COLORS = [Fore.BLUE, Fore.CYAN, Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.WHITE]
-EVENT = NamedTuple('Event', [('type', str), ('payload', object)])
 
 
 class CollisionProcessor(esper.Processor):
