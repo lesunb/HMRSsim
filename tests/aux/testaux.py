@@ -2,7 +2,7 @@ from components.Position import Position
 from components.Collision import Collision
 from components.Path import Path
 from main import EVENT
-from systems.GotoDESProcessor import GotoPosEventTag, GotoPosPayload
+from systems.GotoDESProcessor import GotoPoiEventTag, GotoPoiPayload, GotoPosEventTag, GotoPosPayload
 
 def get_entity_id(simulation, drawio_object_id):
     """Gets the simulation entity id given the id of the drawio object"""
@@ -51,11 +51,18 @@ def get_path_last_point(path):
 
 # setar ponto para ir
 def store_goto_position_event(simulation, entity_id, pos):
-    id = get_entity_id(simulation, entity_id)
+    id = cast_id(simulation, entity_id)
     x = pos[0]
     y = pos[1]
     payload = GotoPosPayload(id, [x, y])
     new_event = EVENT(GotoPosEventTag, payload)
+    event_store = simulation.KWARGS['EVENT_STORE']
+    event_store.put(new_event)
+
+def store_goto_poi_event(simulation, entity_id, poi_tag):
+    id = cast_id(simulation, entity_id)
+    payload = GotoPoiPayload(id, poi_tag)
+    new_event = EVENT(GotoPoiEventTag, payload)
     event_store = simulation.KWARGS['EVENT_STORE']
     event_store.put(new_event)
 

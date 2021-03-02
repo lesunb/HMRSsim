@@ -1,12 +1,13 @@
 from components.Collision import Collision
 from components.Path import Path
 from components.Position import Position
+from components.Map import Map
 from main import Simulator
 from systems.PathProcessor import PathProcessor
 from systems.MovementProcessor import MovementProcessor
 from systems.CollisionProcessor import CollisionProcessor
-from tests.aux.testaux import get_component, create_path, have_collided, get_collision
-import systems.GotoDESProcessor as gotoProcessor
+from tests.aux.testaux import get_component, create_path, store_goto_poi_event, get_center, store_goto_position_event, add_component
+import systems.GotoDESProcessor as NavigationSystem
 from tests.aux.report import clean, set_report
 
 import systems.CollisionDetectorDESProcessor as collisionDetector
@@ -19,38 +20,36 @@ config = {
         "duration": 10
     }
 
-config["map"] = "collidable_wall_map.drawio"
+config["map"] = "three_room_map.drawio"
 
 simulation = Simulator(config)
 
-print(simulation.objects)
-print(simulation.draw2ent)
-
-robot = get_component(simulation, Position, 'robot')
-wall = get_component(simulation, Position, 'collidable_wall')
-points = [robot.center, wall.center]
-create_path(simulation, 'robot', points)
-
-wall = get_component(simulation, Position, 'second_collidable_wall')
-points = [wall.center]
-create_path(simulation, 'robot', points)  #só pode ter um path também, adicionar nos paths.
-
-simulation.add_des_system((collisionDetector.process,))
-
-simulation.add_system(CollisionProcessor())
+NavigationSystemProcess = NavigationSystem.init()
+simulation.add_des_system((NavigationSystemProcess,))
 width, height = simulation.window_dimensions
 simulation.add_system(PathProcessor())
 simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height))
 
+if not simulation.world.has_component(1, Map):
+    simulation.world.add_component(1, Map())
+
+"""
+room_three_center = get_center(simulation, 'room3')
+print("room three center: ", room_three_center)
+store_goto_position_event(simulation, 'robot', room_three_center)
+"""
+
+room_three_center = get_center(simulation, 'room3')
+map = simulation.world.component_for_entity(1, Map)
+map.pois["room_three_center"] = room_three_center
+
+store_goto_poi_event(simulation, 'robot', 'room_three_center')
+
+
+robot_position = get_component(simulation, Position, 'robot')
+print("before: ", robot_position.center)
+
 simulation.run()
 
-collisions = get_component(simulation, Collision, 'robot')
-
-print(collisions)
-
-print(get_collision(simulation, 'robot', 'second_collidable_wall'))
-print(have_collided(simulation, 'robot', 'second_collidable_wall'))
-
-#print(have_collided(simulation, 'robot', 'collidable_wall'))
-#print("robot position after: ", robot_position.center)
-#print(simulation.draw2ent)
+robot_position = get_component(simulation, Position, 'robot')
+print(robot_position.center)

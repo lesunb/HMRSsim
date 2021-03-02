@@ -49,7 +49,7 @@ def init(navigation_function: NavigationFunction = find_route):
                     # TODO: Fire event for control system
                     continue
             else:
-                target = list(map(lambda p: float(p), payload.target))
+                target = tuple(map(lambda p: float(p), payload.target))
             # Position of entity
             entity_pos = world.component_for_entity(payload.entity, Position)
             source = entity_pos.center

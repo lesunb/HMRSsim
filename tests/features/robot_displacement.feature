@@ -11,16 +11,24 @@ Feature: Robot Displacement
 # Map description: consists of three rooms, a robot and a path that leads
 # the robot to the third room
 
-Scenario: The robot moves to a specific Position
-    Given a map with three rooms
-    And a robot with the ability to move to a specific position
-    And a goto event to the center of 'room three'
-    When after run simulation
-    Then the robot is in the center of 'room three'
-
 Scenario: The robot moves along a path until it reaches its destination
     Given a map with three rooms
     And a robot with the ability to follow a path
     And a path from the robot to the center of 'room three'
+    When after run simulation
+    Then the robot is in the center of 'room three'
+
+Scenario: The robot moves to a specific Position
+    Given a map with three rooms
+    And a robot with the ability to move to a specific position
+    And a gotoPos event to the center of 'room three'
+    When after run simulation
+    Then the robot is in the center of 'room three'
+
+Scenario: The robot moves to a specific POI
+    Given a map with three rooms
+    And a POI in the center of 'room three'
+    And a robot with the ability to move to a specific POI
+    And a goto POI event
     When after run simulation
     Then the robot is in the center of 'room three'
