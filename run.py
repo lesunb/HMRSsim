@@ -14,7 +14,9 @@ import systems.GotoDESProcessor as NavigationSystem
 
 from components.Script import Script
 
-from utils.Firebase import db, NAMESPACE
+from utils.Firebase import db, clean_old_simulation
+NAMESPACE = 'simulator'
+clean_old_simulation(NAMESPACE)
 
 from main import Simulator
 import systems.SeerPlugin as Seer
@@ -83,21 +85,6 @@ for p in normal_processors:
 for p in des_processors:
     simulator.add_des_system(p)
 
-
-# @window.event
-# def on_draw():
-#     # Clear the window to background color
-#     window.clear()
-#     # Draw the batch of Renderables:
-#     simulator.batch.draw()
-#
-#
-# @window.event
-# def on_close():
-#     global EXIT
-#     print(f'Exiting from window')
-#     EXIT = False
-#     exitEvent.succeed()
 
 # Create the error handlers dict
 error_handlers = {

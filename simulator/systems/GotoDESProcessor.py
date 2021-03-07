@@ -14,11 +14,11 @@ from components.Path import Path
 from components.Position import Position
 from components.Script import Script
 
-from systems.NavigationSystem import find_route
+from simulator.systems.NavigationSystem import find_route
 
 from typehints.component_types import EVENT, ERROR
 
-from systems.PathProcessor import EndOfPathTag
+from simulator.systems.PathProcessor import EndOfPathTag
 from utils.Navigation import PathNotFound, add_nodes_from_points
 
 GotoPoiPayload = NamedTuple('GotoPoiPayload', [('entity', int), ('target', str)])

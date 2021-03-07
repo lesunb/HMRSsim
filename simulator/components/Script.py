@@ -8,7 +8,7 @@ ErrorHandler = Callable[[NamedTuple, SystemArgs], None]
 
 class States(Enum):
     READY = 'ready'
-    BLOCKED = 'bloqued'
+    BLOCKED = 'blocked'
     DONE = 'done'
 
 

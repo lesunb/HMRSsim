@@ -6,7 +6,7 @@ from simpy import FilterStore, Environment
 import logging
 
 from typehints.component_types import EVENT, ERROR
-from systems.PathProcessor import EndOfPathTag
+from simulator.systems.PathProcessor import EndOfPathTag
 
 import components.Script as scriptComponent
 
