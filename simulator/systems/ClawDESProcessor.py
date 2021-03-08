@@ -17,7 +17,7 @@ from collision import collide
 from primitives import Ellipse
 
 import logging
-import systems.ManageObjects as ObjectManager
+import simulator.systems.ManageObjects as ObjectManager
 
 
 class ClawOps(Enum):

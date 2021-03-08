@@ -5,21 +5,21 @@ from systems.MovementProcessor import MovementProcessor
 from systems.CollisionProcessor import CollisionProcessor
 from systems.PathProcessor import PathProcessor
 
-
 import systems.EnergyConsumptionDESProcessor as energySystem
 import systems.ManageObjects as ObjectManager
 import systems.ClawDESProcessor as ClawProcessor
 import systems.ScriptEventsDES as ScriptSystem
 import systems.GotoDESProcessor as NavigationSystem
+import systems.SeerPlugin as Seer
 
 from components.Script import Script
+
+from main import Simulator
 
 from utils.Firebase import db, clean_old_simulation
 NAMESPACE = 'simulator'
 clean_old_simulation(NAMESPACE)
 
-from main import Simulator
-import systems.SeerPlugin as Seer
 
 extra_instructions = [
     (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction),

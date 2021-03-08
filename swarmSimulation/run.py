@@ -1,6 +1,5 @@
 import sys
-import json
-
+import logging
 
 import simulator.systems.ScriptEventsDES as ScriptSystem
 import simulator.systems.GotoDESProcessor as NavigationSystem
@@ -13,7 +12,6 @@ import swarmSimulation.systems.HoverDisturbance as HoverDisturbance
 import swarmSimulation.systems.HoverSystem as HoverSystem
 
 
-from simulator.components.Script import Script
 from swarmSimulation.components.Hover import Hover, HoverState
 
 from simulator.main import Simulator
@@ -62,7 +60,7 @@ des_processors = [
     # (NavigationSystemProcess,),
     # (ScriptProcessor,),
     (HoverDisturbance.init(max_disturbance=0.1, prob_disturbance=0.4, disturbance_interval=(1 / (fps / 3))),),
-    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1 / (fps / 6))),)
+    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1 / (fps / 3)), max_speed=1),)
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:
@@ -71,25 +69,30 @@ for p in des_processors:
     simulator.add_des_system(p)
 
 
-# Create the error handlers dict
-# error_handlers = {
-#     NavigationSystem.PathErrorTag: NavigationSystem.handle_PathError
-# }
-# # Adding error handlers to the robot
-# robot = simulator.objects[0][0]
-# script = simulator.world.component_for_entity(robot, Script)
-# script.error_handlers = error_handlers
-
 drone = simulator.objects[0][0]
 hover = simulator.world.component_for_entity(drone, Hover)
-hover.target = (242.5, 202.5)
-hover.status = HoverState.HOVERING
+
+
+# The controller for now
+def control(kill_switch):
+    logger = logging.getLogger(__name__)
+    hover.target = (200, 200)
+    hover.status = HoverState.MOVING
+    logger.debug(f'Update hover: {hover}')
+    yield env.timeout(5)
+    hover.target = (220, 180)
+    hover.status = HoverState.MOVING
+    logger.debug(f'Update hover: {hover}')
+    yield env.timeout(5)
+    hover.target = (240, 200)
+    hover.status = HoverState.MOVING
+    logger.debug(f'Update hover: {hover}')
+    yield env.timeout(5)
+    logger.debug(f'Yielding kill_switch')
+    kill_switch.succeed()
+
 
 if __name__ == "__main__":
-    # NOTE!  schedule_interval will automatically pass a "delta time" argument
-    #        to world.process, so you must make sure that your Processor classes
-    #        account for this. See the example Processors above.
+    env.process(control(simulator.KWARGS['_KILL_SWITCH']))
     simulator.run()
-    # print("Robot's script logs")
-    # print("\n".join(script.logs))
-    # pass
+

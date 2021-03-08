@@ -112,10 +112,8 @@ class Simulator:
         self.KWARGS: SystemArgs = {
             "ENV": self.ENV,
             "WORLD": self.world,
-            "_KILLSWITCH": self.ENV.event() if self.DURATION > 0 else None,
+            "_KILL_SWITCH": self.ENV.event(),
             "EVENT_STORE": simpy.FilterStore(self.ENV),
-            # Pyglet specific things (for the re-create entity)
-            # "BATCH": self.batch,
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
         self.cleanups: typing.List[CleanupFunction] = [cleanup]
@@ -181,19 +179,20 @@ class Simulator:
             self.world.process(self.KWARGS)
             # # ticks on the clock
             # TODO: find a way to work 100% DES
-            if self.KWARGS["_KILLSWITCH"] is not None:
-                switch = yield self.KWARGS["_KILLSWITCH"] | self.ENV.timeout(1.0 / self.FPS, False)
-                if self.KWARGS["_KILLSWITCH"] in switch:
+            if self.KWARGS["_KILL_SWITCH"] is not None:
+                switch = yield self.KWARGS["_KILL_SWITCH"] | self.ENV.timeout(1.0 / self.FPS, False)
+                if self.KWARGS["_KILL_SWITCH"] in switch:
                     break
             else:
                 yield self.ENV.timeout(1.0 / self.FPS, False)
-        return 0
+        logger.debug(f'simulation loop exited')
+        self.EXIT_EVENT.succeed()
 
     def run(self):
         """
         Runs the simulation.
         Simulation continues for DURATION seconds, if DURATION is specified.
-        Simulation exits on EXIT_EVENT or if _KILLSWITCH event is triggered.
+        Simulation exits on EXIT_EVENT or if _KILL_SWITCH event is triggered.
         After simulation loop terminates, ALL cleanup functions are executed,
         the last being the user defined one, if present.
         """

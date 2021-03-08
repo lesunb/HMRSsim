@@ -9,7 +9,7 @@ class SystemArgs(typing.TypedDict):
     """Type of Keyword Arguments passed to systems in the process method."""
     ENV: simpy.Environment
     WORLD: esper.World
-    _KILLSWITCH: typing.Union[simpy.Event, None]
+    _KILL_SWITCH: typing.Union[simpy.Event, None]
     EVENT_STORE: simpy.FilterStore
     WINDOW_OPTIONS: WindowOptions
 
