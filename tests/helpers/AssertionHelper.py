@@ -1,5 +1,5 @@
 from components.Collision import Collision
-from tests.helpers import TestHelper
+from tests.helpers.TestHelper import TestHelper
 
 class AssertionHelper(TestHelper):
     def __init__(self, simulation) -> None:

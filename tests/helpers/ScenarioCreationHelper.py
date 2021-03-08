@@ -3,11 +3,12 @@ from systems.PathProcessor import PathProcessor
 from systems.MovementProcessor import MovementProcessor
 import systems.GotoDESProcessor as NavigationSystem
 from components.Path import Path
+from components.Map import Map
 from typehints.component_types import EVENT
-from tests.helpers import TestHelper
+from tests.helpers.TestHelper import TestHelper
 
 class ScenarioCreationHelper(TestHelper):
-    def __init__(self, simulation) -> None:
+    def __init__(self, simulation):
         super().__init__(simulation)
     
     def add_component(self, component, drawio_id):
@@ -58,6 +59,10 @@ class ScenarioCreationHelper(TestHelper):
         width, height = self.simulation.window_dimensions
         self.simulation.add_system(PathProcessor())
         self.simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height))
+
+    def add_poi(self, poi_tag, poi_value):
+        map = self.simulation.world.component_for_entity(1, Map)
+        map.pois[poi_tag] = poi_value
 
     # add seer
     # add log json
