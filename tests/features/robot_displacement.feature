@@ -1,6 +1,6 @@
 Feature: Robot Displacement
 
-# Tested Features: movement using Path, movement using GotoPos
+# Tested Features: movement using Path, movement using GotoPos and movement using POI
 
 # Acceptance Criteria - First Scenario: the robot is capable of following 
 # the path and entering the room.
