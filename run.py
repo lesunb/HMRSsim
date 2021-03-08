@@ -1,16 +1,16 @@
 import sys
 import json
 
-from systems.MovementProcessor import MovementProcessor
-from systems.CollisionProcessor import CollisionProcessor
-from systems.PathProcessor import PathProcessor
+from simulator.systems.MovementProcessor import MovementProcessor
+from simulator.systems.CollisionProcessor import CollisionProcessor
+from simulator.systems.PathProcessor import PathProcessor
 
-import systems.EnergyConsumptionDESProcessor as energySystem
-import systems.ManageObjects as ObjectManager
-import systems.ClawDESProcessor as ClawProcessor
-import systems.ScriptEventsDES as ScriptSystem
-import systems.GotoDESProcessor as NavigationSystem
-import systems.SeerPlugin as Seer
+import simulator.systems.EnergyConsumptionDESProcessor as energySystem
+import simulator.systems.ManageObjects as ObjectManager
+import simulator.systems.ClawDESProcessor as ClawProcessor
+import simulator.systems.ScriptEventsDES as ScriptSystem
+import simulator.systems.GotoDESProcessor as NavigationSystem
+import simulator.systems.SeerPlugin as Seer
 
 from components.Script import Script
 
