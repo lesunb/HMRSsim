@@ -1,4 +1,5 @@
 import esper
+import logging
 
 from components.Position import Position
 from components.Velocity import Velocity
@@ -11,6 +12,7 @@ class MovementProcessor(esper.Processor):
         self.miny = miny
         self.maxx = maxx
         self.maxy = maxy
+        self.logger = logging.getLogger(__name__)
 
     def process(self, env):
         # This will iterate over every Entity that has BOTH of these components:
@@ -18,6 +20,7 @@ class MovementProcessor(esper.Processor):
             # Update the Renderable Component's position by it's Velocity:
             # An example of keeping the sprite inside screen boundaries. Basically,
             # adjust the position back inside screen boundaries if it is outside:
+            # old = pos.center # DEBUG
             new_x = max(self.minx, pos.x + vel.x)
             new_y = max(self.miny, pos.y + vel.y)
 
@@ -29,5 +32,6 @@ class MovementProcessor(esper.Processor):
                 pos.x = new_x
                 pos.y = new_y
                 pos.center = (pos.x + pos.w // 2, pos.y + pos.h // 2)
+                # self.logger.debug(f'{old} --> {pos.center}')
             else:
-                pos.changed = False # or pos.changed
+                pos.changed = False

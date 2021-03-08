@@ -4,6 +4,7 @@ from simulator import dynamic_importer
 from simulator import mxCellDecoder
 
 from swarmSimulation.components.Hover import Hover
+from components.Velocity import Velocity
 
 TYPE = 'drone'
 
@@ -22,7 +23,8 @@ def build_object(cell, world, window_options, draw2entity):
             component = dynamic_importer.init_component(component_name, init_values)
             components.append(component)
     hover = Hover()
-    components.append(hover)
+    vel = Velocity()
+    components += [hover, vel]
     for c in components:
         world.add_component(ent, c)
     return {style['id']: [ent, style]}, [(ent, style['id'])], {}

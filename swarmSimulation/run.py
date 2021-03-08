@@ -10,8 +10,11 @@ from simulator.systems.CollisionProcessor import CollisionProcessor
 from simulator.systems.PathProcessor import PathProcessor
 
 import swarmSimulation.systems.HoverDisturbance as HoverDisturbance
-from simulator.components.Script import Script
+import swarmSimulation.systems.HoverSystem as HoverSystem
 
+
+from simulator.components.Script import Script
+from swarmSimulation.components.Hover import Hover, HoverState
 
 from simulator.main import Simulator
 from simulator.utils.Firebase import db, clean_old_simulation
@@ -26,6 +29,7 @@ NavigationSystemProcess = NavigationSystem.init()
 simulator = Simulator(sys.argv[1])
 # Some simulator objects
 width, height = simulator.window_dimensions
+fps = simulator.FPS
 # window = simulator.window
 eventStore = simulator.KWARGS['EVENT_STORE']
 exitEvent = simulator.EXIT_EVENT
@@ -55,9 +59,10 @@ normal_processors = [
 # Defines DES processors
 des_processors = [
     Seer.init([firebase_seer_consumer], 0.05, False),
-    (NavigationSystemProcess,),
-    (ScriptProcessor,),
-    (HoverDisturbance.init(),)
+    # (NavigationSystemProcess,),
+    # (ScriptProcessor,),
+    (HoverDisturbance.init(max_disturbance=0.1, prob_disturbance=0.4, disturbance_interval=(1 / (fps / 3))),),
+    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1 / (fps / 6))),)
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:
@@ -75,11 +80,16 @@ for p in des_processors:
 # script = simulator.world.component_for_entity(robot, Script)
 # script.error_handlers = error_handlers
 
+drone = simulator.objects[0][0]
+hover = simulator.world.component_for_entity(drone, Hover)
+hover.target = (242.5, 202.5)
+hover.status = HoverState.HOVERING
+
 if __name__ == "__main__":
     # NOTE!  schedule_interval will automatically pass a "delta time" argument
     #        to world.process, so you must make sure that your Processor classes
     #        account for this. See the example Processors above.
-    # simulator.run()
+    simulator.run()
     # print("Robot's script logs")
     # print("\n".join(script.logs))
-    pass
+    # pass
