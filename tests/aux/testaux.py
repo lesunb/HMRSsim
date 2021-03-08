@@ -1,34 +1,41 @@
 from components.Position import Position
 from components.Collision import Collision
 from components.Path import Path
+from components.Map import Map
 from typehints.component_types import EVENT
 from systems.GotoDESProcessor import GotoPoiEventTag, GotoPoiPayload, GotoPosEventTag, GotoPosPayload
 
-def get_entity_id(simulation, drawio_object_id):
-    """Gets the simulation entity id given the id of the drawio object"""
-    drawio_object_id = str(drawio_object_id)
-
-    for obj in simulation.objects:
-        if obj[1] == drawio_object_id:
-            return obj[0]
-    return None
-
-def get_style_id(simulation, drawio_style_id):
-    id = simulation.draw2ent[str(drawio_style_id)][0]    
-    return id
-
-def cast_id(simulation, drawio_id):
-    """Converts the object id present in the xml tree to the object id in the simulation."""
+def get_object_id(simulation, drawio_id):
+    """Gets the simulation entity id given the id of the drawio object."""
     drawio_id = str(drawio_id)
 
     for obj in simulation.objects:
         if obj[1] == drawio_id:
             return obj[0]
-
-    id = simulation.draw2ent.get(drawio_id, None)
-    if id:
-        return id[0]
     return None
+
+def get_drawio_id(simulation, drawio_id):
+    entity_id = simulation.draw2ent.get(drawio_id, None)  
+    if entity_id:
+        return entity_id[0]
+    return entity_id
+
+def get_pickable_id(simulation, name):
+    return simulation.interactive.get(name, None)
+
+def cast_id(simulation, drawio_id):
+    """Converts the object id present in the xml tree to the object id in the simulation.
+    Tipos possíveis:
+    - No caso do objeto ser do tipo pickable, passar a propriedade name como
+    parametro para o drawio_id
+    """
+    entity_id = get_object_id(simulation, drawio_id)
+    if entity_id:
+        return entity_id
+    entity_id = get_pickable_id(simulation, drawio_id) 
+    if entity_id:
+        return entity_id   
+    return get_drawio_id(simulation, drawio_id)
 
 def get_component(simulation, component, id):
     entity_id = cast_id(simulation, id)
@@ -37,8 +44,11 @@ def get_component(simulation, component, id):
     else:
         return None
 
+def get_position(simulation, drawio_id):
+    return get_component(simulation, Position, drawio_id)
+
 def add_component(simulation, component, drawio_object_id):
-    id = get_entity_id(simulation, drawio_object_id)
+    id = cast_id(simulation, drawio_object_id)
     simulation.world.add_component(id, component)
 
 def get_path_points(path):
@@ -96,3 +106,25 @@ def have_collided(simulation, entity_id, other_entity_id):
         return True
     return False
     
+def get_poi(simulation, poi_tag):
+    map = simulation.world.component_for_entity(1, Map)
+    return map.pois[poi_tag]
+
+def is_in_poi(simulation, entity_id, poi_tag):
+    entity_position = get_position(simulation, entity_id)  # verificar se é para pegar o centro
+    poi = get_poi(simulation, poi_tag)
+
+    if entity_position.x == poi[0] and entity_position.y == poi[1]:
+        return True
+    else:
+        return False
+        #raise AssertionError(f'Entity is not in the POI. Entity Position: {entity_position}. Poi: {poi}')
+        #como retornar o Assertion e o False
+
+def is_in_center_of(simulation, entity_id, other_entity_id):
+    entity_center = get_center(simulation, entity_id)
+    other_entity_center = get_center(simulation, other_entity_id)
+
+    if entity_center[0] == other_entity_center[0] and entity_center[1] == other_entity_center[1]:
+        return True
+    return False
