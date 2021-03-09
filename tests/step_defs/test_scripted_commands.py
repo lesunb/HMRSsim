@@ -33,30 +33,32 @@ def map(config):
     return simulation
 
 @given("a robot with the ability to follow a script command")
-def ability_to_follow_a_script_command():
-    pass
+def ability_to_follow_a_script_command(scenario_helper):
+    scenario_helper.add_script_ability()
 
 @given("a robot with the ability to grab pickables")
-def ability_to_grab_pickables():
-    pass
+def ability_to_grab_pickables(scenario_helper):
+    scenario_helper.add_claw_ability('robot')
 
 @given(parsers.parse("a script command 'Go to' {poi_tag} poi"))
-def script_command_go_to(poi_tag):
-    pass
+def script_command_go_to(scenario_helper, poi_tag):
+    scenario_helper.add_go_command('robot', poi_tag)
 
 @given(parsers.parse("a script command {command_name} {pickable_name} pickable"))
-def script_command_grab_and_drop(command_name, pickable_name):
-    pass
+def script_command_grab_and_drop(scenario_helper, command_name, pickable_name):
+    scenario_helper.add_command(f"{command_name} {pickable_name}", 'robot')
 
 @when("after run simulation")
 def run_simulation(simulation):
     simulation.run()
 
 @then("the robot is in the 'medRoom' poi")
-def robot_is_in_medicine_room():
+def robot_is_in_medicine_room(assertion_helper):
+    #assert assertion_helper.is_in_center_of('robot', 'medRoom') == True
     pass
 
 @then("the 'medicine' is in the 'patientRoom' poi")
-def medicine_is_in_patient_room(simulation):
+def medicine_is_in_patient_room(assertion_helper):
+    #assert assertion_helper.is_in_poi('medicine', 'patientRoom')
     pass
 
