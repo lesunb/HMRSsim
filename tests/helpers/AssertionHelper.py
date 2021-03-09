@@ -26,9 +26,26 @@ class AssertionHelper(TestHelper):
             # como retornar o Assertion e o False
 
     def is_in_center_of(self, entity_id, other_entity_id):
+        """Compara o x e o y do centro"""
         entity_center = self.get_center(entity_id)
         other_entity_center = self.get_center(other_entity_id)
 
         if entity_center[0] == other_entity_center[0] and entity_center[1] == other_entity_center[1]:
+            return True
+        return False
+    
+    def is_in_same_position(self, entity_id, other_entity_id):
+        """Compara o x e o y."""
+        entity_position = self.get_position(entity_id)
+        other_entity_position = self.get_position(other_entity_id)
+
+        if entity_position.x == other_entity_position.x and entity_position.y == other_entity_position.y:
+            return True
+        return False
+    
+    def is_in_position(self, entity_id, position):
+        # TODO: melhorar nome dos metodos
+        entity_position = self.get_position(entity_id)
+        if entity_position.x == position[0] and entity_position.y == position[1]:
             return True
         return False

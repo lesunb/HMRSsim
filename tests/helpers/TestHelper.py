@@ -48,6 +48,12 @@ class TestHelper:
     
     def get_position(self, drawio_id):
         return self.get_component(Position, drawio_id)
+    
+    def set_position(self, drawio_id, x, y):
+        position = self.get_component(Position, drawio_id)
+        if position:
+            position.x = x
+            position.y = y
 
     def get_center(self, drawio_id):
         position = self.get_component(Position, drawio_id)

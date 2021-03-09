@@ -1,6 +1,6 @@
-<mxfile host="65bd71144e" modified="2021-03-02T20:48:21.635Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.51.1 Chrome/83.0.4103.122 Electron/9.3.3 Safari/537.36" etag="gEqJkSIy0HeYz_Qn34mj" version="14.2.4" type="embed">
+<mxfile host="65bd71144e" modified="2021-03-09T01:12:25.385Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.51.1 Chrome/83.0.4103.122 Electron/9.3.3 Safari/537.36" etag="4H7Jl_GQj7r8KPYfvNdU" version="14.2.4" type="embed">
     <diagram id="1XTyoEW7qzfLBBSgb7DO" name="Page-1">
-        <mxGraphModel dx="614" dy="317" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="614" dy="332" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -10,7 +10,7 @@
                 <mxCell id="6" value="Room2" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#6a00ff;strokeColor=#3700CC;fontColor=#ffffff;" parent="1" vertex="1">
                     <mxGeometry x="2" y="85" width="120" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="room3" value="Room3" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;strokeColor=#006EAF;fontColor=#ffffff;" parent="1" vertex="1">
+                <mxCell id="room_three" value="Room3" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;strokeColor=#006EAF;fontColor=#ffffff;" parent="1" vertex="1">
                     <mxGeometry x="2" y="2" width="120" height="80" as="geometry"/>
                 </mxCell>
                 <object label="robot" movable="true" speed="5" type="robot" id="robot">
@@ -79,7 +79,7 @@
                     </mxCell>
                 </object>
                 <object label="" type="map-path" id="32">
-                    <mxCell style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxCell style="endArrow=classic;html=1;" parent="1" edge="1">
                         <mxGeometry width="50" height="50" relative="1" as="geometry">
                             <mxPoint x="400" y="210" as="sourcePoint"/>
                             <mxPoint x="400" y="50" as="targetPoint"/>
@@ -87,7 +87,7 @@
                     </mxCell>
                 </object>
                 <object label="" type="map-path" id="33">
-                    <mxCell style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxCell style="endArrow=classic;html=1;" parent="1" edge="1">
                         <mxGeometry width="50" height="50" relative="1" as="geometry">
                             <mxPoint x="410" y="50" as="sourcePoint"/>
                             <mxPoint x="130" y="50" as="targetPoint"/>
@@ -95,7 +95,7 @@
                     </mxCell>
                 </object>
                 <object label="" type="map-path" id="34">
-                    <mxCell style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxCell style="endArrow=classic;html=1;" parent="1" edge="1">
                         <mxGeometry width="50" height="50" relative="1" as="geometry">
                             <mxPoint x="400" y="210" as="sourcePoint"/>
                             <mxPoint x="130" y="210" as="targetPoint"/>
@@ -103,7 +103,7 @@
                     </mxCell>
                 </object>
                 <object label="" type="map-path" id="35">
-                    <mxCell style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxCell style="endArrow=classic;html=1;" parent="1" edge="1">
                         <mxGeometry width="50" height="50" relative="1" as="geometry">
                             <mxPoint x="410" y="130" as="sourcePoint"/>
                             <mxPoint x="130" y="130" as="targetPoint"/>

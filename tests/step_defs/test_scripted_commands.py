@@ -3,7 +3,18 @@ from pytest_bdd import scenarios, given, when, then, parsers
 
 from main import Simulator
 
+from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper
+from tests.helpers.AssertionHelper import AssertionHelper
+
 scenarios('../features/scripted_commands.feature')
+
+@pytest.fixture
+def scenario_helper(simulation):
+    return ScenarioCreationHelper(simulation)
+
+@pytest.fixture
+def assertion_helper(simulation):
+    return AssertionHelper(simulation)
 
 @pytest.fixture
 def config():
