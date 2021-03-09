@@ -1,3 +1,5 @@
+from components.Claw import Claw
+from components.Script import Script
 from systems.GotoDESProcessor import GotoPoiEventTag, GotoPoiPayload, GotoPosEventTag, GotoPosPayload
 from systems.PathProcessor import PathProcessor
 from systems.MovementProcessor import MovementProcessor
@@ -51,6 +53,7 @@ class ScenarioCreationHelper(TestHelper):
         self.simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height))
 
     def add_ability_to_navigate(self):
+        """Serve para o gotoPos e para o gotoPoi"""
         NavigationSystemProcess = NavigationSystem.init()
         self.simulation.add_des_system((NavigationSystemProcess,))
         width, height = self.simulation.window_dimensions
@@ -60,20 +63,11 @@ class ScenarioCreationHelper(TestHelper):
     def add_ability_to_collide(self):
         self.simulation.add_system(CollisionProcessor())
         self.simulation.add_des_system((collisionDetector.process,))
-
-    def add_ability_to_move_to_specific_poi(self):
-        NavigationSystemProcess = NavigationSystem.init()
-        self.simulation.add_des_system((NavigationSystemProcess,))
-        width, height = self.simulation.window_dimensions
-        self.simulation.add_system(PathProcessor())
-        self.simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height))
     
-    def add_ability_to_move_to_specific_position(self):
-        NavigationSystemProcess = NavigationSystem.init()
-        self.simulation.add_des_system((NavigationSystemProcess,))
-        width, height = self.simulation.window_dimensions
-        self.simulation.add_system(PathProcessor())
-        self.simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height))
+    def add_claw_ability(self, drawio_id):
+        claw = self.get_component(Claw, drawio_id)
+        if claw is None:
+            self.add_component(Claw(80, 1), drawio_id)
 
     def add_script_ability(self):
         extra_instructions = [
@@ -85,9 +79,38 @@ class ScenarioCreationHelper(TestHelper):
         self.simulation.add_des_system((ScriptProcessor,),)
         self.simulation.add_des_system((ClawProcessor.process,))
 
+
+
     def add_poi(self, poi_tag, poi_value):
         map = self.simulation.world.component_for_entity(1, Map)
         map.pois[poi_tag] = poi_value
+
+    def add_commands(self, command_list, drawio_id):
+        script = self.get_component(Script, drawio_id)
+        if script is None:
+            self.add_component(Script(command_list), drawio_id)  
+        else:
+            for command in command_list:
+                script.instructions.append(command)
+
+    def add_command(self, command, drawio_id):
+        script = self.get_component(Script, drawio_id)
+        if script is None:
+            self.add_component(Script([command]), drawio_id)        
+        else:
+            script.instructions.append(command)
+
+    def add_go_command(self, drawio_id, poi_tag):
+        command = f"Go {poi_tag}"
+        self.add_command(command, drawio_id)
+
+    def add_grab_command(self, drawio_id, pickable_name):
+        command = f"Grab {pickable_name}"
+        self.add_command(command, drawio_id)
+
+    def add_drop_command(self, drawio_id, pickable_name):
+        command = f"Drop {pickable_name}"
+        self.add_command(command, drawio_id)
 
     # add seer
     # add log json

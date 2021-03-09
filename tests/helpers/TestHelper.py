@@ -41,7 +41,7 @@ class TestHelper:
 
     def get_component(self, component, drawio_id):
         entity_id = self.cast_id(drawio_id)
-        if self.simulation.world.has_component(entity_id, component):
+        if entity_id and self.simulation.world.has_component(entity_id, component):
             return self.simulation.world.component_for_entity(entity_id, component)
         else:
             return None
