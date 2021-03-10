@@ -6,7 +6,7 @@ import json
 import simpy
 import pathlib
 import esper
-import logging
+from logging import getLogger
 import logging.config
 import yaml
 
@@ -14,14 +14,14 @@ import typing
 import map_parser
 
 from components.Inventory import Inventory
-from utils.create_components import initialize_components
+from utils.create_components import initialize_components, import_external_component
 from typehints.dict_types import SystemArgs, Config, EntityDefinition
 from utils.config import working_directory
 fileName = pathlib.Path.cwd().joinpath(f'{working_directory}/loggerConfig.yml')
 stream = open(fileName)
 loggerConfig = yaml.safe_load(stream)
 logging.config.dictConfig(loggerConfig)
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 """Format for all DES events added to Stores.
@@ -78,13 +78,16 @@ class Simulator:
         self.DEFAULT_LINE_WIDTH = config.get('DLW', 10)
         self.DURATION = config.get('duration', -1)
 
+        context = config.get('context', '.')
+        if context != '.':
+            import_external_component(context)
         if 'map' in config:
-            file = pathlib.Path(config.get('context', '.')) / config.get('map')
+            file = pathlib.Path(context) / config.get('map')
             logger.info(f'Using simulation map {file}')
             simulation = map_parser.build_simulation_from_map(file)
         else:
             logger.info('No map found in the configuration. Creating empty simulation.')
-            simulation = map_parser.build_simulation_from_map("", True)
+            simulation = map_parser.build_simulation_from_map(context, True)
         self.world: esper.World = simulation['world']
         # self.window = simulation['window']
         # self.batch = simulation['batch']
@@ -175,16 +178,9 @@ class Simulator:
         """
         # Other processors
         while not self.EXIT:
-            # pyglet.clock.tick()
             self.world.process(self.KWARGS)
-            # logger.debug(f'[ENV TIME {self.ENV.now}] Processed world.')
-            # For many windows
-            # for w in pyglet.app.windows:
-            #     w.switch_to()
-            #     w.dispatch_events()
-            #     w.dispatch_event('on_draw')
-            #     w.flip()
             # # ticks on the clock
+            # TODO: find a way to work 100% DES
             if self.KWARGS["_KILLSWITCH"] is not None:
                 switch = yield self.KWARGS["_KILLSWITCH"] | self.ENV.timeout(1.0 / self.FPS, False)
                 if self.KWARGS["_KILLSWITCH"] in switch:

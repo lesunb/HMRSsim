@@ -3,6 +3,7 @@
 import esper
 import logging
 import os
+import pathlib
 
 import resources.load_resources as loader
 import mxCellDecoder as mxCellDecoder
@@ -15,13 +16,8 @@ from xml.etree.ElementTree import Element
 from typehints.build_types import WindowOptions, DependencyNotFound
 from typing import List, Tuple
 
-available_builders = export_available_builders()
-"""Dict of available object typehints (e.g. robot, map-path, etc).
-   Dict key is the TYPE tag. Value is the build_object function.
-"""
 
-
-def build_simulation_from_map(file: str, skip_map=False, simulation_components=None, line_width=10):
+def build_simulation_from_map(file: pathlib.Path, skip_map=False, simulation_components=None, line_width=10):
     """Creates the base for the simulation.
 
         If a map is provided, the simulation comes from the map.
@@ -34,7 +30,7 @@ def build_simulation_from_map(file: str, skip_map=False, simulation_components=N
         if not skip_map:
             logger.error(f'Map file {file} does not exist. Creating empty simulation instead')
         window_name = 'Default'
-        map_content = Element([], tag='not found', attrib={})
+        map_content = Element('', tag='not found', attrib={})
 
     width = int(map_content.attrib.get('pageWidth', 500))
     height = int(map_content.attrib.get('pageHeight', 500))
@@ -62,7 +58,14 @@ def build_simulation_from_map(file: str, skip_map=False, simulation_components=N
             world.add_component(1, c)
 
     if content_root:
-        draw_map, objects, interactive = build_simulation_objects(content_root, world, ((width, height), line_width))
+        context = (file.parent if not skip_map else file) / 'builders'
+        available_builders = export_available_builders([context])
+        draw_map, objects, interactive = build_simulation_objects(
+            content_root,
+            world,
+            ((width, height), line_width),
+            available_builders
+        )
     else:
         draw_map = {}
         objects = []
@@ -79,7 +82,11 @@ def build_simulation_from_map(file: str, skip_map=False, simulation_components=N
     }
 
 
-def build_simulation_objects(content_root: Element, world: esper.World, window_options: WindowOptions):
+def build_simulation_objects(
+        content_root: Element,
+        world: esper.World,
+        window_options: WindowOptions,
+        available_builders: dict):
     """ Parses the XML Elements into esper entities.
 
         Parsing is done by transforming Element's attributes and annotations into components.
@@ -113,10 +120,10 @@ def build_simulation_objects(content_root: Element, world: esper.World, window_o
                 world.add_component(ent, c)
             draw2entity[style['id']] = [ent, style]
         if cell.tag == 'object':
-            type = cell.attrib['type']
+            cell_type = cell.attrib['type']
             try:
                 pending_updates = \
-                    available_builders[type].__dict__['build_object'](cell, world, window_options, draw2entity)
+                    available_builders[cell_type].__dict__['build_object'](cell, world, window_options, draw2entity)
                 draw2entity.update(pending_updates[0])
                 objects += pending_updates[1]
                 interactive.update(pending_updates[2])
@@ -132,10 +139,10 @@ def build_simulation_objects(content_root: Element, world: esper.World, window_o
                 world.add_component(ent, c)
             draw2entity[style['id']] = [ent, style]
         if cell.tag == 'object':
-            type = cell.attrib['type']
+            cell_type = cell.attrib['type']
             try:
                 pending_updates = \
-                    available_builders[type].__dict__['build_object'](cell, world, window_options, draw2entity)
+                    available_builders[cell_type].__dict__['build_object'](cell, world, window_options, draw2entity)
                 draw2entity.update(pending_updates[0])
                 objects += pending_updates[1]
                 interactive.update(pending_updates[2])

@@ -7,11 +7,11 @@ config = {
     "storageBucket": "seer-3ec9b.appspot.com"
 }
 
-# TODO: Move this to .env file
-NAMESPACE = 'simulator'
 
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
 
-# Remove any old data that might be there
-db.child(NAMESPACE).child('live_report').remove()
+
+def clean_old_simulation(namespace: str):
+    """Clean previous simulation from firebase"""
+    return db.child(namespace).child('live_report').remove()
