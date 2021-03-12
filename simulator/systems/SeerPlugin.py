@@ -8,8 +8,8 @@ from typehints.dict_types import SystemArgs
 from simpy import Environment
 from esper import World
 
-from components.Skeleton import Skeleton
-from components.Position import Position
+from simulator.components.Skeleton import Skeleton
+from simulator.components.Position import Position
 
 message_buffer = Queue()
 

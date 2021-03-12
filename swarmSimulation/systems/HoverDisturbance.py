@@ -3,7 +3,7 @@ import random
 
 from simulator.typehints.dict_types import SystemArgs
 
-from components.Velocity import Velocity
+from simulator.components.Velocity import Velocity
 from swarmSimulation.components.Hover import Hover, HoverState
 
 

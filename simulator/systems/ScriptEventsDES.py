@@ -8,7 +8,7 @@ import logging
 from typehints.component_types import EVENT, ERROR
 from simulator.systems.PathProcessor import EndOfPathTag
 
-import components.Script as scriptComponent
+import simulator.components.Script as scriptComponent
 
 
 ExecutePayload = NamedTuple('ExecuteScriptInstructionPayload', [('ent', int)])

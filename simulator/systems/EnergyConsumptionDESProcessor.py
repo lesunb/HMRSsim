@@ -4,7 +4,7 @@ from typehints.dict_types import SystemArgs
 from simpy import Environment
 from esper import World
 
-from components.BatteryComponent import Battery
+from simulator.components.BatteryComponent import Battery
 
 # Clock independente do tick da simulação - 1s
 # Buscar no mundo as entidades que tem componente Battery

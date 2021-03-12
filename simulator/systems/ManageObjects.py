@@ -6,9 +6,9 @@ from simpy import FilterStore, Store
 from esper import World
 from pyglet.graphics import Batch
 
-from components.Renderable import Renderable
-from components.Inventory import Inventory
-from components.Pickable import Pickable
+from simulator.components.Renderable import Renderable
+from simulator.components.Inventory import Inventory
+from simulator.components.Pickable import Pickable
 
 from mxCellDecoder import parse_object
 

@@ -1,7 +1,7 @@
 import primitives as primitives
-from components.Collidable import Collidable
-from components.Position import Position
-from components.Velocity import Velocity
+from simulator.components.Collidable import Collidable
+from simulator.components.Position import Position
+from simulator.components.Velocity import Velocity
 from utils.helpers import parse_style
 
 from typing import Tuple, List

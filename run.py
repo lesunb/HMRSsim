@@ -12,7 +12,7 @@ import simulator.systems.ScriptEventsDES as ScriptSystem
 import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.SeerPlugin as Seer
 
-from components.Script import Script
+from simulator.components.Script import Script
 
 from main import Simulator
 

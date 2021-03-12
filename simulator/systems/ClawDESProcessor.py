@@ -6,15 +6,14 @@ from simpy import FilterStore, Store, Environment
 from typehints.component_types import EVENT
 from typehints.dict_types import SystemArgs
 
-from components.Position import Position
-from components.Claw import Claw
-from components.Collidable import Collidable
-from components.Pickable import Pickable
-from components.Inventory import Inventory
-from components.Script import Script, States
+from simulator.components.Position import Position
+from simulator.components.Claw import Claw
+from simulator.components.Collidable import Collidable
+from simulator.components.Pickable import Pickable
+from simulator.components.Inventory import Inventory
+from simulator.components.Script import Script, States
 
 from collision import collide
-from primitives import Ellipse
 
 import logging
 import simulator.systems.ManageObjects as ObjectManager
@@ -36,6 +35,7 @@ DropInstructionTag = 'Drop'
 _EVENT_STORE: FilterStore
 _WORLD: World
 _ENV: Environment
+
 
 def process(kwargs: SystemArgs):
     global _EVENT_STORE

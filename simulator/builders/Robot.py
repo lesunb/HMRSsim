@@ -1,4 +1,5 @@
 import json
+from esper import World
 
 import dynamic_importer
 import mxCellDecoder
@@ -9,7 +10,7 @@ COMPONENT_DEPENDENCIES = []
 SYSTEM_DEPENDENCIES = []
 
 
-def build_object(cell, world, window_options, draw2entity):
+def build_object(cell, world: World, window_options, draw2entity):
     (components, style) = mxCellDecoder.parse_object(cell, window_options)
     ent = world.create_entity()
     # Custom components
@@ -19,6 +20,7 @@ def build_object(cell, world, window_options, draw2entity):
             init_values = json.loads(val)
             component = dynamic_importer.init_component(component_name, init_values)
             components.append(component)
+    print(components)
     for c in components:
         world.add_component(ent, c)
     return {style['id']: [ent, style]}, [(ent, style['id'])], {}

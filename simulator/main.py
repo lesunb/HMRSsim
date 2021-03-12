@@ -13,11 +13,11 @@ import yaml
 import typing
 import map_parser
 
-from components.Inventory import Inventory
+from simulator.components.Inventory import Inventory
 from utils.create_components import initialize_components, import_external_component
 from typehints.dict_types import SystemArgs, Config, EntityDefinition
 
-fileName = pathlib.Path.cwd().joinpath('loggerConfig.yml')
+fileName = pathlib.Path(__file__).parent.joinpath('loggerConfig.yml')
 stream = open(fileName)
 loggerConfig = yaml.safe_load(stream)
 logging.config.dictConfig(loggerConfig)
@@ -79,6 +79,7 @@ class Simulator:
         self.DURATION = config.get('duration', -1)
 
         context = config.get('context', '.')
+        logger.info(f'Context is {context}')
         if context != '.':
             import_external_component(context)
         if 'map' in config:

@@ -2,8 +2,8 @@ import logging
 
 from simulator.typehints.dict_types import SystemArgs
 
-from components.Velocity import Velocity
-from components.Position import Position
+from simulator.components.Velocity import Velocity
+from simulator.components.Position import Position
 from swarmSimulation.components.Hover import Hover, HoverState
 
 from simulator.utils.Navigation import distance

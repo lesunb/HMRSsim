@@ -1,8 +1,8 @@
 import esper
 import logging
 
-from components.Position import Position
-from components.Velocity import Velocity
+from simulator.components.Position import Position
+from simulator.components.Velocity import Velocity
 
 
 class MovementProcessor(esper.Processor):

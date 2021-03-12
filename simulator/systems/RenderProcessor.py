@@ -1,8 +1,8 @@
 import esper
 
-from components.Renderable import Renderable
-from components.Position import Position
-from components.Label import Label
+from simulator.components.Renderable import Renderable
+from simulator.components.Position import Position
+from simulator.components.Label import Label
 
 
 class RenderProcessor(esper.Processor):

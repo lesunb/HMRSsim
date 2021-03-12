@@ -9,7 +9,7 @@ Env Depencies
 -------------
 python 3, pip
 
-Instal pipenv
+Install pipenv
 ------------- 
 
 pipenv easy the process of managing python dependencies

@@ -3,16 +3,16 @@ import logging
 
 from typing import NamedTuple, List, Union, Callable
 
-from components.Map import Map
+from simulator.components.Map import Map
 from typehints.component_types import Point
 from typehints.dict_types import SystemArgs
 
 from simpy import FilterStore
 
-import components.Script as scriptComponent
-from components.Path import Path
-from components.Position import Position
-from components.Script import Script
+import simulator.components.Script as scriptComponent
+from simulator.components.Path import Path
+from simulator.components.Position import Position
+from simulator.components.Script import Script
 
 from simulator.systems.NavigationSystem import find_route
 
