@@ -5,9 +5,9 @@ from typehints.dict_types import SystemArgs
 
 from simpy import FilterStore
 
-from components.Path import Path
-from components.Position import Position
-from components.Velocity import Velocity
+from simulator.components.Path import Path
+from simulator.components.Position import Position
+from simulator.components.Velocity import Velocity
 from typing import List
 from typehints.component_types import Point, EVENT
 

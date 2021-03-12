@@ -25,5 +25,5 @@ def init(disturbance_interval=1, prob_disturbance=0.2, max_disturbance=0.5):
                         velocity.x += (disturbance if not flip else -disturbance)
                     else:
                         velocity.y += (disturbance if not flip else -disturbance)
-            env.timeout(disturbance_interval)
+            yield env.timeout(disturbance_interval)
     return process

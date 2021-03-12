@@ -1,8 +1,8 @@
 import esper
 import logging
-from components.Map import Map
-from components.Skeleton import Skeleton
-from components.Position import Position
+from simulator.components.Map import Map
+from simulator.components.Skeleton import Skeleton
+from simulator.components.Position import Position
 
 TYPE = 'POI'
 

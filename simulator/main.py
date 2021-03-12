@@ -13,11 +13,11 @@ import yaml
 import typing
 import map_parser
 
-from components.Inventory import Inventory
+from simulator.components.Inventory import Inventory
 from utils.create_components import initialize_components, import_external_component
 from typehints.dict_types import SystemArgs, Config, EntityDefinition
-from utils.config import working_directory
-fileName = pathlib.Path.cwd().joinpath(f'{working_directory}/loggerConfig.yml')
+
+fileName = pathlib.Path(__file__).parent.joinpath('loggerConfig.yml')
 stream = open(fileName)
 loggerConfig = yaml.safe_load(stream)
 logging.config.dictConfig(loggerConfig)
@@ -79,6 +79,7 @@ class Simulator:
         self.DURATION = config.get('duration', -1)
 
         context = config.get('context', '.')
+        logger.info(f'Context is {context}')
         if context != '.':
             import_external_component(context)
         if 'map' in config:
@@ -112,10 +113,8 @@ class Simulator:
         self.KWARGS: SystemArgs = {
             "ENV": self.ENV,
             "WORLD": self.world,
-            "_KILLSWITCH": self.ENV.event() if self.DURATION > 0 else None,
+            "_KILL_SWITCH": self.ENV.event(),
             "EVENT_STORE": simpy.FilterStore(self.ENV),
-            # Pyglet specific things (for the re-create entity)
-            # "BATCH": self.batch,
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
         self.cleanups: typing.List[CleanupFunction] = [cleanup]
@@ -181,19 +180,20 @@ class Simulator:
             self.world.process(self.KWARGS)
             # # ticks on the clock
             # TODO: find a way to work 100% DES
-            if self.KWARGS["_KILLSWITCH"] is not None:
-                switch = yield self.KWARGS["_KILLSWITCH"] | self.ENV.timeout(1.0 / self.FPS, False)
-                if self.KWARGS["_KILLSWITCH"] in switch:
+            if self.KWARGS["_KILL_SWITCH"] is not None:
+                switch = yield self.KWARGS["_KILL_SWITCH"] | self.ENV.timeout(1.0 / self.FPS, False)
+                if self.KWARGS["_KILL_SWITCH"] in switch:
                     break
             else:
                 yield self.ENV.timeout(1.0 / self.FPS, False)
-        return 0
+        logger.debug(f'simulation loop exited')
+        self.EXIT_EVENT.succeed()
 
     def run(self):
         """
         Runs the simulation.
         Simulation continues for DURATION seconds, if DURATION is specified.
-        Simulation exits on EXIT_EVENT or if _KILLSWITCH event is triggered.
+        Simulation exits on EXIT_EVENT or if _KILL_SWITCH event is triggered.
         After simulation loop terminates, ALL cleanup functions are executed,
         the last being the user defined one, if present.
         """

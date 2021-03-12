@@ -1,17 +1,25 @@
 import sys
-import json
-
+import simpy
+import logging
+import math
 
 import simulator.systems.ScriptEventsDES as ScriptSystem
 import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.SeerPlugin as Seer
+import simulator.systems.SensorSystem as SensorSystem
+
 from simulator.systems.MovementProcessor import MovementProcessor
 from simulator.systems.CollisionProcessor import CollisionProcessor
 from simulator.systems.PathProcessor import PathProcessor
 
-import swarmSimulation.systems.HoverDisturbance as HoverDisturbance
-from simulator.components.Script import Script
 
+import swarmSimulation.systems.HoverDisturbance as HoverDisturbance
+import swarmSimulation.systems.HoverSystem as HoverSystem
+
+
+from simulator.components.ProximitySensor import ProximitySensor
+from simulator.components.Position import Position
+from swarmSimulation.components.Hover import Hover, HoverState
 
 from simulator.main import Simulator
 from simulator.utils.Firebase import db, clean_old_simulation
@@ -26,6 +34,7 @@ NavigationSystemProcess = NavigationSystem.init()
 simulator = Simulator(sys.argv[1])
 # Some simulator objects
 width, height = simulator.window_dimensions
+fps = simulator.FPS
 # window = simulator.window
 eventStore = simulator.KWARGS['EVENT_STORE']
 exitEvent = simulator.EXIT_EVENT
@@ -55,9 +64,11 @@ normal_processors = [
 # Defines DES processors
 des_processors = [
     Seer.init([firebase_seer_consumer], 0.05, False),
-    (NavigationSystemProcess,),
-    (ScriptProcessor,),
-    (HoverDisturbance.init(),)
+    (SensorSystem.init(ProximitySensor, 1),),
+    # (NavigationSystemProcess,),
+    # (ScriptProcessor,),
+    (HoverDisturbance.init(max_disturbance=0.1, prob_disturbance=0.4, disturbance_interval=(1 / (fps / 3))),),
+    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1 / (fps / 3)), max_speed=1),)
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:
@@ -66,20 +77,58 @@ for p in des_processors:
     simulator.add_des_system(p)
 
 
-# Create the error handlers dict
-# error_handlers = {
-#     NavigationSystem.PathErrorTag: NavigationSystem.handle_PathError
-# }
-# # Adding error handlers to the robot
-# robot = simulator.objects[0][0]
-# script = simulator.world.component_for_entity(robot, Script)
-# script.error_handlers = error_handlers
+for drone, _ in simulator.objects:
+    hover = simulator.world.component_for_entity(drone, Hover)
+    sensor: ProximitySensor = simulator.world.component_for_entity(drone, ProximitySensor)
+    sensor.reply_channel = simpy.Store(env)
+
+
+def capture(sensor: ProximitySensor):
+    while True:
+        ev = yield sensor.reply_channel.get()
+        payload = ev.payload
+        me = payload.ent
+        they = payload.other_ent
+        mypos = payload.pos
+        myvel = payload.vel
+        other_pos = payload.other_pos
+        dx = math.fabs(other_pos.x - mypos.x)
+        dy = math.fabs(other_pos.y - mypos.y)
+        ndx = math.fabs(other_pos.x - (mypos.x - myvel.x))
+        ndy = math.fabs(other_pos.y - (mypos.y - myvel.y))
+        print(f'{me} {they}. [{dx}, {ndx}]. [{dy}, {ndy}].')
+        if math.fabs(ndx - dx) <= 2:
+            myvel.x = 0
+        if math.fabs(ndy - dy) <= 2:
+            myvel.y = 0
+
+
+# The controller for now
+def control(kill_switch):
+    # logger = logging.getLogger(__name__)
+    for drone, _ in simulator.objects:
+        hover = simulator.world.component_for_entity(drone, Hover)
+        pos = simulator.world.component_for_entity(drone, Position)
+        hover.target = (pos.center[0], pos.center[1])
+        hover.status = HoverState.MOVING
+    # logger.debug(f'Update hover: {hover}')
+    # yield env.timeout(5)
+    # hover.target = (220, 180)
+    # hover.status = HoverState.MOVING
+    # logger.debug(f'Update hover: {hover}')
+    # yield env.timeout(5)
+    # hover.target = (240, 200)
+    # hover.status = HoverState.MOVING
+    # logger.debug(f'Update hover: {hover}')
+    # yield env.timeout(5)
+    # logger.debug(f'Yielding kill_switch')
+    # kill_switch.succeed()
+
 
 if __name__ == "__main__":
-    # NOTE!  schedule_interval will automatically pass a "delta time" argument
-    #        to world.process, so you must make sure that your Processor classes
-    #        account for this. See the example Processors above.
-    # simulator.run()
-    # print("Robot's script logs")
-    # print("\n".join(script.logs))
-    pass
+    # env.process(control(simulator.KWARGS['_KILL_SWITCH']))
+    for drone, _ in simulator.objects:
+        sensor: ProximitySensor = simulator.world.component_for_entity(drone, ProximitySensor)
+        env.process(capture(sensor))
+    simulator.run()
+

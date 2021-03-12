@@ -1,10 +1,10 @@
 from collision import Poly
 from collections import namedtuple
 
-from components.Collidable import Collidable
-from components.Renderable import Renderable
-from components.Velocity import Velocity
-from components.Position import Position
+from simulator.components.Collidable import Collidable
+from simulator.components.Renderable import Renderable
+from simulator.components.Velocity import Velocity
+from simulator.components.Position import Position
 
 import resources.load_resources as loader
 

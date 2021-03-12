@@ -21,6 +21,7 @@ collision = "*"
 pep8 = "*"
 colorama = "*"
 pyrebase = '*'
+python-dotenv = '*'
 
 [requires]
-python_version = "3.8.2"
+python_version = "3.8.5"

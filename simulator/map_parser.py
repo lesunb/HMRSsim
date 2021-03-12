@@ -10,8 +10,8 @@ import mxCellDecoder as mxCellDecoder
 
 from dynamic_builders import export_available_builders
 from utils.create_components import initialize_components
-from components.Inventory import Inventory
-from components.Skeleton import Skeleton
+from simulator.components.Inventory import Inventory
+from simulator.components.Skeleton import Skeleton
 from xml.etree.ElementTree import Element
 from typehints.build_types import WindowOptions, DependencyNotFound
 from typing import List, Tuple
@@ -104,6 +104,7 @@ def build_simulation_objects(
                                  Key is the entity name, value is the entity id
     """
     logger = logging.getLogger(__name__)
+    logger.info(f'Available builders: {available_builders}')
     draw2entity = {}
     objects: List[Tuple[int, str]] = []
     interactive = {}

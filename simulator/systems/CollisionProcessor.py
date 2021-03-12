@@ -2,9 +2,9 @@ import esper
 import logging
 from random import choice
 from collision import Vector, collide
-from components.Velocity import Velocity
-from components.Collidable import Collidable
-from components.Position import Position
+from simulator.components.Velocity import Velocity
+from simulator.components.Collidable import Collidable
+from simulator.components.Position import Position
 from typing import NamedTuple
 from typehints.dict_types import SystemArgs
 from typehints.component_types import EVENT

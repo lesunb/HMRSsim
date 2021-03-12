@@ -1,25 +1,25 @@
 import sys
 import json
 
-from systems.MovementProcessor import MovementProcessor
-from systems.CollisionProcessor import CollisionProcessor
-from systems.PathProcessor import PathProcessor
+from simulator.systems.MovementProcessor import MovementProcessor
+from simulator.systems.CollisionProcessor import CollisionProcessor
+from simulator.systems.PathProcessor import PathProcessor
 
+import simulator.systems.EnergyConsumptionDESProcessor as energySystem
+import simulator.systems.ManageObjects as ObjectManager
+import simulator.systems.ClawDESProcessor as ClawProcessor
+import simulator.systems.ScriptEventsDES as ScriptSystem
+import simulator.systems.GotoDESProcessor as NavigationSystem
+import simulator.systems.SeerPlugin as Seer
 
-import systems.EnergyConsumptionDESProcessor as energySystem
-import systems.ManageObjects as ObjectManager
-import systems.ClawDESProcessor as ClawProcessor
-import systems.ScriptEventsDES as ScriptSystem
-import systems.GotoDESProcessor as NavigationSystem
+from simulator.components.Script import Script
 
-from components.Script import Script
+from main import Simulator
 
 from utils.Firebase import db, clean_old_simulation
 NAMESPACE = 'simulator'
 clean_old_simulation(NAMESPACE)
 
-from main import Simulator
-import systems.SeerPlugin as Seer
 
 extra_instructions = [
     (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction),
