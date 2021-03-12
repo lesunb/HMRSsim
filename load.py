@@ -1,16 +1,7 @@
-from components.Collision import Collision
-from components.Path import Path
-from components.Position import Position
-from components.Map import Map
+from simulator.components.Script import Script
 from main import Simulator
-from systems.PathProcessor import PathProcessor
-from systems.MovementProcessor import MovementProcessor
-from systems.CollisionProcessor import CollisionProcessor
-from tests.aux.testaux import get_component, create_path, store_goto_poi_event, get_center, store_goto_position_event, add_component
-import systems.GotoDESProcessor as NavigationSystem
-from tests.aux.report import clean, set_report
 
-import systems.CollisionDetectorDESProcessor as collisionDetector
+from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper
 
 
 config = {
@@ -20,36 +11,22 @@ config = {
         "duration": 10
     }
 
-config["map"] = "three_room_map.drawio"
+config["map"] = "med_and_patient_room_map_with_commands.drawio"
 
 simulation = Simulator(config)
+scenario_helper = ScenarioCreationHelper(simulation)
 
-NavigationSystemProcess = NavigationSystem.init()
-simulation.add_des_system((NavigationSystemProcess,))
-width, height = simulation.window_dimensions
-simulation.add_system(PathProcessor())
-simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height))
+scenario_helper.add_script_ability()
+scenario_helper.add_ability_to_navigate()
+print("objects: ", simulation.objects)
+print("robot components: ", simulation.world.components_for_entity(2))
+script = simulation.world.component_for_entity(2, Script)
 
-if not simulation.world.has_component(1, Map):
-    simulation.world.add_component(1, Map())
+#simulation.world.add_component(2, Script())
 
-"""
-room_three_center = get_center(simulation, 'room3')
-print("room three center: ", room_three_center)
-store_goto_position_event(simulation, 'robot', room_three_center)
-"""
-
-room_three_center = get_center(simulation, 'room3')
-map = simulation.world.component_for_entity(1, Map)
-map.pois["room_three_center"] = room_three_center
-
-store_goto_poi_event(simulation, 'robot', 'room_three_center')
-
-
-robot_position = get_component(simulation, Position, 'robot')
-print("before: ", robot_position.center)
-
+#print("Before: ", scenario_helper.get_position('medicine'))
+#print("Before: ", scenario_helper.get_position('robot'))
 simulation.run()
 
-robot_position = get_component(simulation, Position, 'robot')
-print(robot_position.center)
+#print("After: ", scenario_helper.get_position('medicine'))
+#print("After: ", scenario_helper.get_position('robot'))

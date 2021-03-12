@@ -1,6 +1,6 @@
-from components.Position import Position
+from simulator.components.Position import Position
+from simulator.components.Collision import Collision
 from typehints.dict_types import SystemArgs
-from components.Collision import Collision
 
 def process(kwargs: SystemArgs):
     event_store = kwargs.get('EVENT_STORE', None)

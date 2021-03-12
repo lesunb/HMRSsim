@@ -1,15 +1,15 @@
-from components.Claw import Claw
-from components.Script import Script
-from systems.GotoDESProcessor import GotoPoiEventTag, GotoPoiPayload, GotoPosEventTag, GotoPosPayload
-from systems.PathProcessor import PathProcessor
-from systems.MovementProcessor import MovementProcessor
-import systems.GotoDESProcessor as NavigationSystem
-import systems.ClawDESProcessor as ClawProcessor
-import systems.ScriptEventsDES as ScriptSystem
-import systems.CollisionDetectorDESProcessor as collisionDetector
-from systems.CollisionProcessor import CollisionProcessor
-from components.Path import Path
-from components.Map import Map
+from simulator.components.Claw import Claw
+from simulator.components.Script import Script
+from simulator.systems.GotoDESProcessor import GotoPoiEventTag, GotoPoiPayload, GotoPosEventTag, GotoPosPayload
+from simulator.systems.PathProcessor import PathProcessor
+from simulator.systems.MovementProcessor import MovementProcessor
+import simulator.systems.GotoDESProcessor as NavigationSystem
+import simulator.systems.ClawDESProcessor as ClawProcessor
+import simulator.systems.ScriptEventsDES as ScriptSystem
+import simulator.systems.CollisionDetectorDESProcessor as collisionDetector
+from simulator.systems.CollisionProcessor import CollisionProcessor
+from simulator.components.Path import Path
+from simulator.components.Map import Map
 from typehints.component_types import EVENT
 from tests.helpers.TestHelper import TestHelper
 

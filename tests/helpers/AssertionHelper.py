@@ -1,4 +1,4 @@
-from components.Collision import Collision
+from simulator.components.Collision import Collision
 from tests.helpers.TestHelper import TestHelper
 
 class AssertionHelper(TestHelper):

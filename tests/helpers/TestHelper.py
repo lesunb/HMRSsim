@@ -1,6 +1,6 @@
-from components.Position import Position
-from components.Collision import Collision
-from components.Map import Map
+from simulator.components.Position import Position
+from simulator.components.Collision import Collision
+from simulator.components.Map import Map
 
 class TestHelper:
     def __init__(self, simulation):
