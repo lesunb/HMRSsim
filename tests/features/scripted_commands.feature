@@ -14,6 +14,7 @@ Feature: Scripted Commands
 Scenario: The robot Go to a POI using a script command
     Given a map with a medicine room and a patient room
     And a robot with the ability to follow a script command
+    And the robot has the ability to navigate
     And a script command 'Go to' 'medRoom' poi
     When after run simulation
     Then the robot is in the 'medRoom' poi
@@ -22,6 +23,7 @@ Scenario: The robot grab and drop a medicine using a script command
     Given a map with a medicine room and a patient room
     And a robot with the ability to follow a script command
     And a robot with the ability to grab pickables
+    And the robot has the ability to navigate
     And a script command 'Go to' 'medRoom' poi
     And a script command 'Grab' 'medicine' pickable
     And a script command 'Go to' 'patientRoom' poi

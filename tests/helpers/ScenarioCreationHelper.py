@@ -7,6 +7,7 @@ import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.ClawDESProcessor as ClawProcessor
 import simulator.systems.ScriptEventsDES as ScriptSystem
 import simulator.systems.CollisionDetectorDESProcessor as collisionDetector
+import simulator.systems.ManageObjects as ObjectManager
 from simulator.systems.CollisionProcessor import CollisionProcessor
 from simulator.components.Path import Path
 from simulator.components.Map import Map
@@ -78,8 +79,7 @@ class ScenarioCreationHelper(TestHelper):
         ScriptProcessor = ScriptSystem.init(extra_instructions, [ClawProcessor.ClawDoneTag])
         self.simulation.add_des_system((ScriptProcessor,),)
         self.simulation.add_des_system((ClawProcessor.process,))
-
-
+        self.simulation.add_des_system((ObjectManager.process,))
 
     def add_poi(self, poi_tag, poi_value):
         map = self.simulation.world.component_for_entity(1, Map)

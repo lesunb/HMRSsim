@@ -44,5 +44,4 @@ def run_simulation(simulation):
 
 @then(parsers.parse("the '{pickable}' is in the '{poi_tag}' poi"))
 def pickable_is_in_the_correct_poi(assertion_helper, pickable, poi_tag):
-    #assert assertion_helper.is_in_poi(pickable, poi_tag)
-    pass
+    assert assertion_helper.robot_drop_pickable_in_poi('robot', pickable, poi_tag)

@@ -15,15 +15,27 @@ class AssertionHelper(TestHelper):
         return False
 
     def is_in_poi(self, entity_id, poi_tag):
-        entity_position = self.get_position(entity_id)  # TODO: verificar se é para pegar o centro
+        entity_position = self.get_center(entity_id)
         poi = self.get_poi(poi_tag)
-
-        if entity_position.x == poi[0] and entity_position.y == poi[1]:
+        
+        if (entity_position[0] == poi[0]) and (entity_position[1] == poi[1]):
             return True
         else:
             return False
             # TODO: raise AssertionError(f'Entity is not in the POI. Entity Position: {entity_position}. Poi: {poi}')
             # como retornar o Assertion e o False
+
+    def robot_drop_pickable_in_poi(self, robot_id, pickable_name, poi_tag):
+        pickable_position = self.get_center(pickable_name)
+        poi = self.get_poi(poi_tag)
+        robot_height = self.get_position(robot_id).h
+
+        print("robot height: ", robot_height)
+
+        if (pickable_position[0] == poi[0]) and (pickable_position[1] == poi[1] + robot_height):
+            return True
+        else:
+            return False
 
     def is_in_center_of(self, entity_id, other_entity_id):
         """Compara o x e o y do centro"""

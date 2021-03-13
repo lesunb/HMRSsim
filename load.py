@@ -1,7 +1,23 @@
+from tests.helpers.AssertionHelper import AssertionHelper
 from simulator.components.Script import Script
 from main import Simulator
+import simulator.systems.SeerPlugin as Seer
+
+#from utils.Firebase import db, clean_old_simulation
+#NAMESPACE = 'cris'
+#clean_old_simulation(NAMESPACE)
 
 from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper
+
+def firebase_seer_consumer(message, msg_idx):
+    """Sends Seer messages to firebase"""
+    if msg_idx >= 0:
+        if msg_idx == 1:
+            for idx, j in enumerate(message):
+                db.child(NAMESPACE).child('live_report').child(msg_idx).child(idx).set({j: message[j]})
+        else:
+            _ = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
+
 
 
 config = {
@@ -11,22 +27,22 @@ config = {
         "duration": 10
     }
 
-config["map"] = "med_and_patient_room_map_with_commands.drawio"
+config["map"] = "med_and_patient_room_map.drawio"
 
 simulation = Simulator(config)
 scenario_helper = ScenarioCreationHelper(simulation)
 
 scenario_helper.add_script_ability()
+scenario_helper.add_claw_ability('robot')
 scenario_helper.add_ability_to_navigate()
-print("objects: ", simulation.objects)
-print("robot components: ", simulation.world.components_for_entity(2))
-script = simulation.world.component_for_entity(2, Script)
 
-#simulation.world.add_component(2, Script())
+scenario_helper.add_go_command('robot', 'medRoom')
+#scenario_helper.add_command("Grab medicine", 'robot')
+#scenario_helper.add_go_command('robot', 'patientRoom')
+#scenario_helper.add_command("Drop medicine", 'robot')
 
-#print("Before: ", scenario_helper.get_position('medicine'))
-#print("Before: ", scenario_helper.get_position('robot'))
 simulation.run()
+print("is in poi: ", AssertionHelper(simulation).robot_drop_pickable_in_poi('robot', 'medicine', 'patientRoom'))
 
-#print("After: ", scenario_helper.get_position('medicine'))
-#print("After: ", scenario_helper.get_position('robot'))
+print("Robot: ", scenario_helper.get_center('robot'))
+print("Poi: ", scenario_helper.get_poi('medRoom'))
