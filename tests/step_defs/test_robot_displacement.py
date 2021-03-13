@@ -27,14 +27,14 @@ def scenario_helper(simulation):
 def assertion_helper(simulation):
     return AssertionHelper(simulation)
 
-@given("a map with three rooms", target_fixture="simulation") 
+@given("a map with three rooms", target_fixture="simulation")
 def map_with_three_rooms(config):
     config["map"] = "three_room_map.drawio"
     simulation = Simulator(config)
 
     if not simulation.world.has_component(1, Map):
         simulation.world.add_component(1, Map())
-    
+
     return simulation
 
 @given("a robot with the ability to follow a path")

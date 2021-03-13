@@ -1,7 +1,7 @@
 from tests.helpers.AssertionHelper import AssertionHelper
-from simulator.components.Script import Script
+#from simulator.components.Script import Script
 from main import Simulator
-import simulator.systems.SeerPlugin as Seer
+#import simulator.systems.SeerPlugin as Seer
 
 #from utils.Firebase import db, clean_old_simulation
 #NAMESPACE = 'cris'
@@ -9,14 +9,14 @@ import simulator.systems.SeerPlugin as Seer
 
 from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper
 
-def firebase_seer_consumer(message, msg_idx):
-    """Sends Seer messages to firebase"""
-    if msg_idx >= 0:
-        if msg_idx == 1:
-            for idx, j in enumerate(message):
-                db.child(NAMESPACE).child('live_report').child(msg_idx).child(idx).set({j: message[j]})
-        else:
-            _ = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
+#def firebase_seer_consumer(message, msg_idx):
+#    """Sends Seer messages to firebase."""
+#    if msg_idx >= 0:
+#        if msg_idx == 1:
+#            for idx, j in enumerate(message):
+#                db.child(NAMESPACE).child('live_report').child(msg_idx).child(idx).set({j: message[j]})
+#        else:
+#            _ = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
 
 
 

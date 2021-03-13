@@ -25,7 +25,7 @@ def config():
     return config
 
 @given("a map with a medicine room, a patient room and a robot with commands", target_fixture="simulation")
-def map(config):
+def med_and_patient_room_map(config):
     config["map"] = "med_and_patient_room_map_with_commands.drawio"
     simulation = Simulator(config)
     return simulation

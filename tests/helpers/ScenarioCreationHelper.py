@@ -17,7 +17,7 @@ from tests.helpers.TestHelper import TestHelper
 class ScenarioCreationHelper(TestHelper):
     def __init__(self, simulation):
         super().__init__(simulation)
-    
+
     def add_component(self, component, drawio_id):
         entity_id = self.cast_id(drawio_id)
         self.simulation.world.add_component(entity_id, component)
@@ -54,7 +54,7 @@ class ScenarioCreationHelper(TestHelper):
         self.simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height))
 
     def add_ability_to_navigate(self):
-        """Serve para o gotoPos e para o gotoPoi"""
+        """Serve para o gotoPos e para o gotoPoi."""
         NavigationSystemProcess = NavigationSystem.init()
         self.simulation.add_des_system((NavigationSystemProcess,))
         width, height = self.simulation.window_dimensions
@@ -82,13 +82,13 @@ class ScenarioCreationHelper(TestHelper):
         self.simulation.add_des_system((ObjectManager.process,))
 
     def add_poi(self, poi_tag, poi_value):
-        map = self.simulation.world.component_for_entity(1, Map)
-        map.pois[poi_tag] = poi_value
+        world_map = self.simulation.world.component_for_entity(1, Map)
+        world_map.pois[poi_tag] = poi_value
 
     def add_commands(self, command_list, drawio_id):
         script = self.get_component(Script, drawio_id)
         if script is None:
-            self.add_component(Script(command_list), drawio_id)  
+            self.add_component(Script(command_list), drawio_id)
         else:
             for command in command_list:
                 script.instructions.append(command)
@@ -96,7 +96,7 @@ class ScenarioCreationHelper(TestHelper):
     def add_command(self, command, drawio_id):
         script = self.get_component(Script, drawio_id)
         if script is None:
-            self.add_component(Script([command]), drawio_id)        
+            self.add_component(Script([command]), drawio_id)
         else:
             script.instructions.append(command)
 

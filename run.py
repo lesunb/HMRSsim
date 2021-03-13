@@ -50,12 +50,12 @@ env = simulator.ENV
 
 
 def my_seer_consumer(message, _):
-    """Saves Seer messages in a file"""
+    """Saves Seer messages in a file."""
     fd.write(json.dumps(message) + '\n')
 
 
 def firebase_seer_consumer(message, msg_idx):
-    """Sends Seer messages to firebase"""
+    """Sends Seer messages to firebase."""
     if msg_idx >= 0:
         if msg_idx == 1:
             for idx, j in enumerate(message):

@@ -7,7 +7,7 @@ POI = NamedTuple('POI', [('tag', str), ('point', Point)])
 
 
 class PathNotFound(Exception):
-    """Exception when the path finding algorithm can't find a path from source to destination"""
+    """Exception when the path finding algorithm can't find a path from source to destination."""
     def __init__(self, source: Point, target: Point, partial_path=None):
         self.partial_path = partial_path
         if partial_path is None:
@@ -17,7 +17,7 @@ class PathNotFound(Exception):
 
 
 def normalize_point(point: Point, map_component) -> Point:
-    """Transforms a point coordinate into its super-point coordinate"""
+    """Transforms a point coordinate into its super-point coordinate."""
     point_width = map_component.point_width
     x = (point[0] // point_width) * point_width + (point_width // 2)
     y = (point[1] // point_width) * point_width + (point_width // 2)
@@ -29,12 +29,12 @@ def merge_edges(a: List[Point], b: List[Point]):
 
 
 def distance(a: Point, b: Point) -> float:
-    """Euclidean distance of 2 points"""
+    """Euclidean distance of 2 points."""
     return math.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2)
 
 
 def add_nodes_from_points(map_component, points: List[Point]):
-    """Updated a map_component from a new list of points (aka Path)"""
+    """Updated a map_component from a new list of points (aka Path)."""
     if len(points) < 2:
         return
     points = list(map(lambda p: normalize_point(p, map_component), points))

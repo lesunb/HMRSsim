@@ -11,7 +11,6 @@ import typing
 
 from pathlib import Path
 from utils.helpers import list_folder
-from utils.config import working_directory
 
 available_components = list_folder(Path('./components'))
 

@@ -6,11 +6,11 @@ class AssertionHelper(TestHelper):
         super().__init__(simulation)
 
     def have_collided(self, entity_id, other_entity_id):
-        """Verifica se ocorreu 1 colisao"""
-        collision = self.get_component(Collision, entity_id) 
+        """Verifica se ocorreu 1 colisao."""
+        collision = self.get_component(Collision, entity_id)
         other_entity_id = self.cast_id(other_entity_id)
-        
-        if collision and other_entity_id in collision.collisions: 
+
+        if collision and other_entity_id in collision.collisions:
             return True
         return False
 
@@ -38,7 +38,7 @@ class AssertionHelper(TestHelper):
             return False
 
     def is_in_center_of(self, entity_id, other_entity_id):
-        """Compara o x e o y do centro"""
+        """Compara o x e o y do centro."""
         entity_center = self.get_center(entity_id)
         other_entity_center = self.get_center(other_entity_id)
 

@@ -16,7 +16,7 @@ class TestHelper:
         return None
 
     def get_drawio_id(self, drawio_id):
-        entity_id = self.simulation.draw2ent.get(drawio_id, None)  
+        entity_id = self.simulation.draw2ent.get(drawio_id, None)
         if entity_id:
             return entity_id[0]
         return entity_id
@@ -26,6 +26,7 @@ class TestHelper:
 
     def cast_id(self, drawio_id):
         """Converts the object id present in the xml tree to the object id in the simulation.
+
         Tipos possíveis:
         - No caso do objeto ser do tipo pickable, passar a propriedade name como
         parametro para o drawio_id
@@ -33,9 +34,9 @@ class TestHelper:
         entity_id = self.get_object_id(drawio_id)
         if entity_id:
             return entity_id
-        entity_id = self.get_pickable_id(drawio_id) 
+        entity_id = self.get_pickable_id(drawio_id)
         if entity_id:
-            return entity_id   
+            return entity_id
         return self.get_drawio_id(drawio_id)
 
 
@@ -45,7 +46,7 @@ class TestHelper:
             return self.simulation.world.component_for_entity(entity_id, component)
         else:
             return None
-    
+
     def get_position(self, drawio_id):
         return self.get_component(Position, drawio_id)
     
@@ -62,13 +63,13 @@ class TestHelper:
         return None
     
     def get_poi(self, poi_tag):
-        map = self.simulation.world.component_for_entity(1, Map)
-        return map.pois[poi_tag]
+        world_map = self.simulation.world.component_for_entity(1, Map)
+        return world_map.pois[poi_tag]
 
     def get_collision(self, entity_id, other_entity_id):
-        collision = self.get_component(Collision, entity_id) 
+        collision = self.get_component(Collision, entity_id)
         other_entity_id = self.cast_id(other_entity_id)
-        
+
         if collision and other_entity_id in collision.collisions:  
             return collision.collisions[other_entity_id]
         return None
