@@ -3,6 +3,7 @@ from typehints.component_types import Component
 
 class Collision(Component):
     def __init__(self, other_entity, time, position):
+        """The component keeps all the collisions of one entity."""
         self.collisions = {}
         self.add_collision(other_entity, time, position)
 
