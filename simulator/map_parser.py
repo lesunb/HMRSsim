@@ -30,7 +30,7 @@ def build_simulation_from_map(file: pathlib.Path, skip_map=False, simulation_com
         if not skip_map:
             logger.error(f'Map file {file} does not exist. Creating empty simulation instead')
         window_name = 'Default'
-        map_content = Element('', tag='not found')
+        map_content = Element('', attrib={})
 
     width = int(map_content.attrib.get('pageWidth', 500))
     height = int(map_content.attrib.get('pageHeight', 500))
