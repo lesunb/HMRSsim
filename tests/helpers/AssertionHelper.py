@@ -16,15 +16,14 @@ class AssertionHelper(TestHelper):
         return False
 
     def is_in_poi(self, drawio_id: str, poi_tag: str):
-        """
-        Assert if the center of the object is positioned at the poi (point of interest).
+        """Assert if the center of the object is positioned at the poi (point of interest).
 
         - drawio_id: property id from an element of the drawio file.
         - poi_tag: the poi_tag property of a POI
         """
         entity_center = self.get_center(drawio_id)
         poi = self.get_poi(poi_tag)
-        
+
         if (entity_center[0] == poi[0]) and (entity_center[1] == poi[1]):
             return True
         else:

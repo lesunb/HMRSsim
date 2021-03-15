@@ -21,17 +21,17 @@ class ScenarioCreationHelper(TestHelper):
         super().__init__(simulation)
 
     def add_component(self, component, drawio_id):
-        """Adds a component to the specified entity (drawio_id).
+        """
+        Adds a component to the specified entity (drawio_id).
 
         - component: instance of a Component.
         - drawio_id: property id from an element of the drawio file.
         """
         entity_id = self.cast_id(drawio_id)
         self.simulation.world.add_component(entity_id, component)
-    
+
     def create_path(self, robot_id, points):
-        """
-        Adds a path to the robot going through the specified points.
+        """Adds a path to the robot going through the specified points.
 
         - robot_id: the robot property id from the drawio file.
         - points: List of (x,y) positions.
@@ -45,7 +45,8 @@ class ScenarioCreationHelper(TestHelper):
                 path.points.append(point)
 
     def add_goto_position_event(self, drawio_id, position):
-        """Adds an event for the robot to go to a position passed as a parameter.
+        """
+        Adds an event for the robot to go to a position passed as a parameter.
 
         - drawio_id: property id from an element of the drawio file.
         - position: a tuple (x, y) or array [x, y] with x-axis value and y-axis value.
@@ -59,7 +60,8 @@ class ScenarioCreationHelper(TestHelper):
         event_store.put(new_event)
 
     def add_goto_poi_event(self, drawio_id, poi_tag):
-        """Adds an event for the robot to go to a POI passed as a parameter.
+        """
+        Adds an event for the robot to go to a POI passed as a parameter.
 
         - drawio_id: property id from an element of the drawio file.
         - poi_tag: the poi_tag property of a POI.

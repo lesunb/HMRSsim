@@ -9,8 +9,7 @@ class TestHelper:
         self.simulation = simulation
 
     def get_object_id(self, drawio_id: str) -> int:
-        """
-        Gets the esper entity id from a drawio object id.
+        """Gets the esper entity id from a drawio object id.
 
         - drawio_id: property id from an object element tree.
         """
@@ -44,7 +43,7 @@ class TestHelper:
         """
         Transforms the id present in the drawio xml to the esper entity id.
 
-        - In case the object is a pickable, pass the name property as the 
+        - In case the object is a pickable, pass the name property as the
         parameter to the drawio_id.
         """
         entity_id = self.get_object_id(drawio_id)
@@ -76,7 +75,7 @@ class TestHelper:
         - drawio_id: property id from an element of the drawio file.
         """
         return self.get_component(Position, drawio_id)
-    
+
     def set_position(self, drawio_id: str, x: float, y: float) -> None:
         """
         Changes the position of an entity.
@@ -115,6 +114,6 @@ class TestHelper:
         collision = self.get_component(Collision, entity_id)
         other_entity_id = self.cast_id(other_entity_id)
 
-        if collision and other_entity_id in collision.collisions:  
+        if collision and other_entity_id in collision.collisions:
             return collision.collisions[other_entity_id]
         return None
