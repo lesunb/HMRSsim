@@ -21,8 +21,7 @@ class TestHelper:
         return None
 
     def get_drawio_id(self, drawio_id: str) -> int:
-        """
-        Gets the esper entity id from a drawio 'draw2ent' id.
+        """Gets the esper entity id from a drawio 'draw2ent' id.
 
         - drawio_id: property id of an style element (is not an object) of drawio file (xml).
         """
@@ -99,7 +98,7 @@ class TestHelper:
         if position:
             return position.center
         return None
-    
+
     def get_poi(self, poi_tag: str):
         """Returns a tuple with the position values (x,y) of the POI."""
         world_map = self.simulation.world.component_for_entity(1, Map)

@@ -21,8 +21,7 @@ class ScenarioCreationHelper(TestHelper):
         super().__init__(simulation)
 
     def add_component(self, component, drawio_id):
-        """
-        Adds a component to the specified entity (drawio_id).
+        """Adds a component to the specified entity (drawio_id).
 
         - component: instance of a Component.
         - drawio_id: property id from an element of the drawio file.
@@ -90,7 +89,7 @@ class ScenarioCreationHelper(TestHelper):
         """Adds the systems responsible for collisions and for checking if collisions have occurred."""
         self.simulation.add_system(CollisionProcessor())
         self.simulation.add_des_system((collisionDetector.process,))
-    
+
     def add_claw_ability(self, drawio_id):
         """Adds the component responsible for grab pickables."""
         claw = self.get_component(Claw, drawio_id)

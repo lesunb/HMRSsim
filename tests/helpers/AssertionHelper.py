@@ -32,8 +32,7 @@ class AssertionHelper(TestHelper):
             # como retornar o Assertion e o False
 
     def robot_drop_pickable_in_poi(self, robot_id: str, pickable_name: str, poi_tag: str):
-        """
-        Assert if the pickable is in the poi that the robot has left.
+        """Assert if the pickable is in the poi that the robot has left.
 
         - robot_id: drawio id of the robot that held the pickable.
         - pickable_name: the name property of the grabbed object, typed 'pickable'.
@@ -60,7 +59,7 @@ class AssertionHelper(TestHelper):
         if entity_center[0] == other_entity_center[0] and entity_center[1] == other_entity_center[1]:
             return True
         return False
-    
+
     def is_in_same_position(self, entity_id, other_entity_id):
         """
         Asserts that the (x,y) position of entity is the same of the other_entity.
