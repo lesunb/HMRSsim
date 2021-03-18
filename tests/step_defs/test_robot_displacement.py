@@ -60,7 +60,6 @@ def path_to_room_three(scenario_helper):
     robot_center = scenario_helper.get_center('robot')
     points = [robot_center, room_three_center]
     scenario_helper.create_path('robot', points)
-    # TODO: metodo para criar um path de um lugar para o outro
 
 @given("a POI named 'room_three_center' in the center of the room")
 def poi_in_center_of_room_three(scenario_helper):

@@ -37,4 +37,4 @@ def stay_still(simulation):
 
 @then("the robot is in 1,1")
 def check_the_robot_is_in_1_1(assertion_helper):
-    assertion_helper.is_in_position('robot', (1,1))
+    assert assertion_helper.is_in_position('robot', (1,1))
