@@ -102,7 +102,9 @@ class TestHelper:
     def get_poi(self, poi_tag: str):
         """Returns a tuple with the position values (x,y) of the POI."""
         world_map = self.simulation.world.component_for_entity(1, Map)
-        return world_map.pois[poi_tag]
+        if world_map:
+            return world_map.pois.get(poi_tag, None)
+        return None
 
     def get_collision(self, entity_id: str, other_entity_id: str) -> Collision:
         """

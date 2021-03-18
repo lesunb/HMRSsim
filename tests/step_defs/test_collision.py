@@ -58,8 +58,8 @@ def run_simulation(simulation):
 
 @then("the robot collides with the wall")
 def collided_into_the_wall(assertion_helper):
-    assert assertion_helper.have_collided('robot', 'collidable_wall') is True
+    assert assertion_helper.have_collided('robot', 'collidable_wall')
 
 @then("the robot collides with the second wall")
 def collided_into_second_wall(assertion_helper):
-    assert assertion_helper.have_collided('robot', 'second_collidable_wall') is True
+    assert assertion_helper.have_collided('robot', 'second_collidable_wall')

@@ -73,4 +73,4 @@ def run_simulation(simulation):
 
 @then("the robot is in the center of 'room_three'")
 def robot_is_in_center_of_room_three(assertion_helper):
-    assert assertion_helper.is_in_center_of('robot', 'room_three') == True
+    assert assertion_helper.is_in_center_of('robot', 'room_three')
