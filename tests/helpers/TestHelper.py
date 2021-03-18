@@ -87,6 +87,7 @@ class TestHelper:
         if position:
             position.x = x
             position.y = y
+            position.center = (position.x + position.w // 2, position.y + position.h // 2) # update the center position
 
     def get_center(self, drawio_id: str):
         """
