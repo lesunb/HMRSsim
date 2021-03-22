@@ -88,31 +88,32 @@ def capture(sensor: ProximitySensor):
         ev = yield sensor.reply_channel.get()
         payload = ev.payload
         me = payload.ent
-        they = payload.other_ent
-        mypos = payload.pos
-        myvel = payload.vel
-        other_pos = payload.other_pos
-        dx = math.fabs(other_pos.x - mypos.x)
-        dy = math.fabs(other_pos.y - mypos.y)
-        ndx = math.fabs(other_pos.x - (mypos.x - myvel.x))
-        ndy = math.fabs(other_pos.y - (mypos.y - myvel.y))
-        print(f'{me} {they}. [{dx}, {ndx}]. [{dy}, {ndy}].')
-        if math.fabs(ndx - dx) <= 2:
-            myvel.x = 0
-        if math.fabs(ndy - dy) <= 2:
-            myvel.y = 0
+        they = list(map(lambda x: x.other_ent, payload.close_entities))
+        # print(f'Drone {me} close to {they}')
+        # mypos = payload.pos
+        # myvel = payload.vel
+        # other_pos = payload.other_pos
+        # dx = math.fabs(other_pos.x - mypos.x)
+        # dy = math.fabs(other_pos.y - mypos.y)
+        # ndx = math.fabs(other_pos.x - (mypos.x - myvel.x))
+        # ndy = math.fabs(other_pos.y - (mypos.y - myvel.y))
+        # print(f'{me} {they}. [{dx}, {ndx}]. [{dy}, {ndy}].')
+        # if math.fabs(ndx - dx) <= 2:
+        #     myvel.x = 0
+        # if math.fabs(ndy - dy) <= 2:
+        #     myvel.y = 0
 
 
 # The controller for now
 def control(kill_switch):
-    # logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
     for drone, _ in simulator.objects:
         hover = simulator.world.component_for_entity(drone, Hover)
         pos = simulator.world.component_for_entity(drone, Position)
         hover.target = (pos.center[0], pos.center[1])
-        hover.status = HoverState.MOVING
-    # logger.debug(f'Update hover: {hover}')
-    # yield env.timeout(5)
+        hover.status = HoverState.HOVERING
+        logger.debug(f'Update hover of drone {drone}: {hover}')
+    yield env.timeout(5)
     # hover.target = (220, 180)
     # hover.status = HoverState.MOVING
     # logger.debug(f'Update hover: {hover}')
@@ -121,8 +122,8 @@ def control(kill_switch):
     # hover.status = HoverState.MOVING
     # logger.debug(f'Update hover: {hover}')
     # yield env.timeout(5)
-    # logger.debug(f'Yielding kill_switch')
-    # kill_switch.succeed()
+    logger.debug(f'Yielding kill_switch')
+    kill_switch.succeed()
 
 
 if __name__ == "__main__":
@@ -130,5 +131,6 @@ if __name__ == "__main__":
     for drone, _ in simulator.objects:
         sensor: ProximitySensor = simulator.world.component_for_entity(drone, ProximitySensor)
         env.process(capture(sensor))
+    env.process(control(simulator.KWARGS['_KILL_SWITCH']))
     simulator.run()
 
