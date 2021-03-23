@@ -15,11 +15,10 @@ from simulator.systems.PathProcessor import PathProcessor
 
 import swarmSimulation.systems.HoverDisturbance as HoverDisturbance
 import swarmSimulation.systems.HoverSystem as HoverSystem
-
+from swarmSimulation.systems.Control import control
 
 from simulator.components.ProximitySensor import ProximitySensor
-from simulator.components.Position import Position
-from swarmSimulation.components.Hover import Hover, HoverState
+from swarmSimulation.components.Hover import Hover
 
 from simulator.main import Simulator
 from simulator.utils.Firebase import db, clean_old_simulation
@@ -88,7 +87,8 @@ def capture(sensor: ProximitySensor):
         ev = yield sensor.reply_channel.get()
         payload = ev.payload
         me = payload.ent
-        they = list(map(lambda x: x.other_ent, payload.close_entities))
+        they = payload.close_entities
+        # TODO: if (GoingToCrashIntoEachOther()) dont();
         # print(f'Drone {me} close to {they}')
         # mypos = payload.pos
         # myvel = payload.vel
@@ -104,33 +104,11 @@ def capture(sensor: ProximitySensor):
         #     myvel.y = 0
 
 
-# The controller for now
-def control(kill_switch):
-    logger = logging.getLogger(__name__)
-    for drone, _ in simulator.objects:
-        hover = simulator.world.component_for_entity(drone, Hover)
-        pos = simulator.world.component_for_entity(drone, Position)
-        hover.target = (pos.center[0], pos.center[1])
-        hover.status = HoverState.HOVERING
-        logger.debug(f'Update hover of drone {drone}: {hover}')
-    yield env.timeout(5)
-    # hover.target = (220, 180)
-    # hover.status = HoverState.MOVING
-    # logger.debug(f'Update hover: {hover}')
-    # yield env.timeout(5)
-    # hover.target = (240, 200)
-    # hover.status = HoverState.MOVING
-    # logger.debug(f'Update hover: {hover}')
-    # yield env.timeout(5)
-    logger.debug(f'Yielding kill_switch')
-    kill_switch.succeed()
-
-
 if __name__ == "__main__":
     # env.process(control(simulator.KWARGS['_KILL_SWITCH']))
     for drone, _ in simulator.objects:
         sensor: ProximitySensor = simulator.world.component_for_entity(drone, ProximitySensor)
         env.process(capture(sensor))
-    env.process(control(simulator.KWARGS['_KILL_SWITCH']))
+    env.process(control(simulator.world, env, simulator.KWARGS['_KILL_SWITCH']))
     simulator.run()
 
