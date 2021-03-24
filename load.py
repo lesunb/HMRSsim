@@ -1,4 +1,7 @@
+from simulator.components.Detectable import Detectable
 from tests.helpers.AssertionHelper import AssertionHelper
+from typehints.component_types import EVENT
+from simulator.systems.CameraDESProcessor import CameraTag, CameraPayload
 #from simulator.components.Script import Script
 from main import Simulator
 #import simulator.systems.SeerPlugin as Seer
@@ -8,6 +11,7 @@ from main import Simulator
 #clean_old_simulation(NAMESPACE)
 
 from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper
+from tests.helpers.AssertionHelper import AssertionHelper
 
 #def firebase_seer_consumer(message, msg_idx):
 #    """Sends Seer messages to firebase."""
@@ -27,22 +31,24 @@ config = {
         "duration": 10
     }
 
-config["map"] = "med_and_patient_room_map.drawio"
+config["map"] = "camera_map.drawio"
 
 simulation = Simulator(config)
 scenario_helper = ScenarioCreationHelper(simulation)
+assertion_helper = AssertionHelper(simulation)
 
-scenario_helper.add_script_ability()
-scenario_helper.add_claw_ability('robot')
-scenario_helper.add_ability_to_navigate()
+scenario_helper.add_camera('robot')
+scenario_helper.add_component(Detectable(), 'person1')  
+scenario_helper.add_component(Detectable(), 'person2')
+scenario_helper.add_recognition_ability()
 
-scenario_helper.add_go_command('robot', 'medRoom')
-#scenario_helper.add_command("Grab medicine", 'robot')
-#scenario_helper.add_go_command('robot', 'patientRoom')
-#scenario_helper.add_command("Drop medicine", 'robot')
+entity_id = scenario_helper.cast_id('robot')
+payload = CameraPayload(entity_id)
+new_event = EVENT(CameraTag, payload)
+event_store = scenario_helper.simulation.KWARGS['EVENT_STORE']
+event_store.put(new_event)
 
 simulation.run()
-print("is in poi: ", AssertionHelper(simulation).robot_drop_pickable_in_poi('robot', 'medicine', 'patientRoom'))
 
-print("Robot: ", scenario_helper.get_center('robot'))
-print("Poi: ", scenario_helper.get_poi('medRoom'))
+print("Captured person1: ", assertion_helper.captured_camera_info('robot', 'person1'))
+print("Captured person2: ", assertion_helper.captured_camera_info('robot', 'person2'))

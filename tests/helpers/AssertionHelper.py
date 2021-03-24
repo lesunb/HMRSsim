@@ -1,5 +1,6 @@
 from simulator.components.Collision import Collision
 from simulator.components.Position import Position
+from simulator.components.Camera import Camera
 from tests.helpers.TestHelper import TestHelper
 
 class AssertionHelper(TestHelper):
@@ -93,6 +94,18 @@ class AssertionHelper(TestHelper):
         raise AssertionError((f'The entity {entity_id} is not at the expected position.\n'
                              f'Actual entity position: {entity_position.x, entity_position.y}.\n'
                              f'Expected entity position: ({position[0]}, {position[1]}).'))
+
+    def captured_camera_info(self, entity_id, captured_entity_id):
+        camera = self.get_component(Camera, entity_id)
+        captured_id = self.cast_id(captured_entity_id)
+        if not camera:
+            raise AssertionError(f'The entity {entity_id} does not have a Camera component.')
+
+        if captured_id in camera.captured_entities:
+            return True
+        else:
+            return False
+        #return [cap for cap in camera.captured_entities if cap == captured_id] # captured_entities == lista de entidades
 
     def get_poi(self, poi_tag: str):
         poi = super().get_poi(poi_tag)
