@@ -1,10 +1,13 @@
 import logging
 
+import simpy
+
 from simulator.typehints.dict_types import SystemArgs
 
 from simulator.components.Velocity import Velocity
 from simulator.components.Position import Position
 from swarmSimulation.components.Hover import Hover, HoverState
+from swarmSimulation.components.Control import ControlResponseFormat, Control
 
 from simulator.utils.Navigation import distance
 from systems.CollisionAvoidance import find_safe_route
@@ -31,7 +34,11 @@ def init(hover_interval=0.15, max_fix_speed=0.2, max_speed=1):
                 try:
                     (action, extra_args) = actions[hover.status]
                     # logger.debug(f'entity {ent} - {hover} @ {pos} - related action: {action}')
-                    action(hover, pos, velocity, *extra_args)
+                    res = action(hover, pos, velocity, *extra_args)
+                    if res:
+                        control_component = world.component_for_entity(1, Control)
+                        response = ControlResponseFormat(ent, res)
+                        control_component.channel.put(response)
                 except KeyError:
                     logger.error(f'No action for {hover.status}')
             yield env.timeout(hover_interval)
@@ -56,7 +63,7 @@ def movement_action(hover: Hover, pos: Position, velocity: Velocity, max_speed: 
     drone_pos = pos.center
     if distance(drone_pos, target) <= 3.0:
         hover.status = HoverState.HOVERING
-        return
+        return True
     dx = target[0] - drone_pos[0]
     dy = target[1] - drone_pos[1]
     velocity.x = min(dx, max_speed) if dx > 0 else max(dx, -max_speed)

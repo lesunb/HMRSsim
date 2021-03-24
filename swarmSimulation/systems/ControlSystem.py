@@ -1,37 +1,58 @@
 import logging
+from typing import List
+
 import esper
 
+from swarmSimulation.components.Control import Control, ControlResponseFormat
 from swarmSimulation.components.Hover import Hover, HoverState
 from simulator.utils.Navigation import distance
 
 from simulator.components.Position import Position
 
-CIRCLE = [
-    (218, 208), (246, 158), (266, 158),
-    (286, 168), (226, 168), (218, 188),
-    (226, 228), (246, 240), (266, 240),
-    (298, 188), (298, 208), (286, 228)
-]
-
 
 # The controller for now
-def control(world, env, kill_switch):
+from typehints.component_types import Point
+from typehints.dict_types import SystemArgs
+
+
+def control(kwargs: SystemArgs):
+    logger = logging.getLogger(__name__)
+    world = kwargs['WORLD']
+    env = kwargs['ENV']
+    kill_switch = kwargs['_KILL_SWITCH']
+    control_component: Control = world.component_for_entity(1, Control)
     logger = logging.getLogger(__name__)
     for drone, (hover, pos) in world.get_components(Hover, Position):
         hover.target = (pos.center[0], pos.center[1])
         hover.status = HoverState.HOVERING
-    yield env.timeout(2)
+    yield env.timeout(1)
     logger.debug(f'MOVING DRONES TO CIRCLE FORMATION')
-    assign_positions(world)
-    yield env.timeout(5)
+    circle_config = control_component.configs['CIRCLE']
+    assign_positions(world, circle_config)
+    control_component.awaiting = len(circle_config)
+    while control_component.awaiting != control_component.success + control_component.error:
+        ev = yield control_component.channel.get()
+        if ev.success:
+            control_component.success += 1
+        else:
+            control_component.error += 1
+        logger.debug(f'Drone {ev.drone} responded. Success? {ev.success}')
+    logger.debug(
+        f'All {control_component.awaiting} drones responded.'
+        f'Success: {control_component.success}  Fail: {control_component.error}'
+    )
+    control_component.awaiting = 0
+    control_component.success = 0
+    control_component.error = 0
+    yield env.timeout(2)
     kill_switch.succeed()
 
 
-def assign_positions(world: esper.World):
+def assign_positions(world: esper.World, config: List[Point]):
     logger = logging.getLogger(__name__)
     components = {}
     assigned = {}
-    for point in CIRCLE:
+    for point in config:
         distances = []
         for ent, (hover, pos) in world.get_components(Hover, Position):
             if assigned.get(ent, False):

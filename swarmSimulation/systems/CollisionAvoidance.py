@@ -9,12 +9,6 @@ from simulator.components.Velocity import Velocity
 from swarmSimulation.components.Hover import Hover, HoverState
 
 from simulator.utils.helpers import rotate_around_point
-# CloseEntity = NamedTuple(
-#     'CloseEntity',
-#     [('other_ent', int), ('other_pos', Position)]
-# )
-
-GOLDEN_RADIANS = 2.399967
 
 
 def dont_crash(world: esper.World, sensor: ProximitySensor):
@@ -55,8 +49,8 @@ def find_safe_route(hover: Hover, mypos: Position, myvel: Velocity, they: List[P
                 hit = True
                 break
         if not hit:
-            myvel.x = ((newx + SAFE_FACTOR) - mypos.x) / (len(they) if not is_hovering else 1.1)
-            myvel.y = ((newy + SAFE_FACTOR) - mypos.y) / (len(they) if not is_hovering else 1.1)
+            myvel.x = ((newx + SAFE_FACTOR) - mypos.x) / (1 + len(they) if not is_hovering else 1.1)
+            myvel.y = ((newy + SAFE_FACTOR) - mypos.y) / (1 + len(they) if not is_hovering else 1.1)
             # logger.debug(f'Ent escaped via route {i}. Vel: {myvel}')
             return
     myvel.x = 0 if not is_hovering else myvel.x / 1.5

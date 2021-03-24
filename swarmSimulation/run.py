@@ -15,11 +15,12 @@ from simulator.systems.PathProcessor import PathProcessor
 
 import swarmSimulation.systems.HoverDisturbance as HoverDisturbance
 import swarmSimulation.systems.HoverSystem as HoverSystem
-from swarmSimulation.systems.Control import control
+from swarmSimulation.systems.ControlSystem import control
 from swarmSimulation.systems.CollisionAvoidance import dont_crash
 
 from simulator.components.ProximitySensor import ProximitySensor
 from swarmSimulation.components.Hover import Hover
+from swarmSimulation.components.Control import Control
 
 from simulator.main import Simulator
 from simulator.utils.Firebase import db, clean_old_simulation
@@ -82,12 +83,21 @@ for drone, _ in simulator.objects:
     sensor: ProximitySensor = simulator.world.component_for_entity(drone, ProximitySensor)
     sensor.reply_channel = simpy.Store(env)
 
+# Control configs
+CIRCLE = [
+    (218, 208), (246, 158), (266, 158),
+    (286, 168), (226, 168), (218, 188),
+    (226, 228), (246, 240), (266, 240),
+    (298, 188), (298, 208), (286, 228)
+]
+control_component = Control(configs={'CIRCLE': CIRCLE}, channel=simpy.Store(env))
+simulator.world.add_component(1, control_component)
 
 if __name__ == "__main__":
     # env.process(control(simulator.KWARGS['_KILL_SWITCH']))
     for drone, _ in simulator.objects:
         sensor: ProximitySensor = simulator.world.component_for_entity(drone, ProximitySensor)
         env.process(dont_crash(simulator.world, sensor))
-    env.process(control(simulator.world, env, simulator.KWARGS['_KILL_SWITCH']))
+    env.process(control(simulator.KWARGS))
     simulator.run()
 
