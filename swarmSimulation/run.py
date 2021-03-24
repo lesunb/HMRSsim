@@ -16,6 +16,7 @@ from simulator.systems.PathProcessor import PathProcessor
 import swarmSimulation.systems.HoverDisturbance as HoverDisturbance
 import swarmSimulation.systems.HoverSystem as HoverSystem
 from swarmSimulation.systems.Control import control
+from swarmSimulation.systems.CollisionAvoidance import dont_crash
 
 from simulator.components.ProximitySensor import ProximitySensor
 from swarmSimulation.components.Hover import Hover
@@ -63,7 +64,7 @@ normal_processors = [
 # Defines DES processors
 des_processors = [
     Seer.init([firebase_seer_consumer], 0.05, False),
-    (SensorSystem.init(ProximitySensor, 1),),
+    (SensorSystem.init(ProximitySensor, 1 / simulator.FPS),),
     # (NavigationSystemProcess,),
     # (ScriptProcessor,),
     (HoverDisturbance.init(max_disturbance=0.1, prob_disturbance=0.4, disturbance_interval=(1 / (fps / 3))),),
@@ -82,33 +83,11 @@ for drone, _ in simulator.objects:
     sensor.reply_channel = simpy.Store(env)
 
 
-def capture(sensor: ProximitySensor):
-    while True:
-        ev = yield sensor.reply_channel.get()
-        payload = ev.payload
-        me = payload.ent
-        they = payload.close_entities
-        # TODO: if (GoingToCrashIntoEachOther()) dont();
-        # print(f'Drone {me} close to {they}')
-        # mypos = payload.pos
-        # myvel = payload.vel
-        # other_pos = payload.other_pos
-        # dx = math.fabs(other_pos.x - mypos.x)
-        # dy = math.fabs(other_pos.y - mypos.y)
-        # ndx = math.fabs(other_pos.x - (mypos.x - myvel.x))
-        # ndy = math.fabs(other_pos.y - (mypos.y - myvel.y))
-        # print(f'{me} {they}. [{dx}, {ndx}]. [{dy}, {ndy}].')
-        # if math.fabs(ndx - dx) <= 2:
-        #     myvel.x = 0
-        # if math.fabs(ndy - dy) <= 2:
-        #     myvel.y = 0
-
-
 if __name__ == "__main__":
     # env.process(control(simulator.KWARGS['_KILL_SWITCH']))
     for drone, _ in simulator.objects:
         sensor: ProximitySensor = simulator.world.component_for_entity(drone, ProximitySensor)
-        env.process(capture(sensor))
+        env.process(dont_crash(simulator.world, sensor))
     env.process(control(simulator.world, env, simulator.KWARGS['_KILL_SWITCH']))
     simulator.run()
 

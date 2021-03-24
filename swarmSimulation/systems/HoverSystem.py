@@ -7,6 +7,7 @@ from simulator.components.Position import Position
 from swarmSimulation.components.Hover import Hover, HoverState
 
 from simulator.utils.Navigation import distance
+from systems.CollisionAvoidance import find_safe_route
 
 
 def init(hover_interval=0.15, max_fix_speed=0.2, max_speed=1):
@@ -60,6 +61,7 @@ def movement_action(hover: Hover, pos: Position, velocity: Velocity, max_speed: 
     dy = target[1] - drone_pos[1]
     velocity.x = min(dx, max_speed) if dx > 0 else max(dx, -max_speed)
     velocity.y = min(dy, max_speed) if dy > 0 else max(dy, -max_speed)
+    find_safe_route(hover, pos, velocity, hover.crowded)
 
 
 def landed_action(hover: Hover, pos: Position, velocity: Velocity):

@@ -25,6 +25,7 @@ class MovementProcessor(esper.Processor):
             new_y = max(self.miny, pos.y + vel.y)
 
             if pos.x != new_x or pos.y != new_y or vel.alpha:
+                # print(f'MOVE {ent} - vel {vel}')
                 pos.changed = True
                 pos.angle = (pos.angle + vel.alpha) % 360
                 new_x = min(self.maxx - pos.w, new_x)

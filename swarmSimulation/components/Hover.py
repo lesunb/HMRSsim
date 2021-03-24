@@ -15,6 +15,7 @@ class Hover(Component):
                  target: Point = None):
         self.status = status
         self.target = target
+        self.crowded = []
 
     def __str__(self):
         return f'Hover[status: {self.status}; target: {self.target}]'

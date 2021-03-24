@@ -20,8 +20,8 @@ def control(world, env, kill_switch):
     for drone, (hover, pos) in world.get_components(Hover, Position):
         hover.target = (pos.center[0], pos.center[1])
         hover.status = HoverState.HOVERING
-        logger.debug(f'Update hover of drone {drone}: {hover}')
     yield env.timeout(2)
+    logger.debug(f'MOVING DRONES TO CIRCLE FORMATION')
     assign_positions(world)
     yield env.timeout(5)
     kill_switch.succeed()
@@ -40,11 +40,11 @@ def assign_positions(world: esper.World):
             center = pos.center
             distances.append((distance(point, center), ent))
         distances.sort()
-        logger.debug(f'Point {point}: {distances}')
+        # logger.debug(f'Point {point}: {distances}')
         for closer in distances:
             if assigned.get(closer[1], False):
                 continue
-            logger.debug(f'Assigning point {point} to entity {closer[1]}')
+            # logger.debug(f'Assigning point {point} to entity {closer[1]}')
             hover = components[closer[1]][0]
             hover.target = point
             hover.status = HoverState.MOVING

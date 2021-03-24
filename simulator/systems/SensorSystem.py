@@ -11,12 +11,12 @@ from collision import collide
 
 CloseEntity = NamedTuple(
     'CloseEntity',
-    [('other_ent', int), ('pos', Position), ('other_pos', Position), ('vel', Velocity)]
+    [('other_ent', int), ('other_pos', Position)]
 )
 
 SensorPayload = NamedTuple(
     'SensorPayload',
-    [('ent', int), ('close_entities', List[CloseEntity])]
+    [('ent', int), ('pos', Position), ('vel', Velocity), ('close_entities', List[CloseEntity])]
 )
 
 
@@ -29,7 +29,7 @@ def init(sensor_type, frequency):
             raise Exception("Can't find env")
         while True:
             for ent, (pos, vel, sensor) in world.get_components(Position, Velocity, sensor_type):
-
+                # logger.debug(f'Analysing ent {ent}')
                 points = [
                     (pos.center[0] - sensor.range, pos.center[1] - sensor.range),
                     (pos.center[0] + sensor.range, pos.center[1] - sensor.range),
@@ -43,12 +43,11 @@ def init(sensor_type, frequency):
                         continue
                     for s1 in otherCol.shapes:
                         if collide(col.shapes[0], s1):
-                            closeEntities.append(CloseEntity(otherEnt, pos, otherPos, vel))
+                            closeEntities.append(CloseEntity(otherEnt, otherPos))
                             break
                 if closeEntities:
-                    event = EVENT('SensorEvent', SensorPayload(ent, closeEntities))
+                    event = EVENT('SensorEvent', SensorPayload(ent, pos, vel, closeEntities))
                     sensor.reply_channel.put(event)
-
             yield env.timeout(frequency)
 
     return process
