@@ -25,13 +25,14 @@ def dont_crash(world: esper.World, sensor: ProximitySensor):
 
 
 def find_safe_route(hover: Hover, mypos: Position, myvel: Velocity, they: List[Position]):
-    logger = logging.getLogger(__name__)
     is_hovering = hover.status == HoverState.HOVERING
     SAFE_FACTOR = 3 if not is_hovering else 0
-    # 10degrees increments up do 90 degrees
+    # 10 degrees increments from original goal up do 90 degrees
     ROUTES = [
-        0, 0.1745329, 0.3490658, 0.5235987, 0.6981316, 0.8726645, 1.0471974, 1.2217303, 1.3962632, 1.5707961,
-        -0.1745329, -0.3490658, -0.5235987, -0.6981316, -0.8726645, -1.0471974, -1.2217303, -1.3962632, -1.5707961
+        0,
+        0.1745329, -0.1745329, 0.3490658, -0.3490658, 0.5235987, -0.5235987,
+        0.6981316, -0.6981316, 0.8726645, -0.8726645, 1.0471974, -1.0471974,
+        1.2217303, -1.2217303, 1.3962632, -1.3962632, 1.5707961, -1.5707961
     ]
     for i in ROUTES:
         newx = mypos.x - SAFE_FACTOR + myvel.x
@@ -51,7 +52,6 @@ def find_safe_route(hover: Hover, mypos: Position, myvel: Velocity, they: List[P
         if not hit:
             myvel.x = ((newx + SAFE_FACTOR) - mypos.x) / (1 + len(they) if not is_hovering else 1.1)
             myvel.y = ((newy + SAFE_FACTOR) - mypos.y) / (1 + len(they) if not is_hovering else 1.1)
-            # logger.debug(f'Ent escaped via route {i}. Vel: {myvel}')
             return
     myvel.x = 0 if not is_hovering else myvel.x / 1.5
     myvel.y = 0 if not is_hovering else myvel.x / 1.5

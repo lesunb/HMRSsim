@@ -13,6 +13,7 @@ from colorama import init, Fore
 init()
 
 COLORS = [Fore.BLUE, Fore.CYAN, Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.WHITE]
+CollisionPayload = NamedTuple('CollisionEvent', [('ent', int), ('other_ent', int)])
 
 
 class CollisionProcessor(esper.Processor):
@@ -42,9 +43,9 @@ class CollisionProcessor(esper.Processor):
                     vel.y = 0
                     vel.alpha = 0
                     if eventStore:
-                        if col.event_tag == 'genericCollision':
-                            self.logger.debug(choice(COLORS) + f'Collision! {ent} - {otherEnt}')
-                        event = EVENT(col.event_tag, (ent, otherEnt))
+                        # if col.event_tag == 'genericCollision':
+                            # self.logger.debug(choice(COLORS) + f'Collision! {ent} - {otherEnt}')
+                        event = EVENT(col.event_tag, CollisionPayload(ent, otherEnt))
                         # self.logger.debug(f'Firing event ent --> otherEnt: {event}')
                         eventStore.put(event)
 

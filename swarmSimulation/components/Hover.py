@@ -3,9 +3,10 @@ import enum
 
 
 class HoverState(enum.Enum):
-    HOVERING = 'hovering',
-    MOVING = 'moving',
-    LANDED = 'landed'
+    HOVERING = '#2e8B57',
+    MOVING = '#ffd700',
+    LANDED = '#708090',
+    CRASHED = '#ff0000',
 
 
 class Hover(Component):
