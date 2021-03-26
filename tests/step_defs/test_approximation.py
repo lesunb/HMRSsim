@@ -31,9 +31,13 @@ def map_robot_with_camera(config):
     simulation = Simulator(config)
     return simulation
 
-@given("a robot with a camera")
+@given("a robot with a camera component")
 def add_camera_to_robot(scenario_helper):
     scenario_helper.add_camera('robot')
+
+@given("a robot with an approximation history component")
+def add_approximation_history_to_robot(scenario_helper):
+    scenario_helper.add_approximation_history_component('robot')
 
 @given("a robot with approximation ability")
 def ability_to_approximate(scenario_helper):
@@ -72,8 +76,8 @@ def run_simulation(simulation):
 
 @then(parsers.parse("the robot approximated the '{person}'"))
 def did_approximated(assertion_helper, person):
-    assert assertion_helper.approximated(person)
+    assert assertion_helper.approximated('robot', person)
 
 @then(parsers.parse("the robot did not approximated the '{person}'"))
 def did_not_approximated(assertion_helper, person):
-    assert assertion_helper.approximated(person) is False
+    assert assertion_helper.approximated('robot', person) is False

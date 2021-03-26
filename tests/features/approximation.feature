@@ -8,7 +8,8 @@ Feature: Approximation
 
 Scenario: The robot searches for a person and finds them
     Given a map containing a robot with a camera
-    And a robot with a camera
+    And a robot with a camera component
+    And a robot with an approximation history component
     And an ability to detect other entities
     And a robot with approximation ability
     And a robot with the ability to navigate
@@ -20,7 +21,8 @@ Scenario: The robot searches for a person and finds them
 
 Scenario: The robot searches for a person and does not find them
     Given a map containing a robot with a camera
-    And a robot with a camera
+    And a robot with a camera component
+    And a robot with an approximation history component
     And an ability to detect other entities
     And a robot with approximation ability
     And a robot with the ability to navigate

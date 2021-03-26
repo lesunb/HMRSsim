@@ -15,7 +15,7 @@ _ENV: Environment
 CameraPayload = NamedTuple('CameraPayload', [('entity', int), ('target', int), ('clicks', int),])
 CameraTag = 'recognitionEvent'
 
-CapturedPayload = NamedTuple('CapturedPayload', [('entity', int), ('target', int),])
+DetectedPayload = NamedTuple('CapturedPayload', [('entity', int), ('target', int),])
 
 def process(kwargs: SystemArgs):
     global _EVENT_STORE
@@ -32,8 +32,8 @@ def process(kwargs: SystemArgs):
         event = yield _EVENT_STORE.get(lambda ev: ev.type == CameraTag)
         payload = event.payload
         logger.debug(f'Camera event {payload}')
-        captured_objects = get_field_of_view_objects(payload.entity) # pegar todos os objetos que estão no raio da camera
-        if payload.target in captured_objects:
+        detected_objects = get_field_of_view_objects(payload.entity) # pegar todos os objetos que estão no raio da camera
+        if payload.target in detected_objects:
             send_detected_event(payload.entity, payload.target)
         elif payload.clicks > 0:
             yield _ENV.timeout(0.5)
@@ -45,7 +45,7 @@ def process(kwargs: SystemArgs):
 def get_field_of_view_objects(me: int):
     if _WORLD.has_component(me, Camera):
         camera = _WORLD.component_for_entity(me, Camera)
-        camera.captured_entities = []
+        camera.detected_entities = []
     else:
         raise Exception("Can't find Camera Component.")
 
@@ -57,11 +57,12 @@ def get_field_of_view_objects(me: int):
     for entity, (detect, other_pos) in _WORLD.get_components(Detectable, Position):
         if detect.detectable is True:
             if is_in_the_radius(me_pos, other_pos, camera.radius):
-                camera.captured_entities.append(entity)
-    return camera.captured_entities
+                position = Position(other_pos.x, other_pos.y)
+                camera.detected_entities.append(entity)
+    return camera.detected_entities
 
 def send_detected_event(me, other_entity):
-    payload = CapturedPayload(me, other_entity)
+    payload = DetectedPayload(me, other_entity)
     new_event = EVENT('Detected', payload)
     _EVENT_STORE.put(new_event)    
 

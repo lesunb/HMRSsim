@@ -1,3 +1,4 @@
+from simulator.components.ApproximationHistory import ApproximationHistory
 from simulator.components.Collision import Collision
 from simulator.components.Position import Position
 from simulator.components.Camera import Camera
@@ -95,20 +96,25 @@ class AssertionHelper(TestHelper):
                              f'Actual entity position: {entity_position.x, entity_position.y}.\n'
                              f'Expected entity position: ({position[0]}, {position[1]}).'))
 
-    def captured_camera_info(self, entity_id, captured_entity_id):
+    def captured_camera_info(self, entity_id, detected_entity_id):
         camera = self.get_component(Camera, entity_id)
-        captured_id = self.cast_id(captured_entity_id)
+        captured_id = self.cast_id(detected_entity_id)
         if not camera:
             raise AssertionError(f'The entity {entity_id} does not have a Camera component.')
 
-        if captured_id in camera.captured_entities:
+        if captured_id in camera.detected_entities:
             return True
         else:
             return False
         #return [cap for cap in camera.captured_entities if cap == captured_id] # captured_entities == lista de entidades
 
-    def approximated(self, drawio_id):
-        pass
+    def approximated(self, drawio_id, detected_drawio_id):
+        detected_id = self.cast_id(detected_drawio_id)
+        history = self.get_component(ApproximationHistory, drawio_id)
+
+        if history and detected_id in history.approximations:
+            return True
+        return False
     
     def get_poi(self, poi_tag: str):
         poi = super().get_poi(poi_tag)

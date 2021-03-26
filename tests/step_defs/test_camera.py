@@ -31,7 +31,7 @@ def map_robot_with_camera(config):
     simulation = Simulator(config)
     return simulation
 
-@given("a robot with a camera")
+@given("a robot with a camera component")
 def add_camera_to_robot(scenario_helper):
     scenario_helper.add_camera('robot')
 

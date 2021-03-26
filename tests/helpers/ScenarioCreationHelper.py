@@ -14,6 +14,7 @@ import simulator.systems.CameraDESProcessor as CameraProcessor
 import simulator.systems.ApproximationDESProcessor as ApproximationProcessor
 import simulator.systems.ManageObjects as ObjectManager
 from simulator.systems.CollisionProcessor import CollisionProcessor
+from simulator.components.ApproximationHistory import ApproximationHistory
 from simulator.components.Path import Path
 from simulator.components.Map import Map
 from typehints.component_types import EVENT
@@ -119,8 +120,8 @@ class ScenarioCreationHelper(TestHelper):
     def add_approximation_ability(self):
         self.simulation.add_des_system((ApproximationProcessor.process,))
 
-    def add_approximation_command(self, drawio_id, drawio_target_id): # só se aproxima se estiver perto
-        pass
+    def add_approximation_history_component(self, drawio_id):
+        self.add_component(ApproximationHistory(), drawio_id)
 
     def add_camera(self, drawio_id):
         camera = Camera()
