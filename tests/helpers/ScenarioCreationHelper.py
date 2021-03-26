@@ -11,6 +11,7 @@ import simulator.systems.ClawDESProcessor as ClawProcessor
 import simulator.systems.ScriptEventsDES as ScriptSystem
 import simulator.systems.CollisionDetectorDESProcessor as collisionDetector
 import simulator.systems.CameraDESProcessor as CameraProcessor
+import simulator.systems.ApproximationDESProcessor as ApproximationProcessor
 import simulator.systems.ManageObjects as ObjectManager
 from simulator.systems.CollisionProcessor import CollisionProcessor
 from simulator.components.Path import Path
@@ -112,8 +113,14 @@ class ScenarioCreationHelper(TestHelper):
         self.simulation.add_des_system((ClawProcessor.process,))
         self.simulation.add_des_system((ObjectManager.process,))
 
-    def add_recognition_ability(self):
+    def add_detection_ability(self):
         self.simulation.add_des_system((CameraProcessor.process,))
+
+    def add_approximation_ability(self):
+        self.simulation.add_des_system((ApproximationProcessor.process,))
+
+    def add_approximation_command(self, drawio_id, drawio_target_id): # só se aproxima se estiver perto
+        pass
 
     def add_camera(self, drawio_id):
         camera = Camera()
@@ -122,9 +129,9 @@ class ScenarioCreationHelper(TestHelper):
     def make_detectable(self, drawio_id):
         self.add_component(Detectable(), drawio_id)
 
-    def add_camera_event(self, drawio_id):
+    def add_camera_detection_event(self, drawio_id, target_id, clicks=100):
         entity_id = self.cast_id(drawio_id)
-        payload = CameraPayload(entity_id)
+        payload = CameraPayload(entity_id, self.cast_id(target_id), clicks)
         new_event = EVENT(CameraTag, payload)
         event_store = self.simulation.KWARGS['EVENT_STORE']
         event_store.put(new_event)
@@ -143,7 +150,7 @@ class ScenarioCreationHelper(TestHelper):
         """
         Adds a list of commands to a robot.
         
-        - Command format: "Go 'poi_tag'", "Grab 'pickable_name', 'Drop pickable_name'"
+        - Command format: "Go poi_tag", "Grab pickable_name", "Drop pickable_name"
         """
         script = self.get_component(Script, drawio_id)
         if script is None:
@@ -156,7 +163,7 @@ class ScenarioCreationHelper(TestHelper):
         """
         Adds one command to the robot.
 
-        - Command format: "Go 'poi_tag'", "Grab 'pickable_name', 'Drop pickable_name'"
+        - Command format: "Go poi_tag", "Grab pickable_name, "Drop pickable_name"
         """
         script = self.get_component(Script, drawio_id)
         if script is None:

@@ -107,6 +107,9 @@ class AssertionHelper(TestHelper):
             return False
         #return [cap for cap in camera.captured_entities if cap == captured_id] # captured_entities == lista de entidades
 
+    def approximated(self, drawio_id):
+        pass
+    
     def get_poi(self, poi_tag: str):
         poi = super().get_poi(poi_tag)
         if not poi:

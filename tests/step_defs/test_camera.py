@@ -1,5 +1,5 @@
 import pytest
-from pytest_bdd import scenarios, given, when, then
+from pytest_bdd import scenarios, given, when, then, parsers
 from main import Simulator
 
 from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper
@@ -35,13 +35,9 @@ def map_robot_with_camera(config):
 def add_camera_to_robot(scenario_helper):
     scenario_helper.add_camera('robot')
 
-@given("an ability to recognize other entities")
+@given("an ability to detect other entities")
 def recognition_ability(scenario_helper):
-    scenario_helper.add_recognition_ability()
-
-@given("a robot with the ability to navigate")
-def ability_to_navigate(scenario_helper):
-    scenario_helper.add_ability_to_navigate()
+    scenario_helper.add_detection_ability()
 
 @given("a detectable entity named 'person1' in the cameras field of view")
 def person_in_field_of_view(scenario_helper):
@@ -51,18 +47,18 @@ def person_in_field_of_view(scenario_helper):
 def person_not_in_field_of_view(scenario_helper):
     scenario_helper.make_detectable('person2')
 
-@given("a camera event to capture detectable entities")
-def add_camera_event(scenario_helper):
-    scenario_helper.add_camera_event('robot')
+@given(parsers.parse("a camera event to detect '{person}'"))
+def add_camera_detection_event(scenario_helper, person):
+    scenario_helper.add_camera_detection_event('robot', person)
 
 @when("after run simulation")
 def run_simulation(simulation):
     simulation.run()
 
-@then("information about the entity 'person1' seen is captured by the camera")
+@then("information about the entity 'person1' is detected by the camera")
 def captured_the_persons_information(assertion_helper):
     assert assertion_helper.captured_camera_info('robot', 'person1') is True
 
-@then("information about the entity 'person2' isnt captured by the camera")
+@then("information about the entity 'person2' is not detected by the camera")
 def did_not_captured_the_persons_information(assertion_helper):
     assert assertion_helper.captured_camera_info('robot', 'person2') is False
