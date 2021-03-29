@@ -54,12 +54,17 @@ def init(hover_interval=0.15, max_fix_speed=0.2, max_speed=1):
             if req in switch:
                 ev = switch[req]
                 ent = ev.payload.ent
-                hover = world.component_for_entity(ent, Hover)
-                if hover.status != HoverState.CRASHED:
-                    control_component = world.component_for_entity(1, Control)
-                    change_hover_state(world, ent, HoverState.CRASHED)
-                    warn_control = ControlResponseFormat(ent, False)
-                    control_component.channel.put(warn_control)
+                other_ent = ev.payload.other_ent
+                for d in [ent, other_ent]:
+                    hover = world.component_for_entity(d, Hover)
+                    vel = world.component_for_entity(d, Velocity)
+                    vel.x = 0
+                    vel.y = 0
+                    if hover.status != HoverState.CRASHED:
+                        control_component = world.component_for_entity(1, Control)
+                        change_hover_state(world, d, HoverState.CRASHED)
+                        warn_control = ControlResponseFormat(d, False)
+                        control_component.channel.put(warn_control)
 
     return process
 
@@ -81,7 +86,7 @@ def movement_action(ent: int, hover: Hover, pos: Position, velocity: Velocity, m
     """Moves drone to new target point. Change state to HOVERING when reaches target"""
     target = hover.target
     drone_pos = pos.center
-    if distance(drone_pos, target) <= 3.0:
+    if distance(drone_pos, target) <= 5.0:
         return ActionResponse(True, HoverState.HOVERING)
     dx = target[0] - drone_pos[0]
     dy = target[1] - drone_pos[1]

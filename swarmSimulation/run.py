@@ -25,6 +25,8 @@ from swarmSimulation.components.Control import Control
 from simulator.main import Simulator
 from simulator.utils.Firebase import db, clean_old_simulation
 
+from swarmSimulation.shapes import SHAPES
+
 # Prep Script and Navigation systems
 extra_instructions = [
     (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction),
@@ -64,12 +66,12 @@ normal_processors = [
 ]
 # Defines DES processors
 des_processors = [
-    Seer.init([firebase_seer_consumer], 0.05, False),
-    (SensorSystem.init(ProximitySensor, 1 / simulator.FPS),),
+    Seer.init([firebase_seer_consumer], 0.1, False),
+    (SensorSystem.init(ProximitySensor, 1 / (fps * .9)),),
     # (NavigationSystemProcess,),
     # (ScriptProcessor,),
     (HoverDisturbance.init(max_disturbance=0.1, prob_disturbance=0.4, disturbance_interval=(1 / (fps / 3))),),
-    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1 / (fps / 3)), max_speed=1),)
+    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1 / (fps * .9)), max_speed=2.15),)
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:
@@ -83,14 +85,8 @@ for drone, _ in simulator.objects:
     sensor: ProximitySensor = simulator.world.component_for_entity(drone, ProximitySensor)
     sensor.reply_channel = simpy.Store(env)
 
-# Control configs
-CIRCLE = [
-    (218, 208), (246, 158), (266, 158),
-    (286, 168), (226, 168), (218, 188),
-    (226, 228), (246, 240), (266, 240),
-    (298, 188), (298, 208), (286, 228)
-]
-control_component = Control(configs={'CIRCLE': CIRCLE}, channel=simpy.Store(env))
+
+control_component = Control(configs=SHAPES, channel=simpy.Store(env))
 simulator.world.add_component(1, control_component)
 
 if __name__ == "__main__":

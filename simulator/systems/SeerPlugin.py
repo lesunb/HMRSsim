@@ -64,7 +64,7 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
         while True:
 
             new_message = {
-                "timestamp": env.now
+                "timestamp": round(float(env.now), 3)
             }
             for ent, (skeleton, position) in world.get_components(Skeleton, Position):
                 if ent == 1:  # Entity 1 is the entire model

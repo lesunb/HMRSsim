@@ -1,4 +1,5 @@
 import logging
+import random
 from typing import List
 
 import esper
@@ -23,12 +24,8 @@ def control(kwargs: SystemArgs):
     kill_switch = kwargs['_KILL_SWITCH']
     control_component: Control = world.component_for_entity(1, Control)
     logger = logging.getLogger(__name__)
-    for drone, (hover, pos) in world.get_components(Hover, Position):
-        hover.target = (pos.center[0], pos.center[1])
-        change_hover_state(world, drone, HoverState.HOVERING)
-    yield env.timeout(1)
-    logger.debug(f'MOVING DRONES TO CIRCLE FORMATION')
-    circle_config = control_component.configs['CIRCLE']
+    logger.debug(f'MOVING DRONES TO DRONE FORMATION')
+    circle_config = control_component.configs['DRONE']
     assign_positions(world, circle_config)
     control_component.awaiting = len(circle_config)
     responded = {}
@@ -42,7 +39,10 @@ def control(kwargs: SystemArgs):
             control_component.success += 1
         else:
             control_component.error += 1
-        logger.debug(f'Drone {ev.drone} responded. Success? {ev.success}.')
+        logger.debug(
+            f'[{env.now}] Drone {ev.drone} responded. Success? {ev.success}. '
+            f'{control_component.success + control_component.error} / {control_component.awaiting} responses'
+        )
     logger.debug(
         f'All {control_component.awaiting} drones responded.'
         f'Success: {control_component.success}  Fail: {control_component.error}'
@@ -57,25 +57,21 @@ def control(kwargs: SystemArgs):
 def assign_positions(world: esper.World, config: List[Point]):
     logger = logging.getLogger(__name__)
     components = {}
-    assigned = {}
+    for ent, (hover, pos) in world.get_components(Hover, Position):
+        components[ent] = (hover, pos)
     for point in config:
         distances = []
-        for ent, (hover, pos) in world.get_components(Hover, Position):
-            if assigned.get(ent, False):
-                continue
-            components[ent] = (hover, pos)
+        for ent, (_, pos) in components.items():
             center = pos.center
             distances.append((distance(point, center), ent))
         distances.sort()
         # logger.debug(f'Point {point}: {distances}')
         for closer in distances:
-            if assigned.get(closer[1], False):
-                continue
             # logger.debug(f'Assigning point {point} to entity {closer[1]}')
             hover = components[closer[1]][0]
             hover.target = point
             change_hover_state(world, closer[1], HoverState.MOVING)
-            assigned[closer[1]] = True
+            components.pop(closer[1])
             break
 
 
