@@ -35,14 +35,19 @@ def init(hover_interval=0.15, max_fix_speed=0.2, max_speed=1):
         event_store = kwargs.get('EVENT_STORE')
         if env is None:
             raise Exception("Can't find environment")
+        # Local ref most used functions for performance
+        get_components = world.get_components
+        component_for_ent = world.component_for_entity
+        sleep = env.timeout
+        #
         while True:
-            for ent, (hover, pos, velocity) in world.get_components(Hover, Position, Velocity):
+            for ent, (hover, pos, velocity) in get_components(Hover, Position, Velocity):
                 try:
                     (action, extra_args) = actions[hover.status]
                     # logger.debug(f'entity {ent} - {hover} @ {pos} - related action: {action}')
                     res: ActionResponse = action(ent, hover, pos, velocity, *extra_args)
                     if res.control_response is not None:
-                        control_component = world.component_for_entity(1, Control)
+                        control_component = component_for_ent(1, Control)
                         response = ControlResponseFormat(ent, res.control_response)
                         control_component.channel.put(response)
                     if res.change_state is not None:
@@ -50,18 +55,18 @@ def init(hover_interval=0.15, max_fix_speed=0.2, max_speed=1):
                 except KeyError:
                     logger.error(f'No action for {hover.status}')
             req = event_store.get(lambda ev: ev.type == 'genericCollision')
-            switch = yield env.timeout(hover_interval) | req
+            switch = yield sleep(hover_interval) | req
             if req in switch:
                 ev = switch[req]
                 ent = ev.payload.ent
                 other_ent = ev.payload.other_ent
                 for d in [ent, other_ent]:
-                    hover = world.component_for_entity(d, Hover)
-                    vel = world.component_for_entity(d, Velocity)
+                    hover = component_for_ent(d, Hover)
+                    vel = component_for_ent(d, Velocity)
                     vel.x = 0
                     vel.y = 0
                     if hover.status != HoverState.CRASHED:
-                        control_component = world.component_for_entity(1, Control)
+                        control_component = component_for_ent(1, Control)
                         change_hover_state(world, d, HoverState.CRASHED)
                         warn_control = ControlResponseFormat(d, False)
                         control_component.channel.put(warn_control)

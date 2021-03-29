@@ -12,19 +12,23 @@ from simulator.utils.helpers import rotate_around_point
 
 
 def dont_crash(world: esper.World, sensor: ProximitySensor):
+    reply_channel_get = sensor.reply_channel.get
+    component_for_entity = world.component_for_entity
     while True:
-        ev = yield sensor.reply_channel.get()
+        ev = yield reply_channel_get()
         payload = ev.payload
         me = payload.ent
-        mypos = payload.pos
-        myvel = payload.vel
         they = list(map(lambda x: x.other_pos, payload.close_entities))
-        hover = world.component_for_entity(me, Hover)
+        hover = component_for_entity(me, Hover)
         hover.crowded = they
-        # find_safe_route(hover, mypos, myvel, they)
 
 
 def find_safe_route(hover: Hover, mypos: Position, myvel: Velocity, they: List[Position]):
+    # Local refs to functions
+    rotate_point = rotate_around_point
+    pos_x = mypos.x
+    pos_y = mypos.y
+    #
     is_hovering = hover.status == HoverState.HOVERING
     SAFE_FACTOR = 1.5 if not is_hovering else 0
     # 10 degrees increments from original goal up do 90 degrees
@@ -36,9 +40,9 @@ def find_safe_route(hover: Hover, mypos: Position, myvel: Velocity, they: List[P
     ]
     hits = [(0, 0, 0, 0)] * 13
     for i, h in enumerate(HEADINGS):
-        newx = mypos.x + myvel.x
-        newy = mypos.y + myvel.y
-        newx, newy = rotate_around_point((newx, newy), h, (mypos.x, mypos.y))
+        newx = pos_x + myvel.x
+        newy = pos_y + myvel.y
+        newx, newy = rotate_point((newx, newy), h, (pos_x, pos_y))
         my_next_position = Position(
             x=newx,
             y=newy,
@@ -52,8 +56,8 @@ def find_safe_route(hover: Hover, mypos: Position, myvel: Velocity, they: List[P
         hits[i] = (hit, i, newx, newy)
     hits.sort()
     (hit, i, newx, newy) = hits[0]
-    myvel.x = (newx - mypos.x) / (2 + hit if not is_hovering else 1.1)
-    myvel.y = (newy - mypos.y) / (2 + hit if not is_hovering else 1.1)
+    myvel.x = (newx - pos_x) / (1.9 + hit if not is_hovering else 1.1)
+    myvel.y = (newy - pos_y) / (1.9 + hit if not is_hovering else 1.1)
 
 
 def intercept(a, b, safe_factor):

@@ -29,23 +29,28 @@ def control(kwargs: SystemArgs):
     assign_positions(world, circle_config)
     control_component.awaiting = len(circle_config)
     responded = {}
-    while control_component.awaiting != control_component.success + control_component.error:
-        ev = yield control_component.channel.get()
+    # Local ref most used vars
+    awaiting = control_component.awaiting
+    success = control_component.success
+    error = control_component.error
+    get_event = control_component.channel.get
+    while awaiting != success + error:
+        ev = yield get_event()
         if responded.get(ev.drone, False):
             logger.debug(f'Repeated reply from drone {ev.drone}.')
             continue
         responded[ev.drone] = True
         if ev.success:
-            control_component.success += 1
+            success += 1
         else:
-            control_component.error += 1
+            error += 1
         logger.debug(
             f'[{env.now}] Drone {ev.drone} responded. Success? {ev.success}. '
-            f'{control_component.success + control_component.error} / {control_component.awaiting} responses'
+            f'{success + error} / {awaiting} responses'
         )
     logger.debug(
-        f'All {control_component.awaiting} drones responded.'
-        f'Success: {control_component.success}  Fail: {control_component.error}'
+        f'All {awaiting} drones responded.'
+        f'Success: {control_component.success}  Fail: {error}'
     )
     control_component.awaiting = 0
     control_component.success = 0

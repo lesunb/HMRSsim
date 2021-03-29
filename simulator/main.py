@@ -118,28 +118,29 @@ class Simulator:
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
         self.cleanups: typing.List[CleanupFunction] = [cleanup]
+        logger.info('===== SIMULATION LOADING COMPLETE =====')
+        self.build_report = []
         self.generate_simulation_build_report()
 
     def generate_simulation_build_report(self):
-        logger.info('===== SIMULATION LOADING COMPLETE =====')
-        logger.info(f'Simulation {self.simulation_name}')
-        logger.info(f'===> Simulation components')
+        self.build_report.append(f'Simulation {self.simulation_name}\n')
+        self.build_report.append(f'===> Simulation components\n')
         for c in self.world.components_for_entity(1):
-            logger.info(c)
-        logger.info(f'{len(self.draw2ent)} entities created.')
-        logger.info(f'{len(self.objects)} typed objects transformed into entities')
-        logger.info(f'===> TYPED OBJECTS')
+            self.build_report.append(str(c) + '\n')
+        self.build_report.append(f'{len(self.draw2ent)} entities created.\n')
+        self.build_report.append(f'{len(self.objects)} typed objects transformed into entities\n')
+        self.build_report.append(f'===> TYPED OBJECTS\n')
         for k, v in self.draw2ent.items():
             if v[1].get('type', None) is None:
                 continue
-            logger.info(f'• {k} --> esper entity {v[0]}. (type {v[1].get("type", "")})')
+            self.build_report.append(f'• {k} --> esper entity {v[0]}. (type {v[1].get("type", "")})\n')
             ent = v[0]
             components = self.world.components_for_entity(ent)
-            logger.info(f'Entity has {len(components)} components.')
+            self.build_report.append(f'Entity has {len(components)} components.\n')
             for c in components:
-                logger.info(f'\t- {c}')
-        logger.info(f'===> Interactive objects')
-        logger.info(self.interactive)
+                self.build_report.append(f'\t- {c}\n')
+        self.build_report.append(f'===> Interactive objects\n')
+        self.build_report.append(str(self.interactive) + '\n')
 
     def add_des_system(self, system: DESSystem):
         """
@@ -175,17 +176,19 @@ class Simulator:
         """
         The simulation loop
         """
+        # Local ref most used vars
+        process_esper_systems = self.world.process
+        kill_switch = self.KWARGS['_KILL_SWITCH']
+        sleep = self.ENV.timeout
+        sleep_interval = 1.0 / self.FPS
         # Other processors
         while not self.EXIT:
-            self.world.process(self.KWARGS)
+            process_esper_systems(self.KWARGS)
             # # ticks on the clock
             # TODO: find a way to work 100% DES
-            if self.KWARGS["_KILL_SWITCH"] is not None:
-                switch = yield self.KWARGS["_KILL_SWITCH"] | self.ENV.timeout(1.0 / self.FPS, False)
-                if self.KWARGS["_KILL_SWITCH"] in switch:
-                    break
-            else:
-                yield self.ENV.timeout(1.0 / self.FPS, False)
+            switch = yield kill_switch | sleep(sleep_interval, False)
+            if kill_switch in switch:
+                break
         logger.debug(f'simulation loop exited')
         self.EXIT_EVENT.succeed()
 

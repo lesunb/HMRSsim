@@ -46,6 +46,8 @@ env = simulator.ENV
 # Prep Seer plugin
 NAMESPACE = 'simulator'
 clean_old_simulation(NAMESPACE)
+build_report = simulator.build_report
+db.child(NAMESPACE).child('logs').set(build_report)
 
 
 def firebase_seer_consumer(message, msg_idx):

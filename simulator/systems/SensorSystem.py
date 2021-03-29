@@ -27,8 +27,11 @@ def init(sensor_type, frequency):
         world = kwargs.get('WORLD', None)
         if env is None:
             raise Exception("Can't find env")
+        # Local ref most used variables
+        get_components = world.get_components
+        sleep = env.timeout
         while True:
-            for ent, (pos, vel, sensor) in world.get_components(Position, Velocity, sensor_type):
+            for ent, (pos, vel, sensor) in get_components(Position, Velocity, sensor_type):
                 # logger.debug(f'Analysing ent {ent}')
                 points = [
                     (pos.center[0] - sensor.range, pos.center[1] - sensor.range),
@@ -38,7 +41,7 @@ def init(sensor_type, frequency):
                 ]
                 col = Collidable([(pos.center, points)])
                 closeEntities = []
-                for otherEnt, (otherCol, otherPos) in world.get_components(Collidable, Position):
+                for otherEnt, (otherCol, otherPos) in get_components(Collidable, Position):
                     if ent == otherEnt:
                         continue
                     for s1 in otherCol.shapes:
@@ -48,6 +51,6 @@ def init(sensor_type, frequency):
                 if closeEntities:
                     event = EVENT('SensorEvent', SensorPayload(ent, pos, vel, closeEntities))
                     sensor.reply_channel.put(event)
-            yield env.timeout(frequency)
+            yield sleep(frequency)
 
     return process
