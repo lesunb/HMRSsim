@@ -3,6 +3,7 @@ from typing import List
 import esper
 import random
 
+from functools import reduce
 from simulator.components.ProximitySensor import ProximitySensor
 from simulator.components.Position import Position
 from simulator.components.Velocity import Velocity
@@ -30,7 +31,7 @@ def find_safe_route(hover: Hover, mypos: Position, myvel: Velocity, they: List[P
     pos_y = mypos.y
     #
     is_hovering = hover.status == HoverState.HOVERING
-    SAFE_FACTOR = 1.5 if not is_hovering else 0
+    SAFE_FACTOR = 2 if not is_hovering else 0
     # 10 degrees increments from original goal up do 90 degrees
     HEADINGS = [
         0.0, 0.523599, 1.047198, 1.48353,
@@ -49,20 +50,24 @@ def find_safe_route(hover: Hover, mypos: Position, myvel: Velocity, they: List[P
             w=mypos.w,
             h=mypos.h
         )
-        hit = 0
-        for other in they:
-            if intercept(my_next_position, other, SAFE_FACTOR):
-                hit += 1
+        hit = reduce(
+            lambda acc, hit_count: acc + hit_count,
+            map(lambda t: intercept(my_next_position, t, SAFE_FACTOR), they),
+            0
+        )
+        # for other in they:
+        #     if intercept(my_next_position, other, SAFE_FACTOR):
+        #         hit += 1
         hits[i] = (hit, i, newx, newy)
     hits.sort()
     (hit, i, newx, newy) = hits[0]
-    myvel.x = (newx - pos_x) / (1.9 + hit if not is_hovering else 1.1)
-    myvel.y = (newy - pos_y) / (1.9 + hit if not is_hovering else 1.1)
+    myvel.x = (newx - pos_x) / (1.8 + hit if not is_hovering else 1.1)
+    myvel.y = (newy - pos_y) / (1.8 + hit if not is_hovering else 1.1)
 
 
 def intercept(a, b, safe_factor):
     if a.x + a.w < (b.x - safe_factor) or (b.x + b.w + safe_factor) < a.x:
-        return False
+        return 0
     elif a.y + a.h < (b.y - safe_factor) or (b.y + b.w + safe_factor) < a.y:
-        return False
-    return True
+        return 0
+    return 1

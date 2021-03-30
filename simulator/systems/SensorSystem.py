@@ -1,5 +1,6 @@
 import logging
 
+from datetime import datetime, timedelta
 from typehints.dict_types import SystemArgs
 from typehints.component_types import EVENT
 from typing import NamedTuple, List
@@ -30,27 +31,39 @@ def init(sensor_type, frequency):
         # Local ref most used variables
         get_components = world.get_components
         sleep = env.timeout
+        total = timedelta()
+        runs = 0
         while True:
+            start = datetime.now()
             for ent, (pos, vel, sensor) in get_components(Position, Velocity, sensor_type):
                 # logger.debug(f'Analysing ent {ent}')
+                center_x, center_y = pos.center
+                sensor_range = sensor.range
                 points = [
-                    (pos.center[0] - sensor.range, pos.center[1] - sensor.range),
-                    (pos.center[0] + sensor.range, pos.center[1] - sensor.range),
-                    (pos.center[0] + sensor.range, pos.center[1] + sensor.range),
-                    (pos.center[0] - sensor.range, pos.center[1] + sensor.range)
+                    (center_x - sensor_range, center_y - sensor_range),
+                    (center_x + sensor_range, center_y - sensor_range),
+                    (center_x + sensor_range, center_y + sensor_range),
+                    (center_x - sensor_range, center_y + sensor_range)
                 ]
                 col = Collidable([(pos.center, points)])
-                closeEntities = []
-                for otherEnt, (otherCol, otherPos) in get_components(Collidable, Position):
-                    if ent == otherEnt:
-                        continue
-                    for s1 in otherCol.shapes:
-                        if collide(col.shapes[0], s1):
-                            closeEntities.append(CloseEntity(otherEnt, otherPos))
-                            break
+                # closeEntities = []
+                # for otherEnt, (otherCol, otherPos) in get_components(Collidable, Position):
+                #     if ent == otherEnt:
+                        # continue
+                    # for s1 in otherCol.shapes:
+                        # if collide(col.shapes[0], s1):
+                        #     closeEntities.append(CloseEntity(otherEnt, otherPos))
+                        #     break
+                other_ents_and_components = get_components(Collidable, Position)
+                closeEntities = [CloseEntity(x[0], x[1][1]) if x != ent else None for x in other_ents_and_components]
                 if closeEntities:
                     event = EVENT('SensorEvent', SensorPayload(ent, pos, vel, closeEntities))
                     sensor.reply_channel.put(event)
             yield sleep(frequency)
+            end = datetime.now()
+            runs += 1
+            total += end - start
+            if runs % 50 == 0:
+                logger.debug(f'runs: {runs}; total: {total}; avg = {total / runs}')
 
     return process

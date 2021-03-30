@@ -15,6 +15,8 @@ class Position(Component):
         self.changed = False
         self.movable = movable
         self.center: Point = (x + w // 2, y + h // 2)
+        self.sector = None
+        self.adjacent_sectors = []
 
     # Helper functions
     # Intended for testing purposes, and instantiate new Components from a Position component

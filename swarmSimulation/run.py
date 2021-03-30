@@ -44,7 +44,7 @@ exitEvent = simulator.EXIT_EVENT
 env = simulator.ENV
 
 # Prep Seer plugin
-NAMESPACE = 'simulator'
+NAMESPACE = 'giovanni'
 clean_old_simulation(NAMESPACE)
 build_report = simulator.build_report
 db.child(NAMESPACE).child('logs').set(build_report)
@@ -62,18 +62,18 @@ def firebase_seer_consumer(message, msg_idx):
 
 # Defines and initializes esper.Processor for the simulation
 normal_processors = [
-    MovementProcessor(minx=0, miny=0, maxx=width, maxy=height),
+    MovementProcessor(minx=0, miny=0, maxx=width, maxy=height, sector_size=20),
     CollisionProcessor(),
     PathProcessor()
 ]
 # Defines DES processors
 des_processors = [
     Seer.init([firebase_seer_consumer], 0.1, False),
-    (SensorSystem.init(ProximitySensor, 1 / (fps * .9)),),
+    # (SensorSystem.init(ProximitySensor, 1.0 / fps),),
     # (NavigationSystemProcess,),
     # (ScriptProcessor,),
     (HoverDisturbance.init(max_disturbance=0.1, prob_disturbance=0.4, disturbance_interval=(1 / (fps / 3))),),
-    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1 / (fps * .9)), max_speed=2.15),)
+    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1.0 / fps), max_speed=2.15),)
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:
