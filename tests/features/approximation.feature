@@ -1,24 +1,42 @@
 Feature: Approximation
 
 Scenario: The robot searches for a person and finds them
-    Given a map containing a robot with a camera
-    And a robot with a camera component
-    And an ability to detect other entities
-    And a robot with approximation ability
-    And a robot with the ability to navigate
-    And a Go to command for the robot to pass through POIs 'intersection1, intersection2, patientRoom2, patientRoom3, patientRoom4, intersection2, robotHome'
-    And a camera event to detect a 'person3' that is in the camera field of view
+    Given a map containing robots with camera components
+    And a robot with id 'robot' that has a camera component
+    And all the simulation robots has detection ability
+    And all the simulation robots has approximation ability
+    And all the simulation robots has the ability to navigate
+    And the 'robot' robot pass through POIs 'intersection1, intersection2, patientRoom2, patientRoom3, patientRoom4, intersection2, robotHome'
+    And a camera event for robot 'robot' detect a 'person3' that is in the camera field of view
     When after run simulation
-    Then the robot approximated the 'person3'
+    Then the 'robot' approximated the 'person3'
 
 Scenario: The robot searches for a person and does not find them
-    Given a map containing a robot with a camera
-    And a robot with a camera component
-    And an ability to detect other entities
-    And a robot with approximation ability
-    And a robot with the ability to navigate
-    And a Go to command for the robot to pass through POIs 'intersection1, intersection2, patientRoom2, patientRoom3, patientRoom4, intersection2, robotHome'
-    And a camera event to detect a 'person2' that is not in the camera field of view
+    Given a map containing robots with camera components
+    And a robot with id 'robot' that has a camera component
+    And all the simulation robots has detection ability
+    And all the simulation robots has approximation ability
+    And all the simulation robots has the ability to navigate
+    And the 'robot' robot pass through POIs 'intersection1, intersection2, patientRoom2, patientRoom3, patientRoom4, intersection2, robotHome'
+    And a camera event for robot 'robot' detect a 'person2' that is not in the camera field of view
     When after run simulation
-    Then the robot did not approximated the 'person2'
+    Then the 'robot' did not approximated the 'person2'
 
+Scenario Outline: Multi-robots searches for specifics persons
+    Given a map containing robots with camera components
+    And a robot with id 'robot' that has a camera component
+    And a robot with id 'robot2' that has a camera component
+    And a robot with id 'robot3' that has a camera component
+    And all the simulation robots has detection ability
+    And all the simulation robots has approximation ability
+    And all the simulation robots has the ability to navigate
+    And the 'robot' robot pass through POIs 'intersection1, intersection2, patientRoom2, patientRoom3, patientRoom4, intersection2, robotHome'
+    And the 'robot2' robot pass through POIs 'intersection1, intersection2, patientRoom1' 
+    And the 'robot3' robot pass through POIs 'patientRoom3'
+    And a camera event for robot 'robot' detect a 'person3' that is in the camera field of view
+    And a camera event for robot 'robot2' detect a 'person2' that is in the camera field of view
+    And a camera event for robot 'robot3' detect a 'person1' that is not in the camera field of view
+    When after run simulation
+    Then the 'robot' approximated the 'person3'
+    Then the 'robot2' approximated the 'person2'
+    Then the 'robot3' did not approximated the 'person1'

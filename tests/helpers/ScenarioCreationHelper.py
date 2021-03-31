@@ -115,10 +115,8 @@ class ScenarioCreationHelper(TestHelper):
         self.simulation.add_des_system((ClawProcessor.process,))
         self.simulation.add_des_system((ObjectManager.process,))
 
-    def add_detection_ability(self, drawio_id):
+    def add_detection_ability(self):
         self.simulation.add_des_system((SensorSystem.init(Camera, 0.1),))
-        camera: Camera = self.get_component(Camera, drawio_id)
-        camera.reply_channel = Store(self.simulation.ENV)
 
     def add_approximation_ability(self):
         self.simulation.add_des_system((ApproximationProcessor.process,))
@@ -128,8 +126,9 @@ class ScenarioCreationHelper(TestHelper):
 
     def add_camera(self, drawio_id):
         camera = Camera()
+        camera.reply_channel = Store(self.simulation.ENV)
         self.add_component(camera, drawio_id)
-
+    
     def make_detectable(self, drawio_id):
         self.add_component(Detectable(), drawio_id)
 

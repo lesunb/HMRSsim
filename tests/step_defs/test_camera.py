@@ -34,9 +34,9 @@ def map_robot_with_camera(config):
 def add_camera_to_robot(scenario_helper):
     scenario_helper.add_camera('robot')
 
-@given("an ability to detect other entities")
+@given("all the simulation robots has detection ability")
 def recognition_ability(scenario_helper: ScenarioCreationHelper):
-    scenario_helper.add_detection_ability('robot')
+    scenario_helper.add_detection_ability()
 
 @given("a camera event to detect a 'person1' that is in the camera field of view")
 def add_event_to_detect_person1(scenario_helper: ScenarioCreationHelper):

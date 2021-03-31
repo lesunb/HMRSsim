@@ -30,14 +30,17 @@ def process(kwargs: SystemArgs):
         event = yield _EVENT_STORE.get(lambda ev: ev.type == 'Detected')
         payload: DetectedPayload = event.payload
         logger.debug(f'Approximation event {payload}')
-
         move_to_detected_target(payload.entity, payload.target_id)
-        _WORLD.remove_component(payload.entity, Camera)
+        if _WORLD.has_component(payload.entity, Camera):
+            _WORLD.remove_component(payload.entity, Camera)
 
 def move_to_detected_target(entity, target):
     target_position = _WORLD.component_for_entity(target, Position)
     destiny_position = target_position.center
-   
+
+    if _WORLD.has_component(entity, ApproximationHistory):
+        return
+
     history = ApproximationHistory(target)
     history.destiny_position = destiny_position
     _WORLD.add_component(entity, history)
