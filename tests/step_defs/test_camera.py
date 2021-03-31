@@ -1,7 +1,6 @@
 import pytest
-from pytest_bdd import scenarios, given, when, then, parsers
+from pytest_bdd import scenarios, given, when, then
 from main import Simulator
-
 from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper
 from tests.helpers.AssertionHelper import AssertionHelper
 
@@ -36,20 +35,16 @@ def add_camera_to_robot(scenario_helper):
     scenario_helper.add_camera('robot')
 
 @given("an ability to detect other entities")
-def recognition_ability(scenario_helper):
-    scenario_helper.add_detection_ability()
+def recognition_ability(scenario_helper: ScenarioCreationHelper):
+    scenario_helper.add_detection_ability('robot')
 
-@given("a detectable entity named 'person1' in the cameras field of view")
-def person_in_field_of_view(scenario_helper):
-    scenario_helper.make_detectable('person1')
+@given("a camera event to detect a 'person1' that is in the camera field of view")
+def add_event_to_detect_person1(scenario_helper: ScenarioCreationHelper):
+    scenario_helper.add_camera_detection_event('robot', 'person1')
 
-@given("a detectable entity named 'person2' that isnt in the cameras field of view")
-def person_not_in_field_of_view(scenario_helper):
-    scenario_helper.make_detectable('person2')
-
-@given(parsers.parse("a camera event to detect '{person}'"))
-def add_camera_detection_event(scenario_helper, person):
-    scenario_helper.add_camera_detection_event('robot', person)
+@given("a camera event to detect a 'person2' that is not in the camera field of view")
+def add_event_to_detect_person2(scenario_helper: ScenarioCreationHelper):
+    scenario_helper.add_camera_detection_event('robot', 'person2')
 
 @when("after run simulation")
 def run_simulation(simulation):

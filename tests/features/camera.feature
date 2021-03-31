@@ -4,8 +4,7 @@ Scenario: The camera receives information from the entities present in its field
     Given a map containing a robot with a camera
     And a robot with a camera component
     And an ability to detect other entities
-    And a detectable entity named 'person1' in the cameras field of view
-    And a camera event to detect 'person1'
+    And a camera event to detect a 'person1' that is in the camera field of view
     When after run simulation
     Then information about the entity 'person1' is detected by the camera
     # evento de detecao da pessoa
@@ -15,7 +14,6 @@ Scenario: The camera does not receive information from entities that are not pre
     Given a map containing a robot with a camera 
     And a robot with a camera component
     And an ability to detect other entities
-    And a detectable entity named 'person2' that isnt in the cameras field of view
-    And a camera event to detect 'person2'
+    And a camera event to detect a 'person2' that is not in the camera field of view
     When after run simulation
     Then information about the entity 'person2' is not detected by the camera
