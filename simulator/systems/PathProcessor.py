@@ -8,6 +8,7 @@ from simpy import FilterStore
 from simulator.components.Path import Path
 from simulator.components.Position import Position
 from simulator.components.Velocity import Velocity
+from simulator.components.ApproximationHistory import ApproximationHistory
 from typing import List
 from typehints.component_types import Point, EVENT
 
@@ -15,6 +16,8 @@ from typehints.component_types import Point, EVENT
 EndOfPathPayload = NamedTuple('EndOfPathPayload', [('ent', int), ('timestamp', str), ('path', List[Point])])
 EndOfPathTag = 'EndOfPath'
 
+EndOfApproximationPayload = NamedTuple('EndOfApproximation', [('ent', int), ('timestamp', str),])
+EndOfApproximationTag = 'EndOfApproximation'
 
 class PathProcessor(esper.Processor):
     def __init__(self):
@@ -43,6 +46,12 @@ class PathProcessor(esper.Processor):
                     event_store.put(end_of_path)
                     pos.changed = False
                     self.world.remove_component(ent, Path)
+
+                    if self.world.has_component(end_of_path.payload.ent, ApproximationHistory):
+                        history = self.world.component_for_entity(end_of_path.payload.ent, ApproximationHistory)
+                        if not history.approximated:
+                            self.send_end_of_approximation_event(end_of_path.payload.ent, event_store, str(env.now))
+
                     return
             else:
                 dx = point[0] - pos_center[0]
@@ -55,3 +64,12 @@ class PathProcessor(esper.Processor):
                     vel.y = min(path.speed, dy)
                 else:
                     vel.y = max(- path.speed, dy)
+
+    def send_end_of_approximation_event(self, ent, event_store, now):
+        entity_pos = self.world.component_for_entity(ent, Position).center
+        history = self.world.component_for_entity(ent, ApproximationHistory)
+        history.entity_final_approx_pos = (entity_pos[0], entity_pos[1])
+        history.approximated = True
+
+        end_of_approximation_event = EVENT(EndOfApproximationTag, EndOfApproximationPayload(ent, now))
+        event_store.put(end_of_approximation_event)

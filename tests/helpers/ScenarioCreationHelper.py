@@ -10,7 +10,9 @@ import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.ClawDESProcessor as ClawProcessor
 import simulator.systems.ScriptEventsDES as ScriptSystem
 import simulator.systems.CollisionDetectorDESProcessor as collisionDetector
-import simulator.systems.CameraDESProcessor as CameraProcessor
+from simulator.systems.CameraProcessor import process_camera_event
+import simulator.systems.SensorSystem as SensorSystem
+from simpy import Store
 import simulator.systems.ApproximationDESProcessor as ApproximationProcessor
 import simulator.systems.ManageObjects as ObjectManager
 from simulator.systems.CollisionProcessor import CollisionProcessor
@@ -19,7 +21,6 @@ from simulator.components.Path import Path
 from simulator.components.Map import Map
 from typehints.component_types import EVENT
 from tests.helpers.TestHelper import TestHelper
-from simulator.systems.CameraDESProcessor import CameraTag, CameraPayload
 
 class ScenarioCreationHelper(TestHelper):
     def __init__(self, simulation):
@@ -114,8 +115,10 @@ class ScenarioCreationHelper(TestHelper):
         self.simulation.add_des_system((ClawProcessor.process,))
         self.simulation.add_des_system((ObjectManager.process,))
 
-    def add_detection_ability(self):
-        self.simulation.add_des_system((CameraProcessor.process,))
+    def add_detection_ability(self, drawio_id):
+        self.simulation.add_des_system((SensorSystem.init(Camera, 0.1),))
+        camera: Camera = self.get_component(Camera, drawio_id)
+        camera.reply_channel = Store(self.simulation.ENV)
 
     def add_approximation_ability(self):
         self.simulation.add_des_system((ApproximationProcessor.process,))
@@ -130,12 +133,10 @@ class ScenarioCreationHelper(TestHelper):
     def make_detectable(self, drawio_id):
         self.add_component(Detectable(), drawio_id)
 
-    def add_camera_detection_event(self, drawio_id, target_id, clicks=100):
-        entity_id = self.cast_id(drawio_id)
-        payload = CameraPayload(entity_id, self.cast_id(target_id), clicks)
-        new_event = EVENT(CameraTag, payload)
-        event_store = self.simulation.KWARGS['EVENT_STORE']
-        event_store.put(new_event)
+    def add_camera_detection_event(self, entity_id, target_id):
+        camera: Camera = self.get_component(Camera, entity_id)
+        entity_id = self.cast_id(target_id)
+        self.simulation.ENV.process(process_camera_event(camera, entity_id, self.simulation))
 
     def add_poi(self, poi_tag: str, poi_value):
         """

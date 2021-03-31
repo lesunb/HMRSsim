@@ -1,10 +1,11 @@
+from main import Simulator
 from simulator.components.Position import Position
 from simulator.components.Collision import Collision
 from simulator.components.Map import Map
 from typehints.component_types import Component
 
 class TestHelper:
-    def __init__(self, simulation):
+    def __init__(self, simulation: Simulator):
         """Receives a Simulation instance as a parameter."""
         self.simulation = simulation
 

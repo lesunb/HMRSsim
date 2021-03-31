@@ -32,52 +32,44 @@ def map_robot_with_camera(config):
     return simulation
 
 @given("a robot with a camera component")
-def add_camera_to_robot(scenario_helper):
+def add_camera_to_robot(scenario_helper: ScenarioCreationHelper):
     scenario_helper.add_camera('robot')
 
-@given("a robot with an approximation history component")
-def add_approximation_history_to_robot(scenario_helper):
-    scenario_helper.add_approximation_history_component('robot')
-
 @given("a robot with approximation ability")
-def ability_to_approximate(scenario_helper):
+def ability_to_approximate(scenario_helper: ScenarioCreationHelper):
     scenario_helper.add_approximation_ability()
 
 @given("an ability to detect other entities")
-def recognition_ability(scenario_helper):
-    scenario_helper.add_detection_ability()
+def recognition_ability(scenario_helper: ScenarioCreationHelper):
+    scenario_helper.add_detection_ability('robot')
 
 @given("a robot with the ability to navigate")
-def ability_to_navigate(scenario_helper):
+def ability_to_navigate(scenario_helper: ScenarioCreationHelper):
     scenario_helper.add_ability_to_navigate()
 
 @given(parsers.parse("a Go to command for the robot to pass through POIs '{pois_tag}'"))
-def pass_through_pois(scenario_helper, pois_tag):
+def pass_through_pois(scenario_helper: ScenarioCreationHelper, pois_tag):
     scenario_helper.add_script_ability()
     pois = pois_tag.replace(' ', '').split(',')
     for poi in pois:
         scenario_helper.add_go_command('robot', poi)
 
-@given("a detectable entity named 'person3' in the cameras field of view")
-def person_in_field_of_view(scenario_helper):
-    scenario_helper.make_detectable('person3')
+@given("a camera event to detect a 'person3' that is in the camera field of view")
+def add_event_to_detect_person3(scenario_helper: ScenarioCreationHelper):
+    scenario_helper.add_camera_detection_event('robot', 'person3') # TODO: mudar o nome dessas pessoas
 
-@given("a detectable entity named 'person2' that isnt in the cameras field of view")
-def person_not_in_field_of_view(scenario_helper):
-    scenario_helper.make_detectable('person2')
-
-@given(parsers.parse("a camera event to detect '{person}'"))
-def add_camera_detection(scenario_helper, person):
-    scenario_helper.add_camera_detection_event('robot', person)  
+@given("a camera event to detect a 'person2' that is not in the camera field of view")
+def add_event_to_detect_person2(scenario_helper: ScenarioCreationHelper):
+    scenario_helper.add_camera_detection_event('robot', 'person2')
 
 @when("after run simulation")
 def run_simulation(simulation):
     simulation.run()
 
 @then(parsers.parse("the robot approximated the '{person}'"))
-def did_approximated(assertion_helper, person):
+def did_approximated(assertion_helper: AssertionHelper, person):
     assert assertion_helper.approximated('robot', person)
 
 @then(parsers.parse("the robot did not approximated the '{person}'"))
-def did_not_approximated(assertion_helper, person):
-    assert assertion_helper.approximated('robot', person) is False
+def did_not_approximated(assertion_helper: AssertionHelper, person):
+    assert assertion_helper.do_not_approximated('robot', person)

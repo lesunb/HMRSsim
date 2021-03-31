@@ -98,24 +98,39 @@ class AssertionHelper(TestHelper):
 
     def captured_camera_info(self, entity_id, detected_entity_id):
         camera = self.get_component(Camera, entity_id)
-        captured_id = self.cast_id(detected_entity_id)
+        target_id = self.cast_id(detected_entity_id)
         if not camera:
             raise AssertionError(f'The entity {entity_id} does not have a Camera component.')
 
-        if captured_id in camera.detected_entities:
+        if target_id in camera.detected_entities:
             return True
         else:
             return False
-        #return [cap for cap in camera.captured_entities if cap == captured_id] # captured_entities == lista de entidades
 
-    def approximated(self, drawio_id, detected_drawio_id):
-        detected_id = self.cast_id(detected_drawio_id)
-        history = self.get_component(ApproximationHistory, drawio_id)
+    def approximated(self, drawio_id, target_drawio_id):
+        target_id = self.cast_id(target_drawio_id)
+        history: ApproximationHistory = self.get_component(ApproximationHistory, drawio_id)
 
-        if history and detected_id in history.approximations:
+        if not history:
+            raise AssertionError(f'The {drawio_id} entity does not approximated target {target_drawio_id}.')
+        elif target_id != history.target_id:
+            raise AssertionError(f'The {drawio_id} entity does not approximated target {target_drawio_id}.')
+        elif history.entity_final_approx_pos != history.destiny_position:
+            raise AssertionError((f'The {drawio_id} entity final approximation position: {history.entity_final_approx_pos} '
+                                f'is not the same of the {target_drawio_id} position: {history.destiny_position}.'))
+        else:
             return True
-        return False
     
+    def do_not_approximated(self, drawio_id, target_drawio_id):
+        target_id = self.cast_id(target_drawio_id)
+        history: ApproximationHistory = self.get_component(ApproximationHistory, drawio_id)
+
+        if history and target_id == history.target_id \
+            and history.entity_final_approx_pos == history.destiny_position:
+            raise AssertionError(f'The {drawio_id} entity approximated target {target_drawio_id}.')
+        return True
+            
+
     def get_poi(self, poi_tag: str):
         poi = super().get_poi(poi_tag)
         if not poi:
