@@ -25,7 +25,7 @@ class CollisionProcessor(esper.Processor):
         self.runs = 0
 
     def process(self, kwargs: SystemArgs):
-        start = datetime.now()
+        # start = datetime.now()
         logger = logging.getLogger(__name__)
         eventStore = kwargs.get('EVENT_STORE', None)
         all_collidables = self.world.get_components(Collidable, Position)
@@ -58,11 +58,11 @@ class CollisionProcessor(esper.Processor):
                         event = EVENT(col.event_tag, CollisionPayload(ent, otherEnt))
                         # self.logger.debug(f'Firing event ent --> otherEnt: {event}')
                         eventStore.put(event)
-        end = datetime.now()
-        self.runs += 1
-        self.total += end - start
-        if self.runs % 50 == 0:
-            logger.debug(f'runs: {self.runs}; total: {self.total}; avg = {self.total / self.runs}')
+        # end = datetime.now()
+        # self.runs += 1
+        # self.total += end - start
+        # if self.runs % 50 == 0:
+        #     logger.debug(f'runs: {self.runs}; total: {self.total}; avg = {self.total / self.runs}')
 
     @staticmethod
     def checkCollide(shapes1, shapes2):

@@ -49,7 +49,7 @@ def init(hover_interval=0.15, max_fix_speed=0.2, max_speed=1):
         runs = 0
         wakes_for_ref = 0
         while True:
-            start = datetime.now()
+            # start = datetime.now()
             all_collidables = get_components(Collidable, Position)
             for ent, (hover, pos, velocity, col) in get_components(Hover, Position, Velocity, Collidable):
                 # Check collision here
@@ -92,11 +92,11 @@ def init(hover_interval=0.15, max_fix_speed=0.2, max_speed=1):
                         change_hover_state(world, d, HoverState.CRASHED)
                         warn_control = ControlResponseFormat(d, False)
                         control_component.channel.put(warn_control)
-            end = datetime.now()
-            runs += 1
-            total += end - start
-            if runs % 50 == 0:
-                logger.debug(f'runs: {runs} ({wakes_for_ref} for ref); total: {total}; avg = {total / runs}')
+            # end = datetime.now()
+            # runs += 1
+            # total += end - start
+            # if runs % 50 == 0:
+            #     logger.debug(f'runs: {runs} ({wakes_for_ref} for ref); total: {total}; avg = {total / runs}')
 
     return process
 

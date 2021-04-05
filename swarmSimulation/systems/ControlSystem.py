@@ -35,27 +35,33 @@ def control(kwargs: SystemArgs):
     error = control_component.error
     get_event = control_component.channel.get
     while awaiting != success + error:
-        ev = yield get_event()
-        if responded.get(ev.drone, False):
-            logger.debug(f'Repeated reply from drone {ev.drone}.')
-            continue
-        responded[ev.drone] = True
-        if ev.success:
-            success += 1
+        next_reply = get_event()
+        switch = yield next_reply | env.timeout(20)
+        if next_reply in switch:
+            ev = switch[next_reply]
+            if responded.get(ev.drone, False):
+                logger.debug(f'Repeated reply from drone {ev.drone}.')
+                continue
+            responded[ev.drone] = True
+            if ev.success:
+                success += 1
+            else:
+                error += 1
+            logger.debug(
+                f'[{env.now}] Drone {ev.drone} responded. Success? {ev.success}. '
+                f'{success + error} / {awaiting} responses'
+            )
         else:
-            error += 1
-        logger.debug(
-            f'[{env.now}] Drone {ev.drone} responded. Success? {ev.success}. '
-            f'{success + error} / {awaiting} responses'
-        )
+            break
     logger.debug(
-        f'All {awaiting} drones responded.'
-        f'Success: {control_component.success}  Fail: {error}'
+        f'{awaiting} drones responded.'
+        f'Success: {success}  Fail: {error}'
+        f'Missing: {awaiting - success - error}'
     )
     control_component.awaiting = 0
     control_component.success = 0
     control_component.error = 0
-    yield env.timeout(2)
+    yield env.timeout(1)
     kill_switch.succeed()
 
 

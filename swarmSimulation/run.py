@@ -7,6 +7,7 @@ import simulator.systems.ScriptEventsDES as ScriptSystem
 import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.SeerPlugin as Seer
 import simulator.systems.SensorSystem as SensorSystem
+import simulator.systems.ClockSystem as ClockSystem
 
 from simulator.systems.MovementProcessor import MovementProcessor
 from simulator.systems.CollisionProcessor import CollisionProcessor
@@ -44,7 +45,7 @@ exitEvent = simulator.EXIT_EVENT
 env = simulator.ENV
 
 # Prep Seer plugin
-NAMESPACE = 'giovanni'
+NAMESPACE = 'simulator'
 clean_old_simulation(NAMESPACE)
 build_report = simulator.build_report
 db.child(NAMESPACE).child('logs').set(build_report)
@@ -73,7 +74,8 @@ des_processors = [
     # (NavigationSystemProcess,),
     # (ScriptProcessor,),
     (HoverDisturbance.init(max_disturbance=0.1, prob_disturbance=0.4, disturbance_interval=(1 / (fps / 3))),),
-    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1.0 / fps), max_speed=2.15),)
+    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1.0 / fps), max_speed=2.15),),
+    (ClockSystem.process, ClockSystem.clean)
 ]
 # Add processors to the simulation, according to processor type
 for p in normal_processors:

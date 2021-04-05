@@ -13,6 +13,8 @@ import yaml
 import typing
 import map_parser
 
+from datetime import datetime, timedelta
+
 from simulator.components.Inventory import Inventory
 from utils.create_components import initialize_components, import_external_component
 from typehints.dict_types import SystemArgs, Config, EntityDefinition
@@ -181,8 +183,10 @@ class Simulator:
         kill_switch = self.KWARGS['_KILL_SWITCH']
         sleep = self.ENV.timeout
         sleep_interval = 1.0 / self.FPS
+        # Collect info
         # Other processors
         while not self.EXIT:
+            start = datetime.now()
             process_esper_systems(self.KWARGS)
             # # ticks on the clock
             # TODO: find a way to work 100% DES
