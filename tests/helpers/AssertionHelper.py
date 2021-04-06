@@ -19,7 +19,7 @@ class AssertionHelper(TestHelper):
         raise AssertionError(f'There is no collision between {entity_id} and {other_entity_id}')
 
     def is_in_poi(self, drawio_id: str, poi_tag: str):
-        """Assert if the center of the object is positioned at the poi (point of interest).
+        """Asserts if the center of the object is positioned at the poi (point of interest).
 
         - drawio_id: property id from an element of the drawio file.
         - poi_tag: the poi_tag property of a POI
@@ -32,7 +32,7 @@ class AssertionHelper(TestHelper):
         raise AssertionError(f'The center of {drawio_id} {entity_center} is not positioned at the POI {poi_tag} {poi}.')
 
     def robot_drop_pickable_in_poi(self, robot_id: str, pickable_name: str, poi_tag: str):
-        """Assert if the pickable is in the poi that the robot has left.
+        """Asserts if the pickable is in the poi that the robot has left.
 
         - robot_id: drawio id of the robot that held the pickable.
         - pickable_name: the name property of the grabbed object, typed 'pickable'.
@@ -52,14 +52,13 @@ class AssertionHelper(TestHelper):
                             f'Poi position (x, y + robot height): ({poi[0]}, {poi[1] + robot_height})'))
 
     def is_in_center_of(self, entity_id, other_entity_id):
-        """
-        Asserts that the center of entity is the same center of the other_entity.
+        """Asserts that the center of entity is the same center of the other_entity.
 
         - entity_id, other_entity_id: the property id of the element (drawio file).
         """
         entity_center = self.get_center(entity_id)
         other_entity_center = self.get_center(other_entity_id)
-        
+
         if entity_center[0] == other_entity_center[0] and entity_center[1] == other_entity_center[1]:
             return True
         raise AssertionError((f'The center of {entity_id} is not the same center of the {other_entity_id}.\n'
@@ -97,7 +96,8 @@ class AssertionHelper(TestHelper):
                              f'Expected entity position: ({position[0]}, {position[1]}).'))
 
     def detected(self, entity_id, detected_entity_id):
-        """Checks if detected_entity_id is present in the list of detected 
+        """
+        Checks if detected_entity_id is present in the list of detected
         entities of the entity_id component Camera."""
         camera = self.get_component(Camera, entity_id)
         target_id = self.cast_id(detected_entity_id)
@@ -130,9 +130,9 @@ class AssertionHelper(TestHelper):
             return True
     
     def do_not_approximated(self, drawio_id, target_drawio_id):
-        """Checks whether the target_drawio_id (detected entity) is not in the 
+        """Checks whether the target_drawio_id (detected entity) is not in the
         drawio_id (robot) ApproximationHistory.
-        
+
         - If approximate, raises an AssertionError, otherwise returns True.
         """
         target_id = self.cast_id(target_drawio_id)

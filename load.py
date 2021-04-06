@@ -1,8 +1,3 @@
-from simulator.components.Detectable import Detectable
-from tests.helpers.AssertionHelper import AssertionHelper
-from typehints.component_types import EVENT
-from simulator.systems.CameraDESProcessor import CameraTag, CameraPayload
-#from simulator.components.Script import Script
 from main import Simulator
 #import simulator.systems.SeerPlugin as Seer
 
@@ -23,7 +18,6 @@ from tests.helpers.AssertionHelper import AssertionHelper
 #            _ = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
 
 
-
 config = {
         "context": "tests/data",
         "FPS": 60,
@@ -32,23 +26,43 @@ config = {
     }
 
 config["map"] = "camera_map.drawio"
+#config["map"] = "three_room_map.drawio"
 
 simulation = Simulator(config)
 scenario_helper = ScenarioCreationHelper(simulation)
 assertion_helper = AssertionHelper(simulation)
 
-scenario_helper.add_camera('robot')
-scenario_helper.add_component(Detectable(), 'person1')  
-scenario_helper.add_component(Detectable(), 'person2')
-scenario_helper.add_recognition_ability()
+#simulation.add_des_system(Seer.init([firebase_seer_consumer], 0.05, False),)
 
-entity_id = scenario_helper.cast_id('robot')
-payload = CameraPayload(entity_id)
-new_event = EVENT(CameraTag, payload)
-event_store = scenario_helper.simulation.KWARGS['EVENT_STORE']
-event_store.put(new_event)
+scenario_helper.add_camera('robot')
+scenario_helper.add_camera('robot2')
+scenario_helper.add_camera('robot3')
+scenario_helper.add_approximation_ability()
+scenario_helper.add_detection_ability()
+
+scenario_helper.add_ability_to_navigate()
+pois_tag = 'intersection1, intersection2, patientRoom2, patientRoom3, patientRoom4, intersection2, robotHome'
+scenario_helper.add_script_ability()
+pois = pois_tag.replace(' ', '').split(',')
+for poi in pois:
+    scenario_helper.add_go_command('robot', poi)
+
+pois_tag = 'intersection1, intersection2, patientRoom1'
+pois = pois_tag.replace(' ', '').split(',')
+for poi in pois:
+    scenario_helper.add_go_command('robot2', poi)
+
+pois_tag = 'patientRoom3'
+pois = pois_tag.replace(' ', '').split(',')
+for poi in pois:
+    scenario_helper.add_go_command('robot3', poi)
+
+scenario_helper.add_camera_detection_event('robot', 'person3') 
+scenario_helper.add_camera_detection_event('robot2', 'person2') 
+scenario_helper.add_camera_detection_event('robot3', 'person1') 
+
 
 simulation.run()
 
-print("Captured person1: ", assertion_helper.captured_camera_info('robot', 'person1'))
-print("Captured person2: ", assertion_helper.captured_camera_info('robot', 'person2'))
+
+#assert assertion_helper.approximated('robot', 'person3')

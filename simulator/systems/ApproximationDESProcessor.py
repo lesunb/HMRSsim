@@ -50,4 +50,4 @@ def move_to_detected_target(entity, target):
     _EVENT_STORE.put(new_event)
 
     script = _WORLD.component_for_entity(entity,Script)
-    script.expecting.append(EndOfApproximationTag) 
+    script.expecting.append(EndOfApproximationTag)

@@ -26,7 +26,8 @@ class ScenarioCreationHelper(TestHelper):
         super().__init__(simulation)
 
     def add_component(self, component, drawio_id):
-        """Adds a component to the specified entity (drawio_id).
+        """
+        Adds a component to the specified entity (drawio_id).
 
         - component: instance of a Component.
         - drawio_id: property id from an element of the drawio file.
@@ -35,7 +36,8 @@ class ScenarioCreationHelper(TestHelper):
         self.simulation.world.add_component(entity_id, component)
 
     def create_path(self, robot_id, points):
-        """Adds a path to the robot going through the specified points.
+        """
+        Adds a path to the robot going through the specified points.
 
         - robot_id: the robot property id from the drawio file.
         - points: List of (x,y) positions.
@@ -129,7 +131,7 @@ class ScenarioCreationHelper(TestHelper):
 
     def add_camera_detection_event(self, entity_id, target_id):
         """
-        Adds the process_camera_event system to the environment to detect 
+        Adds the process_camera_event system to the environment to detect
         colissions between entity_id and target_id.
         """
         camera: Camera = self.get_component(Camera, entity_id)
@@ -149,7 +151,7 @@ class ScenarioCreationHelper(TestHelper):
     def add_commands(self, command_list: List, drawio_id: str):
         """
         Adds a list of commands to a robot.
-        
+
         - Command format: "Go poi_tag", "Grab pickable_name", "Drop pickable_name"
         """
         script = self.get_component(Script, drawio_id)
@@ -201,4 +203,6 @@ class ScenarioCreationHelper(TestHelper):
         command = f"Drop {pickable_name}"
         self.add_command(command, drawio_id)
 
+    def add_firebase_seer(self):
+        pass
     # TODO: Add seer and firebase to the scenario helper.
