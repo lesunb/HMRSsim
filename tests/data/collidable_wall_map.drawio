@@ -1,6 +1,6 @@
-<mxfile host="65bd71144e" modified="2021-02-25T18:20:41.706Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.51.1 Chrome/83.0.4103.122 Electron/9.3.3 Safari/537.36" etag="jiTrUmbZDG-VivPLUUT5" version="14.2.4" type="embed">
+<mxfile>
     <diagram id="cHXXtzAYJmj8Drxh6WFk" name="Page-1">
-        <mxGraphModel dx="614" dy="294" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="639" dy="280" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -13,7 +13,7 @@
                 <mxCell id="second_collidable_wall" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=90;fillColor=#000000;" parent="1" vertex="1">
                     <mxGeometry x="330" y="305" width="310" height="20" as="geometry"/>
                 </mxCell>
-                <object label="Robot" type="robot" speed="5" movable="true" collision_tag="stopEvent" id="robot">
+                <object label="&lt;span style=&quot;background-color: rgb(0 , 0 , 0)&quot;&gt;Robot&lt;/span&gt;" type="robot" speed="5" movable="true" collision_tag="stopEvent" id="robot">
                     <mxCell style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e3c800;strokeColor=#B09500;fontColor=#ffffff;" parent="1" vertex="1">
                         <mxGeometry x="307" y="417" width="30" height="30" as="geometry"/>
                     </mxCell>
@@ -21,6 +21,11 @@
                 <mxCell id="collidable_wall" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;" parent="1" vertex="1">
                     <mxGeometry x="164" y="159" width="310" height="20" as="geometry"/>
                 </mxCell>
+                <object label="&lt;span style=&quot;background-color: rgb(0 , 0 , 0)&quot;&gt;Robot2&lt;br&gt;&lt;/span&gt;" type="robot" speed="5" movable="true" collision_tag="stopEvent" id="robot2">
+                    <mxCell style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e3c800;strokeColor=#B09500;fontColor=#ffffff;" parent="1" vertex="1">
+                        <mxGeometry x="350" y="417" width="30" height="30" as="geometry"/>
+                    </mxCell>
+                </object>
             </root>
         </mxGraphModel>
     </diagram>
