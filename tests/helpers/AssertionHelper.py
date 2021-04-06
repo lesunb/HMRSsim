@@ -96,7 +96,9 @@ class AssertionHelper(TestHelper):
                              f'Actual entity position: {entity_position.x, entity_position.y}.\n'
                              f'Expected entity position: ({position[0]}, {position[1]}).'))
 
-    def captured_camera_info(self, entity_id, detected_entity_id):
+    def detected(self, entity_id, detected_entity_id):
+        """Checks if detected_entity_id is present in the list of detected 
+        entities of the entity_id component Camera."""
         camera = self.get_component(Camera, entity_id)
         target_id = self.cast_id(detected_entity_id)
         if not camera:
@@ -108,6 +110,12 @@ class AssertionHelper(TestHelper):
             return False
 
     def approximated(self, drawio_id, target_drawio_id):
+        """Checks whether the target_drawio_id (detected entity) is in the 
+        drawio_id (robot) ApproximationHistory and whether it went to the
+        expected destination.
+        
+        - If approximate, returns True, otherwise raises an AssertionError.
+        """
         target_id = self.cast_id(target_drawio_id)
         history: ApproximationHistory = self.get_component(ApproximationHistory, drawio_id)
 
@@ -122,6 +130,11 @@ class AssertionHelper(TestHelper):
             return True
     
     def do_not_approximated(self, drawio_id, target_drawio_id):
+        """Checks whether the target_drawio_id (detected entity) is not in the 
+        drawio_id (robot) ApproximationHistory.
+        
+        - If approximate, raises an AssertionError, otherwise returns True.
+        """
         target_id = self.cast_id(target_drawio_id)
         history: ApproximationHistory = self.get_component(ApproximationHistory, drawio_id)
 

@@ -1,5 +1,4 @@
 from typing import List
-from simulator.components.Detectable import Detectable
 from simulator.components.Camera import Camera
 from simulator.components.Claw import Claw
 from simulator.components.Script import Script
@@ -16,7 +15,6 @@ from simpy import Store
 import simulator.systems.ApproximationDESProcessor as ApproximationProcessor
 import simulator.systems.ManageObjects as ObjectManager
 from simulator.systems.CollisionProcessor import CollisionProcessor
-from simulator.components.ApproximationHistory import ApproximationHistory
 from simulator.components.Path import Path
 from simulator.components.Map import Map
 from typehints.component_types import EVENT
@@ -116,26 +114,27 @@ class ScenarioCreationHelper(TestHelper):
         self.simulation.add_des_system((ObjectManager.process,))
 
     def add_detection_ability(self):
+        """Adds to the system the ability to detect entities using a Camera component."""
         self.simulation.add_des_system((SensorSystem.init(Camera, 0.1),))
 
     def add_approximation_ability(self):
+        """Adds to the system the ability to approach entities detected by the camera."""
         self.simulation.add_des_system((ApproximationProcessor.process,))
 
-    def add_approximation_history_component(self, drawio_id):
-        self.add_component(ApproximationHistory(), drawio_id)
-
     def add_camera(self, drawio_id):
+        """Adds a Camera component to entity drawio_id."""
         camera = Camera()
         camera.reply_channel = Store(self.simulation.ENV)
         self.add_component(camera, drawio_id)
-    
-    def make_detectable(self, drawio_id):
-        self.add_component(Detectable(), drawio_id)
 
     def add_camera_detection_event(self, entity_id, target_id):
+        """
+        Adds the process_camera_event system to the environment to detect 
+        colissions between entity_id and target_id.
+        """
         camera: Camera = self.get_component(Camera, entity_id)
-        entity_id = self.cast_id(target_id)
-        self.simulation.ENV.process(process_camera_event(camera, entity_id, self.simulation))
+        target = self.cast_id(target_id)
+        self.simulation.ENV.process(process_camera_event(camera, target, self.simulation))
 
     def add_poi(self, poi_tag: str, poi_value):
         """

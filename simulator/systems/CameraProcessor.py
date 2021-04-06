@@ -1,19 +1,14 @@
-from esper import World
-from simpy import FilterStore,Environment
 from main import Simulator
-from simulator.components.Detectable import Detectable
 from simulator.components.Position import Position
 from simulator.components.Camera import Camera
 from typehints.component_types import EVENT
-from typehints.dict_types import SystemArgs
 from typing import NamedTuple
-import logging
 
 DetectedPayload = NamedTuple('CapturedPayload', [('entity', int), ('target_id', int),('target_info', int),])
 
 def process_camera_event(sensor: Camera, target, simulation: Simulator):
     while True:
-        event = yield sensor.reply_channel.get()
+        event = yield sensor.reply_channel.get() # subscriber - fica esperando a mensagem do sensor
         payload = event.payload
         entities = payload.close_entities
         for entity in entities:

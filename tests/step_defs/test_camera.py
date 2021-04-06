@@ -31,7 +31,7 @@ def map_robot_with_camera(config):
     return simulation
 
 @given(parsers.parse("a robot with id '{robot}' that has a camera component"))
-def add_camera_to_robot(scenario_helper, robot):
+def add_camera_to_robot(scenario_helper: ScenarioCreationHelper, robot):
     scenario_helper.add_camera(robot)
 
 @given("all the simulation robots has detection ability")
@@ -51,9 +51,9 @@ def run_simulation(simulation):
     simulation.run()
 
 @then(parsers.parse("information about the entity '{person}' was detected by the '{robot}' robot camera"))
-def captured_the_persons_information(assertion_helper, robot, person):
-    assert assertion_helper.captured_camera_info(robot, person) is True
+def captured_the_persons_information(assertion_helper: AssertionHelper, robot, person):
+    assert assertion_helper.detected(robot, person) is True
 
 @then(parsers.parse("information about the entity '{person}' was not detected by the '{robot}' robot camera"))
-def did_not_captured_the_persons_information(assertion_helper, robot, person):
-    assert assertion_helper.captured_camera_info(robot, person) is False
+def did_not_captured_the_persons_information(assertion_helper: AssertionHelper, robot, person):
+    assert assertion_helper.detected(robot, person) is False
