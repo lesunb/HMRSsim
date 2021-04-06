@@ -25,7 +25,7 @@ Scenario: Two collision events is received when two collisions occurs
     And a path from the 'robot' to the 'second_collidable_wall'
     When after run simulation
     Then the 'robot' collides with the 'collidable_wall'
-    Then the 'robot' collides with the 'second_collidable_wall'
+    And the 'robot' collides with the 'second_collidable_wall'
 
 Scenario: Two collision events is received when two differents robots collides with a wall
     Given a map with a collidable wall
@@ -35,7 +35,4 @@ Scenario: Two collision events is received when two differents robots collides w
     And a path from the 'robot2' to the 'second_collidable_wall'
     When after run simulation
     Then the 'robot' collides with the 'collidable_wall'
-    Then the 'robot2' collides with the 'second_collidable_wall'
-
-# outro cenario: robot1 colide com a wall e robot 2 collide com a second wall
-# Guarda apenas a ultima colisao entre duas entidades
+    And the 'robot2' collides with the 'second_collidable_wall'
