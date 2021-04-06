@@ -57,9 +57,9 @@ pois = pois_tag.replace(' ', '').split(',')
 for poi in pois:
     scenario_helper.add_go_command('robot3', poi)
 
-scenario_helper.add_camera_detection_event('robot', 'person3') 
-scenario_helper.add_camera_detection_event('robot2', 'person2') 
-scenario_helper.add_camera_detection_event('robot3', 'person1') 
+scenario_helper.add_camera_detection_event('robot', 'person3')
+scenario_helper.add_camera_detection_event('robot2', 'person2')
+scenario_helper.add_camera_detection_event('robot3', 'person1')
 
 
 simulation.run()

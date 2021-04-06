@@ -110,10 +110,10 @@ class AssertionHelper(TestHelper):
             return False
 
     def approximated(self, drawio_id, target_drawio_id):
-        """Checks whether the target_drawio_id (detected entity) is in the 
+        """Checks whether the target_drawio_id (detected entity) is in the
         drawio_id (robot) ApproximationHistory and whether it went to the
         expected destination.
-        
+
         - If approximate, returns True, otherwise raises an AssertionError.
         """
         target_id = self.cast_id(target_drawio_id)
