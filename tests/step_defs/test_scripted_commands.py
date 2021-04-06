@@ -32,34 +32,39 @@ def med_and_patient_room_map(config):
     simulation = Simulator(config)
     return simulation
 
-@given("a robot with the ability to follow a script command")
+@given("all the simulation robots has the ability to follow a script command")
 def ability_to_follow_a_script_command(scenario_helper):
     scenario_helper.add_script_ability()
 
-@given("a robot with the ability to grab pickables")
-def ability_to_grab_pickables(scenario_helper):
-    scenario_helper.add_claw_ability('robot')
+@given(parsers.parse("a robot with id '{robot}' has the ability to grab pickables"))
+def ability_to_grab_pickables(scenario_helper: ScenarioCreationHelper, robot):
+    scenario_helper.add_claw_ability(robot)
 
-@given("the robot has the ability to navigate")
+@given("all the simulation robots has the ability to navigate")
 def ability_to_navigate(scenario_helper):
     scenario_helper.add_ability_to_navigate()
 
-@given(parsers.parse("a script command 'Go to' '{poi_tag}' poi"))
-def script_command_go_to(scenario_helper, poi_tag):
-    scenario_helper.add_go_command('robot', poi_tag)
+@given(parsers.parse("a script command 'Go to' '{poi_tag}' poi for '{robot}'"))
+def script_command_go_to(scenario_helper: ScenarioCreationHelper, poi_tag, robot):
+    scenario_helper.add_go_command(robot, poi_tag)
 
-@given(parsers.parse("a script command '{command_name}' '{pickable_name}' pickable"))
-def script_command_grab_and_drop(scenario_helper, command_name, pickable_name):
-    scenario_helper.add_command(f"{command_name} {pickable_name}", 'robot')
+@given(parsers.parse("a script command '{command_name}' '{pickable_name}' pickable for '{robot}'"))
+def script_command_grab_and_drop(scenario_helper: ScenarioCreationHelper, command_name, pickable_name, robot):
+    scenario_helper.add_command(f"{command_name} {pickable_name}", robot)
+
+@given(parsers.parse("a list of script commands '{commands}' to robot with id '{robot}'"))
+def add_script_commands_to_robot(scenario_helper: ScenarioCreationHelper, commands, robot):
+    command_list = [command.strip() for command in commands.split(',')]
+    scenario_helper.add_commands(command_list, robot)
 
 @when("after run simulation")
 def run_simulation(simulation):
     simulation.run()
 
-@then("the robot is in the 'medRoom' poi")
-def robot_is_in_medicine_room(assertion_helper):
-    assert assertion_helper.is_in_poi('robot', 'medRoom')
+@then(parsers.parse("the robot with id '{robot}' is in the '{poi_tag}' poi"))
+def robot_is_in_medicine_room(assertion_helper: AssertionHelper, robot, poi_tag):
+    assert assertion_helper.is_in_poi(robot, poi_tag)
 
-@then("the 'medicine' is in the 'patientRoom' poi")
-def medicine_is_in_patient_room(assertion_helper):
-    assert assertion_helper.robot_drop_pickable_in_poi('robot', 'medicine', 'patientRoom')
+@then(parsers.parse("the '{robot}' droped the '{medicine}' in the '{poi_tag}' poi"))
+def medicine_is_in_patient_room(assertion_helper:AssertionHelper, robot, medicine, poi_tag):
+    assert assertion_helper.robot_drop_pickable_in_poi(robot, medicine, poi_tag)
