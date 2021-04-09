@@ -1,7 +1,7 @@
 import logging
 import re
+import random
 
-from functools import reduce
 from datetime import datetime, timedelta
 
 from collision import Vector, collide
@@ -45,11 +45,7 @@ def init(hover_interval=0.15, max_fix_speed=0.2, max_speed=1):
         component_for_ent = world.component_for_entity
         sleep = env.timeout
         #
-        total = timedelta()
-        runs = 0
-        wakes_for_ref = 0
         while True:
-            # start = datetime.now()
             all_collidables = get_components(Collidable, Position)
             for ent, (hover, pos, velocity, col) in get_components(Hover, Position, Velocity, Collidable):
                 # Check collision here
@@ -79,7 +75,6 @@ def init(hover_interval=0.15, max_fix_speed=0.2, max_speed=1):
             req = event_store.get(lambda ev: ev.type == 'genericCollision')
             switch = yield req | sleep(hover_interval)
             if req in switch:
-                wakes_for_ref += 1
                 ev = switch[req]
                 ent = ev.payload.ent
                 other_ent = ev.payload.other_ent
@@ -92,12 +87,6 @@ def init(hover_interval=0.15, max_fix_speed=0.2, max_speed=1):
                         change_hover_state(world, d, HoverState.CRASHED)
                         warn_control = ControlResponseFormat(d, False)
                         control_component.channel.put(warn_control)
-            # end = datetime.now()
-            # runs += 1
-            # total += end - start
-            # if runs % 50 == 0:
-            #     logger.debug(f'runs: {runs} ({wakes_for_ref} for ref); total: {total}; avg = {total / runs}')
-
     return process
 
 
@@ -122,8 +111,8 @@ def movement_action(ent: int, hover: Hover, pos: Position, velocity: Velocity, m
         return ActionResponse(True, HoverState.HOVERING)
     dx = target[0] - drone_pos[0]
     dy = target[1] - drone_pos[1]
-    velocity.x = min(dx, max_speed) if dx > 0 else max(dx, -max_speed)
-    velocity.y = min(dy, max_speed) if dy > 0 else max(dy, -max_speed)
+    velocity.x = (min(dx, max_speed) if dx > 0 else max(dx, -max_speed)) * (1 + random.random())
+    velocity.y = (min(dy, max_speed) if dy > 0 else max(dy, -max_speed)) * (1 + random.random())
     find_safe_route(hover, pos, velocity, hover.crowded)
     return  ActionResponse(None, None)
 

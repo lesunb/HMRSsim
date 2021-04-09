@@ -24,10 +24,11 @@ def control(kwargs: SystemArgs):
     kill_switch = kwargs['_KILL_SWITCH']
     control_component: Control = world.component_for_entity(1, Control)
     logger = logging.getLogger(__name__)
-    logger.debug(f'MOVING DRONES TO DRONE FORMATION')
-    circle_config = control_component.configs['DRONE']
+    formation = list(control_component.configs.keys())[0]
+    logger.debug(f'MOVING DRONES TO FORMATION {formation}')
+    circle_config = control_component.configs[formation]
     assign_positions(world, circle_config)
-    control_component.awaiting = len(circle_config)
+    control_component.awaiting = min(len(circle_config), len(world.get_components(Hover)))
     responded = {}
     # Local ref most used vars
     awaiting = control_component.awaiting
@@ -36,7 +37,7 @@ def control(kwargs: SystemArgs):
     get_event = control_component.channel.get
     while awaiting != success + error:
         next_reply = get_event()
-        switch = yield next_reply | env.timeout(20)
+        switch = yield next_reply | env.timeout(15)
         if next_reply in switch:
             ev = switch[next_reply]
             if responded.get(ev.drone, False):
@@ -55,8 +56,7 @@ def control(kwargs: SystemArgs):
             break
     logger.debug(
         f'{awaiting} drones responded.'
-        f'Success: {success}  Fail: {error}'
-        f'Missing: {awaiting - success - error}'
+        f'Success: {success}    Fail: {error}    Missing: {awaiting - success - error}'
     )
     control_component.awaiting = 0
     control_component.success = 0
@@ -71,6 +71,8 @@ def assign_positions(world: esper.World, config: List[Point]):
     for ent, (hover, pos) in world.get_components(Hover, Position):
         components[ent] = (hover, pos)
     for point in config:
+        if len(components) == 0:
+            break
         distances = []
         for ent, (_, pos) in components.items():
             center = pos.center

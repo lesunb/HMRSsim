@@ -10,15 +10,13 @@ def process(kwargs: SystemArgs):
     env = kwargs['ENV']
     sleep = env.timeout
     total = timedelta()
-    runs = 0
-    traces.append('runs,total,env_time,avg_second')
+    traces.append('env_time,total_time,avg_simulation_second\n')
     while True:
         start = datetime.now()
         yield sleep(1)
         end = datetime.now()
         total += end - start
-        runs += 1
-        traces.append(f'{runs},{total},{env.now},{total / runs}\n')
+        traces.append(f'{env.now},{total},{total / env.now}\n')
 
 
 def clean():

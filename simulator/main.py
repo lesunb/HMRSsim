@@ -168,7 +168,7 @@ class Simulator:
         """Add an entity from json to world."""
         initialized_components = initialize_components(entity_definition.get('components', {}))
         ent = self.world.create_entity(*initialized_components)
-        self.draw2ent[ent_id] = [ent, {}]
+        self.draw2ent[ent_id] = [ent, {'type': entity_definition['type']}]
         if entity_definition.get('isInteractive', False):
             self.interactive[entity_definition.get('name', ent_id)] = ent
         if entity_definition.get('isObject', False):

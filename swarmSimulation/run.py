@@ -1,12 +1,9 @@
 import sys
 import simpy
-import logging
-import math
 
 import simulator.systems.ScriptEventsDES as ScriptSystem
 import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.SeerPlugin as Seer
-import simulator.systems.SensorSystem as SensorSystem
 import simulator.systems.ClockSystem as ClockSystem
 
 from simulator.systems.MovementProcessor import MovementProcessor
@@ -26,8 +23,9 @@ from swarmSimulation.components.Control import Control
 from simulator.main import Simulator
 from simulator.utils.Firebase import db, clean_old_simulation
 
-from swarmSimulation.shapes import SHAPES
+from generate_simulation_json import generate_simulation_json, generate_shapes
 
+DRONE_COUNT = 200
 # Prep Script and Navigation systems
 extra_instructions = [
     (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction),
@@ -35,7 +33,7 @@ extra_instructions = [
 ScriptProcessor = ScriptSystem.init(extra_instructions, [])
 NavigationSystemProcess = NavigationSystem.init()
 # Create a simulation with config
-simulator = Simulator(sys.argv[1])
+simulator = Simulator(generate_simulation_json(DRONE_COUNT))
 # Some simulator objects
 width, height = simulator.window_dimensions
 fps = simulator.FPS
@@ -70,11 +68,8 @@ normal_processors = [
 # Defines DES processors
 des_processors = [
     Seer.init([firebase_seer_consumer], 0.1, False),
-    # (SensorSystem.init(ProximitySensor, 1.0 / fps),),
-    # (NavigationSystemProcess,),
-    # (ScriptProcessor,),
     (HoverDisturbance.init(max_disturbance=0.1, prob_disturbance=0.4, disturbance_interval=(1 / (fps / 3))),),
-    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1.0 / fps), max_speed=2.15),),
+    (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1.0 / fps), max_speed=2.5),),
     (ClockSystem.process, ClockSystem.clean)
 ]
 # Add processors to the simulation, according to processor type
@@ -90,11 +85,10 @@ for drone, _ in simulator.objects:
     sensor.reply_channel = simpy.Store(env)
 
 
-control_component = Control(configs=SHAPES, channel=simpy.Store(env))
+control_component = Control(configs=generate_shapes(DRONE_COUNT), channel=simpy.Store(env))
 simulator.world.add_component(1, control_component)
 
 if __name__ == "__main__":
-    # env.process(control(simulator.KWARGS['_KILL_SWITCH']))
     for drone, _ in simulator.objects:
         sensor: ProximitySensor = simulator.world.component_for_entity(drone, ProximitySensor)
         env.process(dont_crash(simulator.world, sensor))

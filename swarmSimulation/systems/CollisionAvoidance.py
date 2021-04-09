@@ -31,7 +31,7 @@ def find_safe_route(hover: Hover, mypos: Position, myvel: Velocity, they: List[P
     pos_y = mypos.y
     #
     is_hovering = hover.status == HoverState.HOVERING
-    SAFE_FACTOR = 2 if not is_hovering else 0
+    SAFE_FACTOR = 1 if not is_hovering else 0
     # 10 degrees increments from original goal up do 90 degrees
     HEADINGS = [
         0.0, 0.523599, 1.047198, 1.48353,
@@ -61,8 +61,8 @@ def find_safe_route(hover: Hover, mypos: Position, myvel: Velocity, they: List[P
         hits[i] = (hit, i, newx, newy)
     hits.sort()
     (hit, i, newx, newy) = hits[0]
-    myvel.x = (newx - pos_x) / (1.8 + hit if not is_hovering else 1.1)
-    myvel.y = (newy - pos_y) / (1.8 + hit if not is_hovering else 1.1)
+    myvel.x = (newx - pos_x) / (1 + hit + random.random() if not is_hovering else 1.1)
+    myvel.y = (newy - pos_y) / (1 + hit + random.random() if not is_hovering else 1.1)
 
 
 def intercept(a, b, safe_factor):

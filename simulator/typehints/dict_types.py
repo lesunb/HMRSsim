@@ -20,6 +20,7 @@ class EntityDefinition(typing.TypedDict):
     isObject: bool
     isInteractive: bool
     name: typing.Optional[str]
+    type: typing.Optional[str]
 
 
 class Config(typing.TypedDict):
