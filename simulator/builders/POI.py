@@ -1,6 +1,8 @@
 import esper
 import logging
-from components.Map import Map
+from simulator.components.Map import Map
+from simulator.components.Skeleton import Skeleton
+from simulator.components.Position import Position
 
 TYPE = 'POI'
 
@@ -14,6 +16,7 @@ def build_object(object, world: esper.World, window_options, draw2entity):
     y = float(mxGeometry.attrib.get('y', 0))
     width = float(mxGeometry.attrib.get('width', 0))
     height = float(mxGeometry.attrib.get('height', 0))
+    pos = Position(x, y, 0, width, height)
     x += (width // 2)
     y += (height // 2)
     # Get the Map for simulation or create one
@@ -30,4 +33,8 @@ def build_object(object, world: esper.World, window_options, draw2entity):
         tag = 'POI_' + str(len(simulation_map.pois))
         logger.warning(f'POI ({x}, {y}) with no TAG. Using {tag}')
     simulation_map.pois[tag] = (x, y)
+    # Alternatively display the POI
+    if object.attrib.get('display', False):
+        skeleton = Skeleton(object.attrib['id'], mxCell.attrib['style'], tag)
+        world.create_entity(pos, skeleton)
     return {}, [], {}

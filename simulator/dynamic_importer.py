@@ -9,10 +9,17 @@
 import logging
 import typing
 
+from pathlib import Path
 from utils.helpers import list_folder
 
-# TODO: Add an include option to add more component folder on simulation.json
-available_components = list_folder('./components')
+available_components = list_folder(Path('./components'))
+
+
+def expand_available_components(paths: typing.List[Path]):
+    global available_components
+    paths.append(Path('./simulator/components'))
+    for p in paths:
+        available_components.update(list_folder(p))
 
 
 def init_component(component_name: str, args: typing.List[typing.Any]):

@@ -1,8 +1,8 @@
 import logging
 import esper
 
-from components.Path import Path
-from components.Position import Position
+from simulator.components.Path import Path
+from simulator.components.Position import Position
 from typehints.build_types import DependencyNotFound
 from xml.etree.ElementTree import Element
 

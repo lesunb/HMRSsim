@@ -1,8 +1,8 @@
-from components.Path import Path
+from simulator.components.Path import Path
 from systems.MovementProcessor import MovementProcessor
 from systems.PathProcessor import PathProcessor
 from simulator.main import Simulator
-from components.Position import Position
+from simulator.components.Position import Position
 
 config = {
  "context": "resources/map",

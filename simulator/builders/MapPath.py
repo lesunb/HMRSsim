@@ -1,15 +1,12 @@
 import logging
 import esper
 
-from components.Map import Map
-from utils.Navigation import normalize_point, merge_edges
+from simulator.components.Map import Map
+from utils.Navigation import add_nodes_from_points
 
-from components.Position import Position
+from simulator.components.Position import Position
 from typehints.build_types import DependencyNotFound
 from xml.etree.ElementTree import Element
-
-from typehints.component_types import Point
-from typing import List, Dict
 
 TYPE = 'map-path'
 
@@ -29,18 +26,6 @@ def build_object(cell, world: esper.World, window_options, draw2entity):
         world.add_component(1, simulation_map)
     add_nodes_from_points(simulation_map, points)
     return {}, [], {}
-
-
-def add_nodes_from_points(map_component: Map, points: List[Point]):
-    points = list(map(lambda p: normalize_point(p, map_component), points))
-    # Treat the edges
-    node_map: Dict[Point, List[Point]] = {points[0]: [points[1]], points[-1]: [points[-2]]}
-    # Other points
-    for idx in range(1, len(points) - 1):
-        node_map[points[idx]] = [points[idx-1], points[idx+1]]
-    for k, v in node_map.items():
-        node_map[k] = merge_edges(v, map_component.nodes.get(k, []))
-    map_component.nodes.update(node_map)
 
 
 def path_from_mxCell(cell: Element, draw2entity, world: esper.World):

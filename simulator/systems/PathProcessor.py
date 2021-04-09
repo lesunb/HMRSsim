@@ -5,12 +5,11 @@ from typehints.dict_types import SystemArgs
 
 from simpy import FilterStore
 
-from main import EVENT
-from components.Path import Path
-from components.Position import Position
-from components.Velocity import Velocity
+from simulator.components.Path import Path
+from simulator.components.Position import Position
+from simulator.components.Velocity import Velocity
 from typing import List
-from typehints.component_types import Point
+from typehints.component_types import Point, EVENT
 
 
 EndOfPathPayload = NamedTuple('EndOfPathPayload', [('ent', int), ('timestamp', str), ('path', List[Point])])
@@ -30,7 +29,6 @@ class PathProcessor(esper.Processor):
             point = path.points[path.curr_point]
             pos_center = pos.center
             if pos_center[0] == point[0] and pos_center[1] == point[1]:
-                self.logger.debug(f"[{env.now}] Entity {ent} moved point in path path - {point}[idx={path.curr_point}] - {pos.center} - {vel}")
                 path.curr_point += 1
                 if path.curr_point == len(path.points):
                     # end of path

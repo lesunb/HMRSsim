@@ -9,6 +9,7 @@ class Skeleton(Component):
         self.style = style
         self.relative = relative
         self.model = model
+        self.changed = False
 
     def __str__(self):
         return f'Skeleton[id={self.id}]'

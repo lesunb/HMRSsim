@@ -1,5 +1,5 @@
-from components.Collidable import Collidable
-from components.Position import Position
+from simulator.components.Collidable import Collidable
+from simulator.components.Position import Position
 from utils.helpers import *
 
 from typehints.component_types import Component, ShapeDefinition

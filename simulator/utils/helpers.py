@@ -5,6 +5,7 @@ import primitives
 from collision import Vector
 from typehints.component_types import ShapeDefinition, Point
 from typing import Union, List, Dict
+from pathlib import Path
 
 ShapeType = Union[primitives.Rectangle, primitives.Ellipse]
 
@@ -73,14 +74,24 @@ def mirror_shape_definition_vertically(definition: ShapeDefinition, shape_center
     return new_def_center, new_points
 
 
-def list_folder(path: str) -> Dict:
+def path_to_import(path: Path):
+    bits = path.parts
+    if bits[0] == '..':
+        bits = bits[1:]
+    return '.'.join(bits)
+
+
+def list_folder(path: Path) -> Dict:
     available = {}
-    for component in os.listdir(path):
-        file_name, extension = os.path.splitext(component)
-        if not extension == '.py':
-            continue
-        if file_name.startswith('__') and file_name.endswith('__'):
-            continue
-        module = importlib.import_module(f'{path[2:]}.{file_name}')
-        available[file_name] = module
+    try:
+        for component in os.listdir(path):
+            file_name, extension = os.path.splitext(component)
+            if not extension == '.py':
+                continue
+            if file_name.startswith('__') and file_name.endswith('__'):
+                continue
+            module = importlib.import_module(path_to_import(path / file_name))
+            available[file_name] = module
+    except FileNotFoundError:
+        return {}
     return available

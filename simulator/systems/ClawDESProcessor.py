@@ -3,21 +3,20 @@ from enum import Enum
 from typing import NamedTuple, List
 from esper import World
 from simpy import FilterStore, Store, Environment
-from main import EVENT
+from typehints.component_types import EVENT
 from typehints.dict_types import SystemArgs
 
-from components.Position import Position
-from components.Claw import Claw
-from components.Collidable import Collidable
-from components.Pickable import Pickable
-from components.Inventory import Inventory
-from components.Script import Script, States
+from simulator.components.Position import Position
+from simulator.components.Claw import Claw
+from simulator.components.Collidable import Collidable
+from simulator.components.Pickable import Pickable
+from simulator.components.Inventory import Inventory
+from simulator.components.Script import Script, States
 
 from collision import collide
-from primitives import Ellipse
 
 import logging
-import systems.ManageObjects as ObjectManager
+import simulator.systems.ManageObjects as ObjectManager
 
 
 class ClawOps(Enum):
@@ -36,6 +35,7 @@ DropInstructionTag = 'Drop'
 _EVENT_STORE: FilterStore
 _WORLD: World
 _ENV: Environment
+
 
 def process(kwargs: SystemArgs):
     global _EVENT_STORE
@@ -144,12 +144,12 @@ def drop_object(obj_name, me):
 
 def grabInstruction(ent: int, args: List[str], script: Script, event_store: FilterStore) -> States:
     _ENV.process(pick_object(obj_name=args[0], me=ent))
-    script.state = States.BLOQUED
+    script.state = States.BLOCKED
     script.expecting.append(ClawDoneTag)
     return script.state
 
 def dropInstrution(ent: int, args: List[str], script: Script, event_store: FilterStore) -> States:
     _ENV.process(drop_object(obj_name=args[0], me=ent))
-    script.state = States.BLOQUED
+    script.state = States.BLOCKED
     script.expecting.append(ClawDoneTag)
     return script.state

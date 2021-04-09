@@ -1,29 +1,31 @@
 """
 Entrypoint for a simulator.
-Defines Simulator class and EVENT.
+Defines Simulator class.
 """
 import json
 import simpy
 import pathlib
 import esper
-import logging
+from logging import getLogger
 import logging.config
 import yaml
 
 import typing
 import map_parser
 
-from components.Inventory import Inventory
-from utils.create_components import initialize_components
+from datetime import datetime, timedelta
+
+from simulator.components.Inventory import Inventory
+from utils.create_components import initialize_components, import_external_component
 from typehints.dict_types import SystemArgs, Config, EntityDefinition
 
-fileName = pathlib.Path.cwd().joinpath('loggerConfig.yml')
+fileName = pathlib.Path(__file__).parent.joinpath('loggerConfig.yml')
 stream = open(fileName)
 loggerConfig = yaml.safe_load(stream)
 logging.config.dictConfig(loggerConfig)
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
-EVENT = typing.NamedTuple('Event', [('type', str), ('payload', typing.NamedTuple)])
+
 """Format for all DES events added to Stores.
 
 Events are created by systems to exchange messages with other systems.
@@ -78,13 +80,17 @@ class Simulator:
         self.DEFAULT_LINE_WIDTH = config.get('DLW', 10)
         self.DURATION = config.get('duration', -1)
 
+        context = config.get('context', '.')
+        logger.info(f'Context is {context}')
+        if context != '.':
+            import_external_component(context)
         if 'map' in config:
-            file = pathlib.Path(config.get('context', '.')) / config.get('map')
+            file = pathlib.Path(context) / config.get('map')
             logger.info(f'Using simulation map {file}')
             simulation = map_parser.build_simulation_from_map(file)
         else:
             logger.info('No map found in the configuration. Creating empty simulation.')
-            simulation = map_parser.build_simulation_from_map("", True)
+            simulation = map_parser.build_simulation_from_map(context, True)
         self.world: esper.World = simulation['world']
         # self.window = simulation['window']
         # self.batch = simulation['batch']
@@ -109,35 +115,34 @@ class Simulator:
         self.KWARGS: SystemArgs = {
             "ENV": self.ENV,
             "WORLD": self.world,
-            "_KILLSWITCH": self.ENV.event() if self.DURATION > 0 else None,
+            "_KILL_SWITCH": self.ENV.event(),
             "EVENT_STORE": simpy.FilterStore(self.ENV),
-            # Pyglet specific things (for the re-create entity)
-            # "BATCH": self.batch,
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
         self.cleanups: typing.List[CleanupFunction] = [cleanup]
+        logger.info('===== SIMULATION LOADING COMPLETE =====')
+        self.build_report = []
         self.generate_simulation_build_report()
 
     def generate_simulation_build_report(self):
-        logger.info('===== SIMULATION LOADING COMPLETE =====')
-        logger.info(f'Simulation {self.simulation_name}')
-        logger.info(f'===> Simulation components')
+        self.build_report.append(f'Simulation {self.simulation_name}\n')
+        self.build_report.append(f'===> Simulation components\n')
         for c in self.world.components_for_entity(1):
-            logger.info(c)
-        logger.info(f'{len(self.draw2ent)} entities created.')
-        logger.info(f'{len(self.objects)} typed objects transformed into entities')
-        logger.info(f'===> TYPED OBJECTS')
+            self.build_report.append(str(c) + '\n')
+        self.build_report.append(f'{len(self.draw2ent)} entities created.\n')
+        self.build_report.append(f'{len(self.objects)} typed objects transformed into entities\n')
+        self.build_report.append(f'===> TYPED OBJECTS\n')
         for k, v in self.draw2ent.items():
             if v[1].get('type', None) is None:
                 continue
-            logger.info(f'• {k} --> esper entity {v[0]}. (type {v[1].get("type", "")})')
+            self.build_report.append(f'• {k} --> esper entity {v[0]}. (type {v[1].get("type", "")})\n')
             ent = v[0]
             components = self.world.components_for_entity(ent)
-            logger.info(f'Entity has {len(components)} components.')
+            self.build_report.append(f'Entity has {len(components)} components.\n')
             for c in components:
-                logger.info(f'\t- {c}')
-        logger.info(f'===> Interactive objects')
-        logger.info(self.interactive)
+                self.build_report.append(f'\t- {c}\n')
+        self.build_report.append(f'===> Interactive objects\n')
+        self.build_report.append(str(self.interactive) + '\n')
 
     def add_des_system(self, system: DESSystem):
         """
@@ -163,7 +168,7 @@ class Simulator:
         """Add an entity from json to world."""
         initialized_components = initialize_components(entity_definition.get('components', {}))
         ent = self.world.create_entity(*initialized_components)
-        self.draw2ent[ent_id] = [ent, {}]
+        self.draw2ent[ent_id] = [ent, {'type': entity_definition['type']}]
         if entity_definition.get('isInteractive', False):
             self.interactive[entity_definition.get('name', ent_id)] = ent
         if entity_definition.get('isObject', False):
@@ -173,31 +178,29 @@ class Simulator:
         """
         The simulation loop
         """
+        # Local ref most used vars
+        process_esper_systems = self.world.process
+        kill_switch = self.KWARGS['_KILL_SWITCH']
+        sleep = self.ENV.timeout
+        sleep_interval = 1.0 / self.FPS
+        # Collect info
         # Other processors
         while not self.EXIT:
-            # pyglet.clock.tick()
-            self.world.process(self.KWARGS)
-            # logger.debug(f'[ENV TIME {self.ENV.now}] Processed world.')
-            # For many windows
-            # for w in pyglet.app.windows:
-            #     w.switch_to()
-            #     w.dispatch_events()
-            #     w.dispatch_event('on_draw')
-            #     w.flip()
+            start = datetime.now()
+            process_esper_systems(self.KWARGS)
             # # ticks on the clock
-            if self.KWARGS["_KILLSWITCH"] is not None:
-                switch = yield self.KWARGS["_KILLSWITCH"] | self.ENV.timeout(1.0 / self.FPS, False)
-                if self.KWARGS["_KILLSWITCH"] in switch:
-                    break
-            else:
-                yield self.ENV.timeout(1.0 / self.FPS, False)
-        return 0
+            # TODO: find a way to work 100% DES
+            switch = yield kill_switch | sleep(sleep_interval, False)
+            if kill_switch in switch:
+                break
+        logger.debug(f'simulation loop exited')
+        self.EXIT_EVENT.succeed()
 
     def run(self):
         """
         Runs the simulation.
         Simulation continues for DURATION seconds, if DURATION is specified.
-        Simulation exits on EXIT_EVENT or if _KILLSWITCH event is triggered.
+        Simulation exits on EXIT_EVENT or if _KILL_SWITCH event is triggered.
         After simulation loop terminates, ALL cleanup functions are executed,
         the last being the user defined one, if present.
         """
@@ -208,6 +211,10 @@ class Simulator:
         else:
             self.ENV.process(self.simulation_loop())
             self.ENV.run(until=self.EXIT_EVENT)
+        logger.info('============ SIMULATION EXECUTION FINISHED ============')
+        logger.info('============ CLEAN UP STAGE ============')
+        logger.info(f'{len(self.cleanups)} Clean up functions to execute')
         while self.cleanups:
             next_function = self.cleanups.pop()
+            logger.info(f'Executing clean-up function {next_function}')
             next_function()

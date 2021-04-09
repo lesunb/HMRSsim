@@ -1,0 +1,6 @@
+{
+    "context": "swarmSimulation",
+    "map": "swarm.drawio",
+    "FPS": 20,
+    "DLW": 10
+}

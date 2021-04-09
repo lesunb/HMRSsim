@@ -1,7 +1,7 @@
 import copy
 
 import mxCellDecoder
-from components.Pickable import Pickable
+from simulator.components.Pickable import Pickable
 
 TYPE = 'pickable'
 

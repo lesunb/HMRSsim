@@ -5,7 +5,7 @@ import typing
 import dynamic_models
 import utils.helpers as helpers
 
-from components.Skeleton import Skeleton
+from simulator.components.Skeleton import Skeleton
 from typehints.build_types import WindowOptions
 from xml.etree.ElementTree import Element
 

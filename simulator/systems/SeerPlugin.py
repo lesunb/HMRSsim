@@ -8,8 +8,8 @@ from typehints.dict_types import SystemArgs
 from simpy import Environment
 from esper import World
 
-from components.Skeleton import Skeleton
-from components.Position import Position
+from simulator.components.Skeleton import Skeleton
+from simulator.components.Position import Position
 
 message_buffer = Queue()
 
@@ -19,20 +19,20 @@ def consumer_manager(consumers: List[Callable], also_log: bool):
     logging.addLevelName(25, 'SEER')
     logger.setLevel('SEER')
     while True:
-        message = message_buffer.get()  # Blocking function
+        message, msg_idx = message_buffer.get()  # Blocking function
         if also_log:
             logger.log(25, message)
         for c in consumers:
-            c(message)
+            c(message, msg_idx)
         message_buffer.task_done()
         if 'theEnd' in message:
             break
+    logger.log(25, f'Exiting consumer manager')
+    return
 
-# TODO: Add support for a custom message builder
+
 def init(consumers: List[Callable], scan_interval: float, also_log=False):
     # Init consumer thread
-    # TODO: Remove daemon. Handle simulator exit gracefully.
-    #  Maybe push a "END" message to the message_buffer.
     thread = threading.Thread(target=consumer_manager, args=[consumers, also_log])
     thread.start()
 
@@ -42,6 +42,7 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
         event_store = kwargs.get('EVENT_STORE', None)
         world: World = kwargs.get('WORLD', None)
         env: Environment = kwargs.get('ENV', None)
+        msg_idx = 0
         if event_store is None:
             raise Exception("Can't find eventStore")
         elif env is None:
@@ -56,18 +57,22 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
             "window_name": simulation_skeleton.id,
             "dimensions": size
         }
-        message_buffer.put(base)
+        message_buffer.put((base, msg_idx))
+        msg_idx += 1
         # Scan simulation situation every scan_interval seconds and report
         last_round: dict = {}
+        # Local ref most used functions
+        get_components = world.get_components
+        sleep = env.timeout
         while True:
 
             new_message = {
-                "timestamp": env.now
+                "timestamp": round(float(env.now), 3)
             }
-            for ent, (skeleton, position) in world.get_components(Skeleton, Position):
+            for ent, (skeleton, position) in get_components(Skeleton, Position):
                 if ent == 1:  # Entity 1 is the entire model
                     continue
-                elif last_round.get(ent, (0, None))[0] != 0 and not position.changed:
+                elif last_round.get(ent, (0, None))[0] != 0 and not position.changed and not skeleton.changed:
                     last_round[ent] = (2, skeleton.id)
                     continue
 
@@ -79,10 +84,10 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
                     'height': position.h,
                     'style': skeleton.style
                 }
-
                 new_message[skeleton.id] = data
                 last_round[ent] = (2, skeleton.id)
                 position.changed = False
+                skeleton.changed = False
             # Check for deleted entities
             deleted = []
             for k, v in last_round.items():
@@ -93,11 +98,13 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
                     last_round[k] = (0, v[1])
             new_message['deleted'] = deleted
             # Add message to queue
-            message_buffer.put(new_message)
-            yield env.timeout(scan_interval)
+            message_buffer.put((new_message, msg_idx))
+            msg_idx += 1
+            yield sleep(scan_interval)
 
     def clean():
-        message_buffer.put({"theEnd": True})
+        message_buffer.put(({"theEnd": True}, -1))
+        logging.getLogger(__name__).debug(f'Executing Seer cleanup function')
         thread.join()
 
     return process, clean
