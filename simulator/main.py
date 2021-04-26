@@ -115,7 +115,7 @@ class Simulator:
         self.KWARGS: SystemArgs = {
             "ENV": self.ENV,
             "WORLD": self.world,
-            "_KILL_SWITCH": self.ENV.event(),
+            "_KILL_SWITCH": self.EXIT_EVENT,
             "EVENT_STORE": simpy.FilterStore(self.ENV),
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
@@ -194,13 +194,12 @@ class Simulator:
             if kill_switch in switch:
                 break
         logger.debug(f'simulation loop exited')
-        self.EXIT_EVENT.succeed()
 
     def run(self):
         """
         Runs the simulation.
         Simulation continues for DURATION seconds, if DURATION is specified.
-        Simulation exits on EXIT_EVENT or if _KILL_SWITCH event is triggered.
+        Simulation exits on EXIT_EVENT (or if _KILL_SWITCH, they're the same) event is triggered.
         After simulation loop terminates, ALL cleanup functions are executed,
         the last being the user defined one, if present.
         """
