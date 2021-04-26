@@ -1,6 +1,6 @@
 <mxfile>
     <diagram id="Os4OQ2AVHIz0DxEbQNlY" name="Page-1">
-        <mxGraphModel dx="687" dy="294" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#F1FAEE" math="0" shadow="0">
+        <mxGraphModel dx="605" dy="261" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#F1FAEE" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -163,7 +163,7 @@
                     </mxCell>
                 </object>
                 <object label="" type="map-path" id="45">
-                    <mxCell style="endArrow=classic;html=1;strokeColor=#000000;" edge="1" parent="1">
+                    <mxCell style="endArrow=classic;html=1;strokeColor=#000000;" parent="1" edge="1">
                         <mxGeometry width="50" height="50" relative="1" as="geometry">
                             <mxPoint x="710" y="280" as="sourcePoint"/>
                             <mxPoint x="520" y="240" as="targetPoint"/>
@@ -173,6 +173,9 @@
                         </mxGeometry>
                     </mxCell>
                 </object>
+                <mxCell id="person4" value="4" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
+                    <mxGeometry x="167" y="80" width="20" height="20" as="geometry"/>
+                </mxCell>
             </root>
         </mxGraphModel>
     </diagram>

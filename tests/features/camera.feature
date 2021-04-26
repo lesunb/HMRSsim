@@ -35,3 +35,13 @@ Scenario: Multi-robot detects specific persons
     When after run simulation
     Then information about the entity 'person1' was detected by the 'robot' robot camera
     Then information about the entity 'person1' was not detected by the 'robot2' robot camera
+
+Scenario: The robot detects more than one person
+    Given a map containing robots with camera components
+    And a robot with id 'robot' that has a camera component
+    And all the simulation robots has detection ability
+    And a camera event for robot 'robot' detect a 'person1' that is in the camera field of view
+    And a camera event for robot 'robot' detect a 'person4' that is in the camera field of view
+    When after run simulation
+    Then information about the entity 'person1' was detected by the 'robot' robot camera
+    Then information about the entity 'person4' was detected by the 'robot' robot camera
