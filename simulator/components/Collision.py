@@ -2,14 +2,12 @@ from typehints.component_types import Component
 
 
 class Collision(Component):
-    def __init__(self, other_entity, time, position):
+    def __init__(self):
         """The component keeps all the collisions of one entity."""
         self.collisions = {}
-        self.add_collision(other_entity, time, position)
 
     def add_collision(self, other_entity, time, position):
-        if other_entity not in self.collisions:
-            self.collisions[other_entity] = [time, position]
+        self.collisions[other_entity] = [time, position]
 
     def __str__(self):
         return f"Collisions: {self.collisions}"

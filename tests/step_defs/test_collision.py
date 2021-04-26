@@ -2,6 +2,8 @@ import pytest
 from pytest_bdd import scenarios, given, when, then, parsers
 from main import Simulator
 
+from simulator.components.Collision import Collision
+
 from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper
 from tests.helpers.AssertionHelper import AssertionHelper
 
@@ -38,6 +40,10 @@ def ability_to_collide(scenario_helper: ScenarioCreationHelper):
 @given("all the simulation robots has the ability to follow a path")
 def ability_to_follow_path(scenario_helper: ScenarioCreationHelper):
     scenario_helper.add_ability_to_follow_path()
+
+@given(parsers.parse("the '{robot}' has a collision component that stores the collision events"))
+def add_collision_component(scenario_helper, robot):
+    scenario_helper.add_collision_component(robot)
 
 @given(parsers.parse("a path from the '{robot}' to the '{collidable_wall}'"))
 def path_to_collidable_wall(scenario_helper: ScenarioCreationHelper, robot, collidable_wall):

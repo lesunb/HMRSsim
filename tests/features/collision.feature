@@ -13,6 +13,7 @@ Scenario: A collision event is received when a collision occurs
     Given a map with a collidable wall
     And all the simulations robots has the ability to collide with the wall
     And all the simulation robots has the ability to follow a path
+    And the 'robot' has a collision component that stores the collision events
     And a path from the 'robot' to the 'collidable_wall'
     When after run simulation
     Then the 'robot' collides with the 'collidable_wall'
@@ -21,6 +22,7 @@ Scenario: Two collision events is received when two collisions occurs
     Given a map with a collidable wall
     And all the simulations robots has the ability to collide with the wall
     And all the simulation robots has the ability to follow a path
+    And the 'robot' has a collision component that stores the collision events
     And a path from the 'robot' to the 'collidable_wall'
     And a path from the 'robot' to the 'second_collidable_wall'
     When after run simulation
@@ -31,6 +33,8 @@ Scenario: Two collision events is received when two differents robots collides w
     Given a map with a collidable wall
     And all the simulations robots has the ability to collide with the wall
     And all the simulation robots has the ability to follow a path
+    And the 'robot' has a collision component that stores the collision events
+    And the 'robot2' has a collision component that stores the collision events
     And a path from the 'robot' to the 'collidable_wall'
     And a path from the 'robot2' to the 'second_collidable_wall'
     When after run simulation

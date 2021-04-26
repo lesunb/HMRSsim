@@ -2,6 +2,7 @@ from typing import List
 from simulator.components.Camera import Camera
 from simulator.components.Claw import Claw
 from simulator.components.Script import Script
+from simulator.components.Collision import Collision
 from simulator.systems.GotoDESProcessor import GotoPoiEventTag, GotoPoiPayload, GotoPosEventTag, GotoPosPayload
 from simulator.systems.PathProcessor import PathProcessor
 from simulator.systems.MovementProcessor import MovementProcessor
@@ -96,6 +97,9 @@ class ScenarioCreationHelper(TestHelper):
         """Adds the systems responsible for collisions and for checking if collisions have occurred."""
         self.simulation.add_system(CollisionProcessor())
         self.simulation.add_des_system((collisionDetector.process,))
+
+    def add_collision_component(self, drawio_id):
+        self.add_component(Collision(), drawio_id)
 
     def add_claw_ability(self, drawio_id):
         """Adds the component responsible for grab pickables."""
