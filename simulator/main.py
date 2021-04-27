@@ -24,8 +24,6 @@ stream = open(fileName)
 loggerConfig = yaml.safe_load(stream)
 logging.config.dictConfig(loggerConfig)
 logger = getLogger(__name__)
-
-
 """Format for all DES events added to Stores.
 
 Events are created by systems to exchange messages with other systems.
@@ -55,7 +53,7 @@ class Simulator:
 
     Attributes:
         CONFIG: str -- Either the path to the config file or 'dict object' if the config was passed via dict
-        FPS: int -- Speed of step in non-DES systems. Default is 60.
+        FPS: int -- Speed of step in non-DES systems. If missing, no non-DES system is executed
         DEFAULT_LINE_WIDTH: int -- Line width for draw.io models. Might affect size width of objects. Default is 10px.
         DURATION: int -- Optional. Duration of the simulation in seconds.
                          After DURATION seconds the simulation loops exits, but events in the queue are still processed,
@@ -67,29 +65,34 @@ class Simulator:
         Load simulation parameters from config.
         Create simulation objects from map, populating them with components.
         """
-        logger.info('========== SIMULATION LOADING ==========')
+        self.build_report = []
+        self.build_report.append('========== SIMULATION LOADING ==========')
         self.CONFIG = 'simulation.json' if config is None else config
         if type(self.CONFIG) == str:
             with open(self.CONFIG) as fd:
                 config = json.load(fd)
         else:
             self.CONFIG = 'dict object'
-        logger.info(f'Loading simulation from {self.CONFIG}')
+        self.build_report.append(f'Loading simulation from {self.CONFIG}')
 
-        self.FPS = config.get('FPS', 60)
+        self.FPS = config.get('FPS', 0)
+        if self.FPS < 0:
+            logger.warning(f'WARNING: FPS value should not be negative')
+            self.build_report.append(f'WARNING: FPS value should not be negative')
+            self.FPS = 0
         self.DEFAULT_LINE_WIDTH = config.get('DLW', 10)
         self.DURATION = config.get('duration', -1)
 
         context = config.get('context', '.')
-        logger.info(f'Context is {context}')
+        self.build_report.append(f'Context is {context}')
         if context != '.':
             import_external_component(context)
         if 'map' in config:
             file = pathlib.Path(context) / config.get('map')
-            logger.info(f'Using simulation map {file}')
+            self.build_report.append(f'Using simulation map {file}')
             simulation = map_parser.build_simulation_from_map(file)
         else:
-            logger.info('No map found in the configuration. Creating empty simulation.')
+            self.build_report.append('No map found in the configuration. Creating empty simulation.')
             simulation = map_parser.build_simulation_from_map(context, True)
         self.world: esper.World = simulation['world']
         # self.window = simulation['window']
@@ -102,7 +105,7 @@ class Simulator:
 
         extra_entities = config.get('extraEntities', None)
         if extra_entities is not None:
-            logger.info(f'Loading extra entities from config')
+            self.build_report.append(f'Loading extra entities from config')
             extras = 0
             for entity_definition in extra_entities:
                 ent_id = entity_definition.get('entId', f'extraEntity_{extras}')
@@ -120,9 +123,11 @@ class Simulator:
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
         self.cleanups: typing.List[CleanupFunction] = [cleanup]
-        logger.info('===== SIMULATION LOADING COMPLETE =====')
-        self.build_report = []
+        self.build_report.append('========== SIMULATION LOADING COMPLETE ==========')
         self.generate_simulation_build_report()
+        self.verbose = config.get('verbose', False)
+        if self.verbose:
+            print('\n'.join(map(str.strip, self.build_report)))
 
     def generate_simulation_build_report(self):
         self.build_report.append(f'Simulation {self.simulation_name}\n')
@@ -162,6 +167,9 @@ class Simulator:
         These events inherit from esper.Processor and are executed at every simulation step.
         An argument kwargs: SystemArgs will be passed to these processors.
         """
+        if self.FPS == 0:
+            logger.warning(f'Adding non-DES system {system}, but FPS was not given. System is useless.')
+            self.build_report.append(f'WARNING: Useless non-DES system {system} because no FPS was provided.')
         self.world.add_processor(system)
 
     def add_entity(self, entity_definition: EntityDefinition, ent_id: str):
@@ -182,15 +190,18 @@ class Simulator:
         process_esper_systems = self.world.process
         kill_switch = self.KWARGS['_KILL_SWITCH']
         sleep = self.ENV.timeout
-        sleep_interval = 1.0 / self.FPS
+        sleep_interval = 1.0 / self.FPS if self.FPS > 0 else None
         # Collect info
         # Other processors
         while not self.EXIT:
             start = datetime.now()
-            process_esper_systems(self.KWARGS)
+            if sleep_interval:
+                process_esper_systems(self.KWARGS)
             # # ticks on the clock
-            # TODO: find a way to work 100% DES
-            switch = yield kill_switch | sleep(sleep_interval, False)
+            if sleep_interval:
+                switch = yield kill_switch | sleep(sleep_interval, False)
+            else:
+                switch = yield kill_switch
             if kill_switch in switch:
                 break
         logger.debug(f'simulation loop exited')

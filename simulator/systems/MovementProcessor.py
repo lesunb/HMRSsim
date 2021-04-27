@@ -16,8 +16,8 @@ class MovementProcessor(esper.Processor):
         self.maxy = maxy
         self.sector_size = sector_size
         self.logger = logging.getLogger(__name__)
-        # self.total = timedelta()
-        # self.runs = 0
+        self.total = timedelta()
+        self.runs = 0
 
     def process(self, env):
         logger = logging.getLogger(__name__)
