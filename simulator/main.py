@@ -13,6 +13,8 @@ import yaml
 import typing
 import map_parser
 
+from datetime import datetime, timedelta
+
 from simulator.components.Inventory import Inventory
 from utils.create_components import initialize_components, import_external_component
 from typehints.dict_types import SystemArgs, Config, EntityDefinition
@@ -22,8 +24,6 @@ stream = open(fileName)
 loggerConfig = yaml.safe_load(stream)
 logging.config.dictConfig(loggerConfig)
 logger = getLogger(__name__)
-
-
 """Format for all DES events added to Stores.
 
 Events are created by systems to exchange messages with other systems.
@@ -53,7 +53,7 @@ class Simulator:
 
     Attributes:
         CONFIG: str -- Either the path to the config file or 'dict object' if the config was passed via dict
-        FPS: int -- Speed of step in non-DES systems. Default is 60.
+        FPS: int -- Speed of step in non-DES systems. If missing, no non-DES system is executed
         DEFAULT_LINE_WIDTH: int -- Line width for draw.io models. Might affect size width of objects. Default is 10px.
         DURATION: int -- Optional. Duration of the simulation in seconds.
                          After DURATION seconds the simulation loops exits, but events in the queue are still processed,
@@ -65,29 +65,34 @@ class Simulator:
         Load simulation parameters from config.
         Create simulation objects from map, populating them with components.
         """
-        logger.info('========== SIMULATION LOADING ==========')
+        self.build_report = []
+        self.build_report.append('========== SIMULATION LOADING ==========')
         self.CONFIG = 'simulation.json' if config is None else config
         if type(self.CONFIG) == str:
             with open(self.CONFIG) as fd:
                 config = json.load(fd)
         else:
             self.CONFIG = 'dict object'
-        logger.info(f'Loading simulation from {self.CONFIG}')
+        self.build_report.append(f'Loading simulation from {self.CONFIG}')
 
-        self.FPS = config.get('FPS', 60)
+        self.FPS = config.get('FPS', 0)
+        if self.FPS < 0:
+            logger.warning(f'WARNING: FPS value should not be negative')
+            self.build_report.append(f'WARNING: FPS value should not be negative')
+            self.FPS = 0
         self.DEFAULT_LINE_WIDTH = config.get('DLW', 10)
         self.DURATION = config.get('duration', -1)
 
         context = config.get('context', '.')
-        logger.info(f'Context is {context}')
+        self.build_report.append(f'Context is {context}')
         if context != '.':
             import_external_component(context)
         if 'map' in config:
             file = pathlib.Path(context) / config.get('map')
-            logger.info(f'Using simulation map {file}')
+            self.build_report.append(f'Using simulation map {file}')
             simulation = map_parser.build_simulation_from_map(file)
         else:
-            logger.info('No map found in the configuration. Creating empty simulation.')
+            self.build_report.append('No map found in the configuration. Creating empty simulation.')
             simulation = map_parser.build_simulation_from_map(context, True)
         self.world: esper.World = simulation['world']
         # self.window = simulation['window']
@@ -100,7 +105,7 @@ class Simulator:
 
         extra_entities = config.get('extraEntities', None)
         if extra_entities is not None:
-            logger.info(f'Loading extra entities from config')
+            self.build_report.append(f'Loading extra entities from config')
             extras = 0
             for entity_definition in extra_entities:
                 ent_id = entity_definition.get('entId', f'extraEntity_{extras}')
@@ -113,33 +118,36 @@ class Simulator:
         self.KWARGS: SystemArgs = {
             "ENV": self.ENV,
             "WORLD": self.world,
-            "_KILL_SWITCH": self.ENV.event(),
+            "_KILL_SWITCH": self.EXIT_EVENT,
             "EVENT_STORE": simpy.FilterStore(self.ENV),
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
         }
         self.cleanups: typing.List[CleanupFunction] = [cleanup]
+        self.build_report.append('========== SIMULATION LOADING COMPLETE ==========')
         self.generate_simulation_build_report()
+        self.verbose = config.get('verbose', False)
+        if self.verbose:
+            print('\n'.join(map(str.strip, self.build_report)))
 
     def generate_simulation_build_report(self):
-        logger.info('===== SIMULATION LOADING COMPLETE =====')
-        logger.info(f'Simulation {self.simulation_name}')
-        logger.info(f'===> Simulation components')
+        self.build_report.append(f'Simulation {self.simulation_name}\n')
+        self.build_report.append(f'===> Simulation components\n')
         for c in self.world.components_for_entity(1):
-            logger.info(c)
-        logger.info(f'{len(self.draw2ent)} entities created.')
-        logger.info(f'{len(self.objects)} typed objects transformed into entities')
-        logger.info(f'===> TYPED OBJECTS')
+            self.build_report.append(str(c) + '\n')
+        self.build_report.append(f'{len(self.draw2ent)} entities created.\n')
+        self.build_report.append(f'{len(self.objects)} typed objects transformed into entities\n')
+        self.build_report.append(f'===> TYPED OBJECTS\n')
         for k, v in self.draw2ent.items():
             if v[1].get('type', None) is None:
                 continue
-            logger.info(f'• {k} --> esper entity {v[0]}. (type {v[1].get("type", "")})')
+            self.build_report.append(f'• {k} --> esper entity {v[0]}. (type {v[1].get("type", "")})\n')
             ent = v[0]
             components = self.world.components_for_entity(ent)
-            logger.info(f'Entity has {len(components)} components.')
+            self.build_report.append(f'Entity has {len(components)} components.\n')
             for c in components:
-                logger.info(f'\t- {c}')
-        logger.info(f'===> Interactive objects')
-        logger.info(self.interactive)
+                self.build_report.append(f'\t- {c}\n')
+        self.build_report.append(f'===> Interactive objects\n')
+        self.build_report.append(str(self.interactive) + '\n')
 
     def add_des_system(self, system: DESSystem):
         """
@@ -159,13 +167,16 @@ class Simulator:
         These events inherit from esper.Processor and are executed at every simulation step.
         An argument kwargs: SystemArgs will be passed to these processors.
         """
+        if self.FPS == 0:
+            logger.warning(f'Adding non-DES system {system}, but FPS was not given. System is useless.')
+            self.build_report.append(f'WARNING: Useless non-DES system {system} because no FPS was provided.')
         self.world.add_processor(system)
 
     def add_entity(self, entity_definition: EntityDefinition, ent_id: str):
         """Add an entity from json to world."""
         initialized_components = initialize_components(entity_definition.get('components', {}))
         ent = self.world.create_entity(*initialized_components)
-        self.draw2ent[ent_id] = [ent, {}]
+        self.draw2ent[ent_id] = [ent, {'type': entity_definition['type']}]
         if entity_definition.get('isInteractive', False):
             self.interactive[entity_definition.get('name', ent_id)] = ent
         if entity_definition.get('isObject', False):
@@ -175,25 +186,31 @@ class Simulator:
         """
         The simulation loop
         """
+        # Local ref most used vars
+        process_esper_systems = self.world.process
+        kill_switch = self.KWARGS['_KILL_SWITCH']
+        sleep = self.ENV.timeout
+        sleep_interval = 1.0 / self.FPS if self.FPS > 0 else None
+        # Collect info
         # Other processors
         while not self.EXIT:
-            self.world.process(self.KWARGS)
+            start = datetime.now()
+            if sleep_interval:
+                process_esper_systems(self.KWARGS)
             # # ticks on the clock
-            # TODO: find a way to work 100% DES
-            if self.KWARGS["_KILL_SWITCH"] is not None:
-                switch = yield self.KWARGS["_KILL_SWITCH"] | self.ENV.timeout(1.0 / self.FPS, False)
-                if self.KWARGS["_KILL_SWITCH"] in switch:
-                    break
+            if sleep_interval:
+                switch = yield kill_switch | sleep(sleep_interval, False)
             else:
-                yield self.ENV.timeout(1.0 / self.FPS, False)
+                switch = yield kill_switch
+            if kill_switch in switch:
+                break
         logger.debug(f'simulation loop exited')
-        self.EXIT_EVENT.succeed()
 
     def run(self):
         """
         Runs the simulation.
         Simulation continues for DURATION seconds, if DURATION is specified.
-        Simulation exits on EXIT_EVENT or if _KILL_SWITCH event is triggered.
+        Simulation exits on EXIT_EVENT (or if _KILL_SWITCH, they're the same) event is triggered.
         After simulation loop terminates, ALL cleanup functions are executed,
         the last being the user defined one, if present.
         """

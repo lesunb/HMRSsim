@@ -25,7 +25,7 @@ def build_object(cell, world, window_options, draw2entity):
             components.append(component)
     hover = Hover()
     vel = Velocity()
-    sensor = ProximitySensor(10, 'drone_sensor')
+    sensor = ProximitySensor(8, 'drone_sensor')
     components += [hover, vel, sensor]
     for c in components:
         world.add_component(ent, c)

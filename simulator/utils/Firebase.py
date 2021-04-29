@@ -13,5 +13,6 @@ db = firebase.database()
 
 
 def clean_old_simulation(namespace: str):
-    """Clean previous simulation from firebase."""
-    return db.child(namespace).child('live_report').remove()
+    """Clean previous simulation from firebase"""
+    db.child(namespace).child('live_report').remove()
+    db.child(namespace).child('logs').remove()

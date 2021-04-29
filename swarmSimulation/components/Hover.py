@@ -3,9 +3,10 @@ import enum
 
 
 class HoverState(enum.Enum):
-    HOVERING = 'hovering',
-    MOVING = 'moving',
-    LANDED = 'landed'
+    HOVERING = '#2e8B57',
+    MOVING = '#ffd700',
+    LANDED = '#708090',
+    CRASHED = '#ff0000',
 
 
 class Hover(Component):
@@ -15,6 +16,7 @@ class Hover(Component):
                  target: Point = None):
         self.status = status
         self.target = target
+        self.crowded = []
 
     def __str__(self):
         return f'Hover[status: {self.status}; target: {self.target}]'

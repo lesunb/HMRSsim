@@ -61,15 +61,18 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
         msg_idx += 1
         # Scan simulation situation every scan_interval seconds and report
         last_round: dict = {}
+        # Local ref most used functions
+        get_components = world.get_components
+        sleep = env.timeout
         while True:
 
             new_message = {
-                "timestamp": env.now
+                "timestamp": round(float(env.now), 3)
             }
-            for ent, (skeleton, position) in world.get_components(Skeleton, Position):
+            for ent, (skeleton, position) in get_components(Skeleton, Position):
                 if ent == 1:  # Entity 1 is the entire model
                     continue
-                elif last_round.get(ent, (0, None))[0] != 0 and not position.changed:
+                elif last_round.get(ent, (0, None))[0] != 0 and not position.changed and not skeleton.changed:
                     last_round[ent] = (2, skeleton.id)
                     continue
 
@@ -81,10 +84,10 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
                     'height': position.h,
                     'style': skeleton.style
                 }
-
                 new_message[skeleton.id] = data
                 last_round[ent] = (2, skeleton.id)
                 position.changed = False
+                skeleton.changed = False
             # Check for deleted entities
             deleted = []
             for k, v in last_round.items():
@@ -97,7 +100,7 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
             # Add message to queue
             message_buffer.put((new_message, msg_idx))
             msg_idx += 1
-            yield env.timeout(scan_interval)
+            yield sleep(scan_interval)
 
     def clean():
         message_buffer.put(({"theEnd": True}, -1))

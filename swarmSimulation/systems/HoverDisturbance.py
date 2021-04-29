@@ -14,16 +14,21 @@ def init(disturbance_interval=1, prob_disturbance=0.2, max_disturbance=0.5):
         env = kwargs.get('ENV', None)
         if env is None:
             raise Exception("Can't find eventStore")
+        # Local ref most used functions for performance
+        get_components = world.get_components
+        sleep = env.timeout
+        prob = random.random
+        #
         while True:
-            for ent, (hover, velocity) in world.get_components(Hover, Velocity):
+            for ent, (hover, velocity) in get_components(Hover, Velocity):
                 if hover.status != HoverState.HOVERING:
                     continue
-                if random.random() < prob_disturbance:
-                    disturbance = random.random() % max_disturbance
-                    flip = random.random() < 0.5
-                    if random.random() < 0.5:
+                if prob() < prob_disturbance:
+                    disturbance = prob() % max_disturbance
+                    flip = prob() < 0.5
+                    if prob() < 0.5:
                         velocity.x += (disturbance if not flip else -disturbance)
                     else:
                         velocity.y += (disturbance if not flip else -disturbance)
-            yield env.timeout(disturbance_interval)
+            yield sleep(disturbance_interval)
     return process
