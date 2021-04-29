@@ -18,10 +18,21 @@ class MovementProcessor(esper.Processor):
         self.logger = logging.getLogger(__name__)
         self.total = timedelta()
         self.runs = 0
+        self.created_tiles = False
 
     def process(self, env):
         logger = logging.getLogger(__name__)
         # start = datetime.now()
+
+        # The Movement Processor is responsible for managing the tiling of the simulation
+        # When it starts (which is after the simulation is loaded) it will initialize the sector
+        # Of all entities that have a position
+        # This is done just once in the first execution
+        if not self.created_tiles:
+            for ent, (pos,) in self.world.get_components(Position):
+                pos.sector = ((pos.y // self.sector_size) * self.maxx) + (pos.x // self.sector_size)
+            self.created_tiles = True
+
         # This will iterate over every Entity that has BOTH of these components:
         for ent, (vel, pos) in self.world.get_components(Velocity, Position):
             # old = pos.center # DEBUG
@@ -51,3 +62,6 @@ class MovementProcessor(esper.Processor):
         # self.total += end - start
         # if self.runs % 50 == 0:
         #     logger.debug(f'runs: {self.runs}; total: {self.total}; avg = {self.total / self.runs}')
+
+    def add_sector_info(self, pos: Position):
+        pos.sector = ((pos.y // self.sector_size) * self.maxx) + (pos.x // self.sector_size)

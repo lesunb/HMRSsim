@@ -129,7 +129,8 @@ def drop_object(obj_name, me):
             ObjectManager.ObjectManagerOps.RECREATE,
             skeleton,
             drop_offset,
-            reply_channel
+            reply_channel,
+            pos.sector
         )
         _EVENT_STORE.put(EVENT(ObjectManager.ManagerTag, drop_payload))
         # Wait for reply
