@@ -1,5 +1,5 @@
 from simulator.components.ApproximationHistory import ApproximationHistory
-from simulator.components.Collision import Collision
+from simulator.components.CollisionHistory import CollisionHistory
 from simulator.components.Position import Position
 from simulator.components.Camera import Camera
 from tests.helpers.TestHelper import TestHelper
@@ -11,7 +11,7 @@ class AssertionHelper(TestHelper):
 
     def have_collided(self, entity_id: str, other_entity_id: str):
         """Assert that a collision has occurred between the entity and the other_entity."""
-        collision = self.get_component(Collision, entity_id)
+        collision = self.get_component(CollisionHistory, entity_id)
         other_id = self.cast_id(other_entity_id)
 
         if collision and other_id in collision.collisions:

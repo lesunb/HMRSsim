@@ -1,6 +1,6 @@
 from main import Simulator
 from simulator.components.Position import Position
-from simulator.components.Collision import Collision
+from simulator.components.CollisionHistory import CollisionHistory
 from simulator.components.Map import Map
 from typehints.component_types import Component
 
@@ -108,13 +108,13 @@ class TestHelper:
             return world_map.pois.get(poi_tag, None)
         return None
 
-    def get_collision(self, entity_id: str, other_entity_id: str) -> Collision:
+    def get_collision(self, entity_id: str, other_entity_id: str) -> CollisionHistory:
         """
         Gets the collision event that occurred between the entity and the other_entity.
 
         - entity_id, other_entity_id: the property id of the element (drawio file).
         """
-        collision = self.get_component(Collision, entity_id)
+        collision = self.get_component(CollisionHistory, entity_id)
         other_entity_id = self.cast_id(other_entity_id)
 
         if collision and other_entity_id in collision.collisions:

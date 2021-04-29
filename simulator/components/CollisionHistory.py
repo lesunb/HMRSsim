@@ -1,7 +1,7 @@
 from typehints.component_types import Component
 
 
-class Collision(Component):
+class CollisionHistory(Component):
     def __init__(self):
         """The component keeps all the collisions of one entity."""
         self.collisions = {}
