@@ -2,20 +2,21 @@ from typing import List
 from simulator.components.Camera import Camera
 from simulator.components.Claw import Claw
 from simulator.components.Script import Script
-from simulator.components.Collision import Collision
+from simulator.components.CollisionHistory import CollisionHistory
 from simulator.systems.GotoDESProcessor import GotoPoiEventTag, GotoPoiPayload, GotoPosEventTag, GotoPosPayload
 from simulator.systems.PathProcessor import PathProcessor
 from simulator.systems.MovementProcessor import MovementProcessor
 import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.ClawDESProcessor as ClawProcessor
 import simulator.systems.ScriptEventsDES as ScriptSystem
-import simulator.systems.CollisionDetectorDESProcessor as collisionDetector
+import simulator.systems.StopCollisionDESProcessor as stopCollision
 from simulator.systems.CameraProcessor import process_camera_event
 import simulator.systems.SensorSystem as SensorSystem
 from simpy import Store
 import simulator.systems.ApproximationDESProcessor as ApproximationProcessor
 import simulator.systems.ManageObjects as ObjectManager
 from simulator.systems.CollisionProcessor import CollisionProcessor
+import simulator.systems.SeerPlugin as Seer
 from simulator.components.Path import Path
 from simulator.components.Map import Map
 from typehints.component_types import EVENT
@@ -96,10 +97,10 @@ class ScenarioCreationHelper(TestHelper):
     def add_ability_to_collide(self):
         """Adds the systems responsible for collisions and for checking if collisions have occurred."""
         self.simulation.add_system(CollisionProcessor())
-        self.simulation.add_des_system((collisionDetector.process,))
+        self.simulation.add_des_system((stopCollision.process,))
 
     def add_collision_component(self, drawio_id):
-        self.add_component(Collision(), drawio_id)
+        self.add_component(CollisionHistory(), drawio_id)
 
     def add_claw_ability(self, drawio_id):
         """Adds the component responsible for grab pickables."""
@@ -207,6 +208,5 @@ class ScenarioCreationHelper(TestHelper):
         command = f"Drop {pickable_name}"
         self.add_command(command, drawio_id)
 
-    def add_firebase_seer(self):
-        pass
-    # TODO: Add seer and firebase to the scenario helper.
+    def add_seer(self, consumer):
+        self.simulation.add_des_system(Seer.init([consumer], 0.05, False),)
