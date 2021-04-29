@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.org/lesunb/HMRSsim.svg?branch=master)](https://travis-ci.org/lesunb/HMRSsim)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b9b2abf80de34584a596147b099f4473)](https://app.codacy.com/gh/gabrielsr/hmrssim?utm_source=github.com&utm_medium=referral&utm_content=gabrielsr/hmrssim&utm_campaign=Badge_Grade_Settings)
-[![Build Status](https://travis-ci.org/gabrielsr/hmrssim.svg?branch=master)](https://travis-ci.org/gabrielsr/hmrssim)
-[![codecov](https://codecov.io/gh/gabrielsr/hmrssim/branch/master/graph/badge.svg)](https://codecov.io/gh/gabrielsr/hmrssim)
+[![codecov](https://codecov.io/gh/lesunb/hmrssim/branch/master/graph/badge.svg)](https://codecov.io/gh/lesunb/hmrssim)
 
 Heterogeneous Multi-Robots Systems Simulator
 ======================================================
