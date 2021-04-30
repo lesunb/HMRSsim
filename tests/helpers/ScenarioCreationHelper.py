@@ -80,19 +80,19 @@ class ScenarioCreationHelper(TestHelper):
         event_store = self.simulation.KWARGS['EVENT_STORE']
         event_store.put(new_event)
 
-    def add_ability_to_follow_path(self):
+    def add_ability_to_follow_path(self, sector_size=50):
         """Adds the systems responsible for guiding the robot through a drawio arrow."""
         width, height = self.simulation.window_dimensions
         self.simulation.add_system(PathProcessor())
-        self.simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height))
+        self.simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height, sector_size=sector_size))
 
-    def add_ability_to_navigate(self):
+    def add_ability_to_navigate(self, sector_size=50):
         """Adds the systems responsible for Go to a specific POI or Position."""
         NavigationSystemProcess = NavigationSystem.init()
         self.simulation.add_des_system((NavigationSystemProcess,))
         width, height = self.simulation.window_dimensions
         self.simulation.add_system(PathProcessor())
-        self.simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height))
+        self.simulation.add_system(MovementProcessor(minx=0, miny=0, maxx=width, maxy=height, sector_size=sector_size))
 
     def add_ability_to_collide(self):
         """Adds the systems responsible for collisions and for checking if collisions have occurred."""

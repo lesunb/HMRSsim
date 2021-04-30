@@ -7,7 +7,7 @@ from simulator.components.Path import Path
 from typehints.dict_types import SystemArgs
 
 from typehints.component_types import EVENT
-from systems.PathProcessor import EndOfPathTag, EndOfPathPayload
+from simulator.systems.PathProcessor import EndOfPathTag, EndOfPathPayload
 StopEventTag = 'stopEvent'
 GenericCollisionTag = 'genericCollision'
 
