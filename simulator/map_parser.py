@@ -5,15 +5,15 @@ import logging
 import os
 import pathlib
 
-import resources.load_resources as loader
+import simulator.resources.load_resources as loader
 import mxCellDecoder as mxCellDecoder
 
-from dynamic_builders import export_available_builders
-from utils.create_components import initialize_components
+from simulator.dynamic_builders import export_available_builders
+from simulator.utils.create_components import initialize_components
 from simulator.components.Inventory import Inventory
 from simulator.components.Skeleton import Skeleton
 from xml.etree.ElementTree import Element
-from typehints.build_types import WindowOptions, DependencyNotFound
+from simulator.typehints.build_types import WindowOptions, DependencyNotFound
 from typing import List, Tuple
 
 

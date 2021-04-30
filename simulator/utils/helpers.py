@@ -1,9 +1,9 @@
 import math
 import os
 import importlib
-import primitives
+from simulator import primitives
 from collision import Vector
-from typehints.component_types import ShapeDefinition, Point
+from simulator.typehints.component_types import ShapeDefinition, Point
 from typing import Union, List, Dict
 from pathlib import Path
 
