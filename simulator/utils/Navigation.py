@@ -1,4 +1,4 @@
-from typehints.component_types import Point
+from simulator.typehints.component_types import Point
 from typing import NamedTuple, List, Dict
 import math
 
