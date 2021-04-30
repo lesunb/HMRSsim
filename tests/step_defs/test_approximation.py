@@ -1,6 +1,6 @@
 import pytest
 from pytest_bdd import scenarios, given, when, then, parsers
-from main import Simulator
+from simulator.main import Simulator
 
 from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper
 from tests.helpers.AssertionHelper import AssertionHelper
@@ -56,7 +56,7 @@ def pass_through_pois(scenario_helper: ScenarioCreationHelper, robot, pois_tag):
 
 @given(parsers.parse("a camera event for robot '{robot}' detect a '{person}' that is in the camera field of view"))
 def add_event_to_detect_person3(scenario_helper: ScenarioCreationHelper, robot, person):
-    scenario_helper.add_camera_detection_event(robot, person) # TODO: mudar o nome dessas pessoas
+    scenario_helper.add_camera_detection_event(robot, person)
 
 @given(parsers.parse("a camera event for robot '{robot}' detect a '{person}' that is not in the camera field of view"))
 def add_event_to_detect_person2(scenario_helper: ScenarioCreationHelper, robot, person):

@@ -1,6 +1,6 @@
 import pytest
 from pytest_bdd import scenarios, given, when, then, parsers
-from main import Simulator
+from simulator.main import Simulator
 
 from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper
 from tests.helpers.AssertionHelper import AssertionHelper

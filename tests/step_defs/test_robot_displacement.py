@@ -1,7 +1,7 @@
 import pytest
 from pytest_bdd import scenarios, given, when, then
 
-from main import Simulator
+from simulator.main import Simulator
 from simulator.components.Map import Map
 
 from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper

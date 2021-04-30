@@ -1,5 +1,5 @@
 from simpy import Store
-from typehints.component_types import Component
+from simulator.typehints.component_types import Component
 
 
 class ProximitySensor(Component):

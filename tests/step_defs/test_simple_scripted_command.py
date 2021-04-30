@@ -2,7 +2,7 @@ import pytest
 from pytest_bdd import scenarios, given, when, then, parsers
 from tests.helpers.ScenarioCreationHelper import ScenarioCreationHelper
 from tests.helpers.AssertionHelper import AssertionHelper
-from main import Simulator
+from simulator.main import Simulator
 
 @pytest.fixture
 def scenario_helper(simulation):
