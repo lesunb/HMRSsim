@@ -46,16 +46,14 @@ def init(sensor_type, frequency):
                     (center_x - sensor_range, center_y + sensor_range)
                 ]
                 col = Collidable([(pos.center, points)])
-                # closeEntities = []
-                # for otherEnt, (otherCol, otherPos) in get_components(Collidable, Position):
-                #     if ent == otherEnt:
-                        # continue
-                    # for s1 in otherCol.shapes:
-                        # if collide(col.shapes[0], s1):
-                        #     closeEntities.append(CloseEntity(otherEnt, otherPos))
-                        #     break
-                other_ents_and_components = get_components(Collidable, Position)
-                closeEntities = [CloseEntity(x[0], x[1][1]) if x != ent else None for x in other_ents_and_components]
+                closeEntities = []
+                for otherEnt, (otherCol, otherPos) in get_components(Collidable, Position):
+                    if ent == otherEnt:
+                        continue
+                    for s1 in otherCol.shapes:
+                        if collide(col.shapes[0], s1):
+                            closeEntities.append(CloseEntity(otherEnt, otherPos))
+                            break
                 if closeEntities:
                     event = EVENT('SensorEvent', SensorPayload(ent, pos, vel, closeEntities))
                     sensor.reply_channel.put(event)
