@@ -1,5 +1,5 @@
 import math
-import utils.helpers as helpers
+import simulator.utils.helpers as helpers
 from typehints.component_types import Component, Point
 
 
