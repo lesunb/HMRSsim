@@ -1,6 +1,6 @@
 from enum import Enum
-from typehints.component_types import Component
-from typehints.dict_types import SystemArgs
+from simulator.typehints.component_types import Component
+from simulator.typehints.dict_types import SystemArgs
 from typing import List, Dict, Callable, NamedTuple
 
 ErrorHandler = Callable[[NamedTuple, SystemArgs], None]

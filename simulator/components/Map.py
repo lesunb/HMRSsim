@@ -4,9 +4,9 @@ The simulator will have a Map component available.
 Maps have nodes and pois (points of interest).
 The Nodes can be used to find a suitable route to a specific position or poi.
 """
-from typehints.component_types import Component, Point
+from simulator.typehints.component_types import Component, Point
 from typing import List, Dict
-from utils.Navigation import Node, POI
+from simulator.utils.Navigation import Node, POI
 
 
 class Map(Component):

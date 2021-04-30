@@ -11,7 +11,7 @@ import logging.config
 import yaml
 
 import typing
-import map_parser
+from simulator import map_parser
 
 from datetime import datetime, timedelta
 
