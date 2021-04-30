@@ -6,7 +6,7 @@ import os
 import pathlib
 
 import simulator.resources.load_resources as loader
-import mxCellDecoder as mxCellDecoder
+from simulator import mxCellDecoder as mxCellDecoder
 
 from simulator.dynamic_builders import export_available_builders
 from simulator.utils.create_components import initialize_components
