@@ -37,7 +37,7 @@ def ability_to_collide(scenario_helper: ScenarioCreationHelper):
 
 @given("all the simulation robots has the ability to follow a path")
 def ability_to_follow_path(scenario_helper: ScenarioCreationHelper):
-    scenario_helper.add_ability_to_follow_path(110)
+    scenario_helper.add_ability_to_follow_path(105)
 
 @given(parsers.parse("the '{robot}' has a collision component that stores the collision events"))
 def add_collision_component(scenario_helper, robot):

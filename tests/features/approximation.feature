@@ -50,16 +50,3 @@ Scenario: Multi-robots searches for specifics persons
     Then the 'robot' approximated the 'person3'
     Then the 'robot2' approximated the 'person2'
     Then the 'robot3' did not approximated the 'person1'
-
-Scenario: The robot approaches all detected people
-    Given a map containing robots with camera components
-    And a robot with id 'robot' that has a camera component
-    And all the simulation robots has detection ability
-    And all the simulation robots has approximation ability
-    And all the simulation robots has the ability to navigate
-    And the 'robot' robot pass through POIs 'intersection1, intersection2, patientRoom2, patientRoom3, patientRoom4, intersection2, robotHome'
-    And a camera event for robot 'robot' detect a 'person3' that is in the camera field of view
-    And a camera event for robot 'robot' detect a 'person1' that is in the camera field of view
-    When after run simulation
-    Then the 'robot' approximated the 'person3'
-    Then the 'robot' approximated the 'person1'
