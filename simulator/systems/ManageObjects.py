@@ -5,7 +5,6 @@ from simulator.typehints.dict_types import SystemArgs
 from enum import Enum
 from simpy import FilterStore, Store
 from esper import World
-from pyglet.graphics import Batch
 
 from simulator.components.Position import Position
 from simulator.components.Inventory import Inventory
@@ -33,14 +32,12 @@ ManagerTag = 'ManagerEventTag'
 
 __event_store: FilterStore
 __world: World
-__batch: Batch
 __window_options = Tuple[Tuple[int, int], int]
 
 
 def process(kwargs: SystemArgs):
     global __world
     global __event_store
-    global __batch
     global __window_options
     __event_store = kwargs.get('EVENT_STORE', None)
     __world = kwargs.get('WORLD', None)
