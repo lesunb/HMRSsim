@@ -1,8 +1,8 @@
-from main import Simulator
+from simulator.main import Simulator
 from simulator.components.Position import Position
 from simulator.components.CollisionHistory import CollisionHistory
 from simulator.components.Map import Map
-from typehints.component_types import Component
+from simulator.typehints.component_types import Component
 
 class TestHelper:
     def __init__(self, simulation: Simulator):
