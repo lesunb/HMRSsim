@@ -4,8 +4,8 @@ import logging
 from typing import NamedTuple, List, Union, Callable
 
 from simulator.components.Map import Map
-from typehints.component_types import Point
-from typehints.dict_types import SystemArgs
+from simulator.typehints.component_types import Point
+from simulator.typehints.dict_types import SystemArgs
 
 from simpy import FilterStore
 
