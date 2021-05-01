@@ -2,7 +2,7 @@ import json
 from esper import World
 
 from simulator import dynamic_importer
-import mxCellDecoder
+from simulator import mxCellDecoder
 
 TYPE = 'robot'
 
