@@ -1,11 +1,11 @@
-import primitives as primitives
+from simulator import primitives as primitives
 from simulator.components.Collidable import Collidable
 from simulator.components.Position import Position
 from simulator.components.Velocity import Velocity
 from simulator.utils.helpers import parse_style
 
 from typing import Tuple, List
-from typehints.component_types import Component
+from simulator.typehints.component_types import Component
 
 MODEL = 'default'
 
