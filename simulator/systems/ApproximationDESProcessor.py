@@ -5,7 +5,7 @@ from simulator.components.Camera import Camera
 from simulator.components.ApproximationHistory import ApproximationHistory
 from simulator.systems.PathProcessor import EndOfApproximationTag
 from simulator.components.Position import Position
-from typehints.dict_types import SystemArgs
+from simulator.typehints.dict_types import SystemArgs
 from simulator.systems.CameraProcessor import DetectedPayload
 from simulator.systems.GotoDESProcessor import GotoPosEventTag, GotoPosPayload
 from simulator.typehints.component_types import EVENT

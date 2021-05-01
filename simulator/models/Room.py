@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from typehints.component_types import Component, ShapeDefinition
+from simulator.typehints.component_types import Component, ShapeDefinition
 from xml.etree.ElementTree import Element
 from simulator.components.Collidable import Collidable
 from simulator.components.Position import Position
