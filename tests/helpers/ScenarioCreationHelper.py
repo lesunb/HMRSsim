@@ -19,7 +19,7 @@ from simulator.systems.CollisionProcessor import CollisionProcessor
 import simulator.systems.SeerPlugin as Seer
 from simulator.components.Path import Path
 from simulator.components.Map import Map
-from typehints.component_types import EVENT
+from simulator.typehints.component_types import EVENT
 from tests.helpers.TestHelper import TestHelper
 
 class ScenarioCreationHelper(TestHelper):
