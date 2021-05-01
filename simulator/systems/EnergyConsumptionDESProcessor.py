@@ -1,5 +1,5 @@
 from typing import NamedTuple
-from typehints.dict_types import SystemArgs
+from simulator.typehints.dict_types import SystemArgs
 
 from simpy import Environment
 from esper import World

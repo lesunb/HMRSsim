@@ -1,6 +1,6 @@
 from typing import NamedTuple, Tuple
 
-from typehints.dict_types import SystemArgs
+from simulator.typehints.dict_types import SystemArgs
 
 from enum import Enum
 from simpy import FilterStore, Store
@@ -11,7 +11,7 @@ from simulator.components.Position import Position
 from simulator.components.Inventory import Inventory
 from simulator.components.Pickable import Pickable
 
-from mxCellDecoder import parse_object
+from simulator.mxCellDecoder import parse_object
 
 import logging
 

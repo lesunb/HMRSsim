@@ -1,7 +1,7 @@
 import esper
 import logging
 from typing import NamedTuple
-from typehints.dict_types import SystemArgs
+from simulator.typehints.dict_types import SystemArgs
 
 from simpy import FilterStore
 
@@ -10,7 +10,7 @@ from simulator.components.Position import Position
 from simulator.components.Velocity import Velocity
 from simulator.components.ApproximationHistory import ApproximationHistory
 from typing import List
-from typehints.component_types import Point, EVENT
+from simulator.typehints.component_types import Point, EVENT
 
 
 EndOfPathPayload = NamedTuple('EndOfPathPayload', [('ent', int), ('timestamp', str), ('path', List[Point])])

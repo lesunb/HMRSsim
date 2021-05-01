@@ -1,8 +1,8 @@
 import logging
 
 from datetime import datetime, timedelta
-from typehints.dict_types import SystemArgs
-from typehints.component_types import EVENT
+from simulator.typehints.dict_types import SystemArgs
+from simulator.typehints.component_types import EVENT
 from typing import NamedTuple, List
 from simulator.components.Position import Position
 from simulator.components.Velocity import Velocity

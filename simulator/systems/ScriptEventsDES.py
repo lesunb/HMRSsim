@@ -1,11 +1,11 @@
 from typing import NamedTuple, List, Tuple, Callable
-from typehints.dict_types import SystemArgs
+from simulator.typehints.dict_types import SystemArgs
 
 from esper import World
 from simpy import FilterStore, Environment
 import logging
 
-from typehints.component_types import EVENT, ERROR
+from simulator.typehints.component_types import EVENT, ERROR
 from simulator.systems.PathProcessor import EndOfPathTag, EndOfApproximationTag
 
 import simulator.components.Script as scriptComponent

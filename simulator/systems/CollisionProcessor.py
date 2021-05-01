@@ -6,8 +6,8 @@ from simulator.components.Velocity import Velocity
 from simulator.components.Collidable import Collidable
 from simulator.components.Position import Position
 from typing import NamedTuple
-from typehints.dict_types import SystemArgs
-from typehints.component_types import EVENT
+from simulator.typehints.dict_types import SystemArgs
+from simulator.typehints.component_types import EVENT
 from datetime import datetime, timedelta
 
 from colorama import init, Fore

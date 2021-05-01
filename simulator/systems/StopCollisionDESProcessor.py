@@ -4,9 +4,9 @@ import simpy
 from simulator.components.Position import Position
 from simulator.components.CollisionHistory import CollisionHistory
 from simulator.components.Path import Path
-from typehints.dict_types import SystemArgs
+from simulator.typehints.dict_types import SystemArgs
 
-from typehints.component_types import EVENT
+from simulator.typehints.component_types import EVENT
 from simulator.systems.PathProcessor import EndOfPathTag, EndOfPathPayload
 StopEventTag = 'stopEvent'
 GenericCollisionTag = 'genericCollision'

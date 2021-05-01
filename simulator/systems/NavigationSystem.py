@@ -2,7 +2,7 @@ from queue import Queue
 
 from simulator.components.Map import Map
 from simulator.components.Path import Path
-from utils.Navigation import Point, normalize_point, Node, PathNotFound, merge_edges, distance
+from simulator.utils.Navigation import Point, normalize_point, Node, PathNotFound, merge_edges, distance
 from typing import List, Dict
 
 import logging

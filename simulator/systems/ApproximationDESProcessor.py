@@ -8,7 +8,7 @@ from simulator.components.Position import Position
 from typehints.dict_types import SystemArgs
 from simulator.systems.CameraProcessor import DetectedPayload
 from simulator.systems.GotoDESProcessor import GotoPosEventTag, GotoPosPayload
-from typehints.component_types import EVENT
+from simulator.typehints.component_types import EVENT
 import logging
 
 _EVENT_STORE: FilterStore

@@ -1,7 +1,7 @@
 from main import Simulator
 from simulator.components.Position import Position
 from simulator.components.Camera import Camera
-from typehints.component_types import EVENT
+from simulator.typehints.component_types import EVENT
 from typing import NamedTuple
 
 DetectedPayload = NamedTuple('CapturedPayload', [('entity', int), ('target_id', int),('target_info', int),])
