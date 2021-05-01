@@ -10,7 +10,7 @@ import logging
 import typing
 
 from pathlib import Path
-from utils.helpers import list_folder
+from simulator.utils.helpers import list_folder
 
 available_components = list_folder(Path('./components'))
 

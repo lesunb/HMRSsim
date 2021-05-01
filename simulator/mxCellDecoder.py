@@ -3,7 +3,7 @@
 """
 import typing
 from simulator import dynamic_models
-import utils.helpers as helpers
+import simulator.utils.helpers as helpers
 
 from simulator.components.Skeleton import Skeleton
 from simulator.typehints.build_types import WindowOptions

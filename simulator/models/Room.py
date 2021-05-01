@@ -3,7 +3,7 @@ from typehints.component_types import Component, ShapeDefinition
 from xml.etree.ElementTree import Element
 from simulator.components.Collidable import Collidable
 from simulator.components.Position import Position
-from utils.helpers import *
+from simulator.utils.helpers import *
 
 MODEL = 'mxgraph.floorplan.room'
 

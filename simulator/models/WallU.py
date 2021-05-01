@@ -1,6 +1,6 @@
 from simulator.components.Collidable import Collidable
 from simulator.components.Position import Position
-from utils.helpers import rotate_shape_definition, parse_style
+from simulator.utils.helpers import rotate_shape_definition, parse_style
 
 from typing import List, Tuple
 from typehints.component_types import ShapeDefinition, Component
