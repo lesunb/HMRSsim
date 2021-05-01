@@ -1,4 +1,4 @@
-from main import Simulator
+from simulator.main import Simulator
 from simulator.components.Position import Position
 from simulator.components.Camera import Camera
 from simulator.typehints.component_types import EVENT
