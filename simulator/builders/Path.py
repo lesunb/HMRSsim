@@ -3,7 +3,7 @@ import esper
 
 from simulator.components.Path import Path
 from simulator.components.Position import Position
-from typehints.build_types import DependencyNotFound
+from simulator.typehints.build_types import DependencyNotFound
 from xml.etree.ElementTree import Element
 
 TYPE = 'path'

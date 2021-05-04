@@ -1,6 +1,6 @@
 import pyglet
 import math
-import utils.helpers as helpers
+import simulator.utils.helpers as helpers
 
 
 class Rectangle:

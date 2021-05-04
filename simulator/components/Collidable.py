@@ -1,8 +1,8 @@
 from typing import List
 from collision import Poly
 
-from typehints.component_types import Component, Point, ShapeDefinition
-from utils.helpers import tuple2vector, get_rel_points
+from simulator.typehints.component_types import Component, Point, ShapeDefinition
+from simulator.utils.helpers import tuple2vector, get_rel_points
 
 
 class Collidable(Component):

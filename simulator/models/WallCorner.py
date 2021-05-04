@@ -1,8 +1,8 @@
 from simulator.components.Collidable import Collidable
 from simulator.components.Position import Position
-from utils.helpers import *
+from simulator.utils.helpers import *
 
-from typehints.component_types import Component, ShapeDefinition
+from simulator.typehints.component_types import Component, ShapeDefinition
 from typing import Tuple, List
 
 MODEL = 'mxgraph.floorplan.wallCorner'

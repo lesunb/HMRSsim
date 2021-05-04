@@ -3,8 +3,8 @@ from enum import Enum
 from typing import NamedTuple, List
 from esper import World
 from simpy import FilterStore, Store, Environment
-from typehints.component_types import EVENT
-from typehints.dict_types import SystemArgs
+from simulator.typehints.component_types import EVENT
+from simulator.typehints.dict_types import SystemArgs
 
 from simulator.components.Position import Position
 from simulator.components.Claw import Claw
@@ -129,7 +129,8 @@ def drop_object(obj_name, me):
             ObjectManager.ObjectManagerOps.RECREATE,
             skeleton,
             drop_offset,
-            reply_channel
+            reply_channel,
+            pos.sector
         )
         _EVENT_STORE.put(EVENT(ObjectManager.ManagerTag, drop_payload))
         # Wait for reply

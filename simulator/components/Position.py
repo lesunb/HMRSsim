@@ -1,6 +1,6 @@
 import math
-import utils.helpers as helpers
-from typehints.component_types import Component, Point
+import simulator.utils.helpers as helpers
+from simulator.typehints.component_types import Component, Point
 
 
 class Position(Component):

@@ -40,6 +40,7 @@ def generate_simulation_json(drone_count: int):
         map="swarm.drawio",
         FPS=24,
         DLW=10,
+        verbose=True,
         extraEntities=[]
     )
 

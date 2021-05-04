@@ -4,8 +4,8 @@ import logging
 from typing import NamedTuple, List, Union, Callable
 
 from simulator.components.Map import Map
-from typehints.component_types import Point
-from typehints.dict_types import SystemArgs
+from simulator.typehints.component_types import Point
+from simulator.typehints.dict_types import SystemArgs
 
 from simpy import FilterStore
 
@@ -16,10 +16,10 @@ from simulator.components.Script import Script
 
 from simulator.systems.NavigationSystem import find_route
 
-from typehints.component_types import EVENT, ERROR
+from simulator.typehints.component_types import EVENT, ERROR
 
 from simulator.systems.PathProcessor import EndOfPathTag
-from utils.Navigation import PathNotFound, add_nodes_from_points
+from simulator.utils.Navigation import PathNotFound, add_nodes_from_points
 
 GotoPoiPayload = NamedTuple('GotoPoiPayload', [('entity', int), ('target', str)])
 GotoPosPayload = NamedTuple('GotoPosPayload', [('entity', int), ('target', list)])

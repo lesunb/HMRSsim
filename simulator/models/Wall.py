@@ -1,7 +1,7 @@
 from collision import Poly, Vector
 from simulator.components.Collidable import Collidable
 from simulator.components.Position import Position
-from utils.helpers import parse_style
+from simulator.utils.helpers import parse_style
 
 MODEL = 'mxgraph.floorplan.wall'
 

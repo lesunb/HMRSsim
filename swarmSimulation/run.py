@@ -25,7 +25,7 @@ from simulator.utils.Firebase import db, clean_old_simulation
 
 from generate_simulation_json import generate_simulation_json, generate_shapes
 
-DRONE_COUNT = 200
+DRONE_COUNT = 96
 # Prep Script and Navigation systems
 extra_instructions = [
     (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction),
@@ -67,7 +67,7 @@ normal_processors = [
 ]
 # Defines DES processors
 des_processors = [
-    Seer.init([firebase_seer_consumer], 0.1, False),
+    Seer.init([firebase_seer_consumer], 0.1, simulator.verbose),
     (HoverDisturbance.init(max_disturbance=0.1, prob_disturbance=0.4, disturbance_interval=(1 / (fps / 3))),),
     (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1.0 / fps), max_speed=2.5),),
     (ClockSystem.process, ClockSystem.clean)
