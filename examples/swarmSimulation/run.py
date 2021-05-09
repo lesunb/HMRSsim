@@ -7,16 +7,11 @@ import simulator.systems.ClockSystem as ClockSystem
 
 from simulator.systems.MovementProcessor import MovementProcessor
 from simulator.systems.CollisionProcessor import CollisionProcessor
-from simulator.systems.PathProcessor import PathProcessor
 
 
 import systems.HoverDisturbance as HoverDisturbance
 import systems.HoverSystem as HoverSystem
 from systems.ControlSystem import control
-from systems.CollisionAvoidance import dont_crash
-
-from simulator.components.ProximitySensor import ProximitySensor
-from examples.swarmSimulation.components.Hover import Hover
 from examples.swarmSimulation.components.Control import Control
 
 from simulator.main import Simulator
@@ -62,7 +57,6 @@ def firebase_seer_consumer(message, msg_idx):
 normal_processors = [
     MovementProcessor(minx=0, miny=0, maxx=width, maxy=height, sector_size=20),
     CollisionProcessor(),
-    PathProcessor()
 ]
 # Defines DES processors
 des_processors = [
@@ -77,20 +71,10 @@ for p in normal_processors:
 for p in des_processors:
     simulator.add_des_system(p)
 
-
-for drone, _ in simulator.objects:
-    hover = simulator.world.component_for_entity(drone, Hover)
-    sensor: ProximitySensor = simulator.world.component_for_entity(drone, ProximitySensor)
-    sensor.reply_channel = simpy.Store(env)
-
-
 control_component = Control(configs=generate_shapes(DRONE_COUNT), channel=simpy.Store(env))
 simulator.world.add_component(1, control_component)
 
 if __name__ == "__main__":
-    for drone, _ in simulator.objects:
-        sensor: ProximitySensor = simulator.world.component_for_entity(drone, ProximitySensor)
-        env.process(dont_crash(simulator.world, sensor))
     env.process(control(simulator.KWARGS))
     simulator.run()
 

@@ -12,18 +12,6 @@ from examples.swarmSimulation.components.Hover import Hover, HoverState
 from simulator.utils.helpers import rotate_around_point
 
 
-def dont_crash(world: esper.World, sensor: ProximitySensor):
-    reply_channel_get = sensor.reply_channel.get
-    component_for_entity = world.component_for_entity
-    while True:
-        ev = yield reply_channel_get()
-        payload = ev.payload
-        me = payload.ent
-        they = list(map(lambda x: x.other_pos, payload.close_entities))
-        hover = component_for_entity(me, Hover)
-        hover.crowded = they
-
-
 def find_safe_route(hover: Hover, mypos: Position, myvel: Velocity, they: List[Position]):
     # Local refs to functions
     rotate_point = rotate_around_point
