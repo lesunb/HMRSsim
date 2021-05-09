@@ -1,12 +1,12 @@
 from typing import NamedTuple, List, Tuple, Callable
-from typehints.dict_types import SystemArgs
+from simulator.typehints.dict_types import SystemArgs
 
 from esper import World
 from simpy import FilterStore, Environment
 import logging
 
-from typehints.component_types import EVENT, ERROR
-from simulator.systems.PathProcessor import EndOfPathTag
+from simulator.typehints.component_types import EVENT, ERROR
+from simulator.systems.PathProcessor import EndOfPathTag, EndOfApproximationTag
 
 import simulator.components.Script as scriptComponent
 
@@ -19,7 +19,7 @@ ExtraInstruction = Tuple[str, Callable[[int, List[str], scriptComponent.Script, 
 def init(extra_instructions: List[ExtraInstruction], watch_list: List[str]):
     logger = logging.getLogger(__name__)
     instruction_set = {t[0]: t[1] for t in extra_instructions}
-    watchlist = [ExecuteInstructionTag, EndOfPathTag] + watch_list
+    watchlist = [ExecuteInstructionTag, EndOfPathTag, EndOfApproximationTag] + watch_list
     logger.debug(f'My instruction set: {instruction_set}')
     logger.debug(f'My Watchlist: {watchlist}')
 

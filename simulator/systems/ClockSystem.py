@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from typehints.dict_types import SystemArgs
+from simulator.typehints.dict_types import SystemArgs
 
 from queue import Queue
 traces = []

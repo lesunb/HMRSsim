@@ -9,6 +9,7 @@ flake8 = "*"
 pytest-cov = "*"
 autopep8 = "*"
 codacy-coverage = "*"
+pytest-bdd = "*"
 
 [packages]
 simpy = "*"
@@ -21,6 +22,8 @@ pep8 = "*"
 colorama = "*"
 pyrebase = '*'
 python-dotenv = '*'
+pytest-cov = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.8.5"

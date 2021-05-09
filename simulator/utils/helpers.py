@@ -1,9 +1,9 @@
 import math
 import os
 import importlib
-import primitives
+from simulator import primitives
 from collision import Vector
-from typehints.component_types import ShapeDefinition, Point
+from simulator.typehints.component_types import ShapeDefinition, Point
 from typing import Union, List, Dict
 from pathlib import Path
 
@@ -59,7 +59,7 @@ def rotate_shape_definition(definition: ShapeDefinition, angle: float, center: P
     new_points = list(map(lambda p: rotate_around_point(p, math.radians(angle), center), definition[1]))
     return new_center, new_points
 
-
+    
 def mirror_shape_definition_horizontally(definition: ShapeDefinition, shape_center: Point) -> ShapeDefinition:
     def_center = definition[0]
     new_def_center = ((shape_center[0] - def_center[0]) + shape_center[0], def_center[1])

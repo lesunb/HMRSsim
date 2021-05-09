@@ -5,15 +5,15 @@ import logging
 import os
 import pathlib
 
-import resources.load_resources as loader
-import mxCellDecoder as mxCellDecoder
+import simulator.resources.load_resources as loader
+from simulator import mxCellDecoder as mxCellDecoder
 
-from dynamic_builders import export_available_builders
-from utils.create_components import initialize_components
+from simulator.dynamic_builders import export_available_builders
+from simulator.utils.create_components import initialize_components
 from simulator.components.Inventory import Inventory
 from simulator.components.Skeleton import Skeleton
 from xml.etree.ElementTree import Element
-from typehints.build_types import WindowOptions, DependencyNotFound
+from simulator.typehints.build_types import WindowOptions, DependencyNotFound
 from typing import List, Tuple
 
 
@@ -30,7 +30,7 @@ def build_simulation_from_map(file: pathlib.Path, skip_map=False, simulation_com
         if not skip_map:
             logger.error(f'Map file {file} does not exist. Creating empty simulation instead')
         window_name = 'Default'
-        map_content = Element('', tag='not found', attrib={})
+        map_content = Element('', attrib={})
 
     width = int(map_content.attrib.get('pageWidth', 500))
     height = int(map_content.attrib.get('pageHeight', 500))

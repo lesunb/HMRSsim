@@ -3,7 +3,7 @@ import logging
 import json
 from queue import Queue
 from typing import Callable, List
-from typehints.dict_types import SystemArgs
+from simulator.typehints.dict_types import SystemArgs
 
 from simpy import Environment
 from esper import World

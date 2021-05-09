@@ -1,6 +1,6 @@
 import logging
 import pathlib
-from dynamic_importer import init_component, ComponentInitError, expand_available_components
+from simulator.dynamic_importer import init_component, ComponentInitError, expand_available_components
 
 
 def initialize_components(components):

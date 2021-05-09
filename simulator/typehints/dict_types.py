@@ -2,7 +2,7 @@ import typing
 import esper
 import simpy
 
-from typehints.build_types import WindowOptions
+from simulator.typehints.build_types import WindowOptions
 
 
 class SystemArgs(typing.TypedDict):

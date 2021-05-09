@@ -2,7 +2,7 @@ from queue import Queue
 
 from simulator.components.Map import Map
 from simulator.components.Path import Path
-from utils.Navigation import Point, normalize_point, Node, PathNotFound, merge_edges, distance
+from simulator.utils.Navigation import Point, normalize_point, Node, PathNotFound, merge_edges, distance
 from typing import List, Dict
 
 import logging
@@ -46,7 +46,7 @@ def find_route(map_component: Map, source: Point, target: Point) -> Path:
 
 
 def create_live_node(map_component: Map, source: Point, target: Point) -> (Point, Node):
-    """Gets connections for a node that's potentially not in the graph"""
+    """Gets connections for a node that's potentially not in the graph."""
     normalized_source = normalize_point(source, map_component)
     normalized_target = normalize_point(target, map_component)
     # 1st we check if node is in the map

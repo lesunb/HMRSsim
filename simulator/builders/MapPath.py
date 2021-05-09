@@ -2,10 +2,10 @@ import logging
 import esper
 
 from simulator.components.Map import Map
-from utils.Navigation import add_nodes_from_points
+from simulator.utils.Navigation import add_nodes_from_points
 
 from simulator.components.Position import Position
-from typehints.build_types import DependencyNotFound
+from simulator.typehints.build_types import DependencyNotFound
 from xml.etree.ElementTree import Element
 
 TYPE = 'map-path'

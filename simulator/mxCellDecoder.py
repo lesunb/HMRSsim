@@ -2,11 +2,11 @@
    TODO: Complete description with exported functions...
 """
 import typing
-import dynamic_models
-import utils.helpers as helpers
+from simulator import dynamic_models
+import simulator.utils.helpers as helpers
 
 from simulator.components.Skeleton import Skeleton
-from typehints.build_types import WindowOptions
+from simulator.typehints.build_types import WindowOptions
 from xml.etree.ElementTree import Element
 
 available_models = dynamic_models.export_available_models()

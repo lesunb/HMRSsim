@@ -1,5 +1,5 @@
-from typehints.component_types import Component
-import utils.helpers as helpers
+from simulator.typehints.component_types import Component
+import simulator.utils.helpers as helpers
 
 
 class Path(Component):
