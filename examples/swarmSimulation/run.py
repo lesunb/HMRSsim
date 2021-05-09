@@ -1,4 +1,3 @@
-import sys
 import simpy
 
 import simulator.systems.ScriptEventsDES as ScriptSystem
@@ -11,14 +10,14 @@ from simulator.systems.CollisionProcessor import CollisionProcessor
 from simulator.systems.PathProcessor import PathProcessor
 
 
-import swarmSimulation.systems.HoverDisturbance as HoverDisturbance
-import swarmSimulation.systems.HoverSystem as HoverSystem
-from swarmSimulation.systems.ControlSystem import control
-from swarmSimulation.systems.CollisionAvoidance import dont_crash
+import systems.HoverDisturbance as HoverDisturbance
+import systems.HoverSystem as HoverSystem
+from systems.ControlSystem import control
+from systems.CollisionAvoidance import dont_crash
 
 from simulator.components.ProximitySensor import ProximitySensor
-from swarmSimulation.components.Hover import Hover
-from swarmSimulation.components.Control import Control
+from examples.swarmSimulation.components.Hover import Hover
+from examples.swarmSimulation.components.Control import Control
 
 from simulator.main import Simulator
 from simulator.utils.Firebase import db, clean_old_simulation

@@ -3,7 +3,7 @@ import json
 from simulator import dynamic_importer
 from simulator import mxCellDecoder
 
-from swarmSimulation.components.Hover import Hover
+from examples.swarmSimulation.components.Hover import Hover
 from simulator.components.Velocity import Velocity
 from simulator.components.ProximitySensor import ProximitySensor
 

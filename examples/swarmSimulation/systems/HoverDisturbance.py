@@ -4,7 +4,7 @@ import random
 from simulator.typehints.dict_types import SystemArgs
 
 from simulator.components.Velocity import Velocity
-from swarmSimulation.components.Hover import Hover, HoverState
+from examples.swarmSimulation.components.Hover import Hover, HoverState
 
 
 def init(disturbance_interval=1, prob_disturbance=0.2, max_disturbance=0.5):

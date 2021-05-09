@@ -1,0 +1,7 @@
+{
+    "context": "examples/navigationSimulation",
+    "map": "poi_test.drawio",
+    "FPS": 60,
+    "DLW": 10,
+    "duration": 10
+}

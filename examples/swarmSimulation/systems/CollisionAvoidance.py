@@ -7,7 +7,7 @@ from functools import reduce
 from simulator.components.ProximitySensor import ProximitySensor
 from simulator.components.Position import Position
 from simulator.components.Velocity import Velocity
-from swarmSimulation.components.Hover import Hover, HoverState
+from examples.swarmSimulation.components.Hover import Hover, HoverState
 
 from simulator.utils.helpers import rotate_around_point
 

@@ -1,5 +1,4 @@
 import sys
-import json
 
 from simulator.systems.MovementProcessor import MovementProcessor
 from simulator.systems.CollisionProcessor import CollisionProcessor
@@ -17,8 +16,19 @@ from simulator.components.Script import Script
 from main import Simulator
 
 from utils.Firebase import db, clean_old_simulation
-NAMESPACE = 'simulator'
+
+# Create a simulation with config
+simulator = Simulator(sys.argv[1])
+# Some simulator objects
+width, height = simulator.window_dimensions
+# window = simulator.window
+eventStore = simulator.KWARGS['EVENT_STORE']
+exitEvent = simulator.EXIT_EVENT
+env = simulator.ENV
+NAMESPACE = 'hospital'
 clean_old_simulation(NAMESPACE)
+build_report = simulator.build_report
+db.child(NAMESPACE).child('logs').set(build_report)
 
 
 extra_instructions = [
@@ -28,30 +38,6 @@ extra_instructions = [
 ]
 ScriptProcessor = ScriptSystem.init(extra_instructions, [ClawProcessor.ClawDoneTag])
 NavigationSystemProcess = NavigationSystem.init()
-
-# File to output the report
-fd = open('report.json', 'w')
-
-
-# Clean up function to be executed after the simulation exists
-def clean():
-    fd.close()
-    print("Closed fd.")
-
-
-# Create a simulation with config
-simulator = Simulator(sys.argv[1], clean)
-# Some simulator objects
-width, height = simulator.window_dimensions
-# window = simulator.window
-eventStore = simulator.KWARGS['EVENT_STORE']
-exitEvent = simulator.EXIT_EVENT
-env = simulator.ENV
-
-
-def my_seer_consumer(message, _):
-    """Saves Seer messages in a file."""
-    fd.write(json.dumps(message) + '\n')
 
 
 def firebase_seer_consumer(message, msg_idx):

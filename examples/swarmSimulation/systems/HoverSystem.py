@@ -2,9 +2,7 @@ import logging
 import re
 import random
 
-from datetime import datetime, timedelta
-
-from collision import Vector, collide
+from collision import Vector
 from esper import World
 from collections import namedtuple
 
@@ -14,11 +12,11 @@ from simulator.components.Skeleton import Skeleton
 from simulator.components.Velocity import Velocity
 from simulator.components.Position import Position
 from simulator.components.Collidable import Collidable
-from swarmSimulation.components.Hover import Hover, HoverState
-from swarmSimulation.components.Control import ControlResponseFormat, Control
+from examples.swarmSimulation.components.Hover import Hover, HoverState
+from examples.swarmSimulation.components.Control import ControlResponseFormat, Control
 
 from simulator.utils.Navigation import distance
-from swarmSimulation.systems.CollisionAvoidance import find_safe_route
+from systems.CollisionAvoidance import find_safe_route
 ActionResponse = namedtuple('ActionResponse', ['control_response', 'change_state'])
 
 

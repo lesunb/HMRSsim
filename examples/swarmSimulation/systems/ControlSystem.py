@@ -1,12 +1,11 @@
 import logging
-import random
 from typing import List
 
 import esper
 
-from swarmSimulation.components.Control import Control
-from swarmSimulation.components.Hover import Hover, HoverState
-from swarmSimulation.systems.HoverSystem import change_hover_state
+from examples.swarmSimulation.components.Control import Control
+from examples.swarmSimulation.components.Hover import Hover, HoverState
+from systems.HoverSystem import change_hover_state
 from simulator.utils.Navigation import distance
 
 from simulator.components.Position import Position

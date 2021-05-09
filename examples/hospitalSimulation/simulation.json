@@ -1,0 +1,7 @@
+{
+    "context": "examples/hospitalSimulation",
+    "map": "hospital_scenario.drawio",
+    "FPS": 60,
+    "DLW": 10,
+    "duration": 10
+}

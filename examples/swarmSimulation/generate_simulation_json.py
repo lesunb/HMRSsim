@@ -36,7 +36,7 @@ def create_drone(pos: List[int], drone_id: str) -> EntityDefinition:
 
 def generate_simulation_json(drone_count: int):
     simulation = Config(
-        context="swarmSimulation",
+        context="examples/swarmSimulation",
         map="swarm.drawio",
         FPS=24,
         DLW=10,
