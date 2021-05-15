@@ -1,0 +1,40 @@
+{
+  "Poke Salmon": {
+    "prep_time": 2,
+    "ingredients": [
+      ["rice", 100],
+      ["nori", 3],
+      ["shoyo", 100],
+      ["carrot", 0.5],
+      ["mango", 0.5],
+      ["salmon", 100]
+    ],
+    "usesStove": false
+  },
+  "Poke Roasted Salmon": {
+    "prep_time": 5,
+    "ingredients": [
+      ["rice", 100],
+      ["nori", 3],
+      ["shoyo", 100],
+      ["carrot", 0.5],
+      ["mango", 0.5],
+      ["salmon", 100]
+    ],
+    "usesStove": true
+  },
+  "Poke Veggie": {
+    "prep_time": 5,
+    "ingredients": [
+      ["rice", 100],
+      ["nori", 3],
+      ["shoyo", 100],
+      ["carrot", 0.5],
+      ["mango", 0.5],
+      ["lettuce", 100],
+      ["tomato", 1],
+      ["mushroom", 200]
+    ],
+    "usesStove": false
+  }
+}

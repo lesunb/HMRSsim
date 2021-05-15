@@ -82,6 +82,7 @@ class Simulator:
             self.FPS = 0
         self.DEFAULT_LINE_WIDTH = config.get('DLW', 10)
         self.DURATION = config.get('duration', -1)
+        simulation_components = config.get('simulationComponents', None)
 
         context = config.get('context', '.')
         self.build_report.append(f'Context is {context}')
@@ -90,10 +91,10 @@ class Simulator:
         if 'map' in config:
             file = pathlib.Path(context) / config.get('map')
             self.build_report.append(f'Using simulation map {file}')
-            simulation = map_parser.build_simulation_from_map(file)
+            simulation = map_parser.build_simulation_from_map(file, simulation_components)
         else:
             self.build_report.append('No map found in the configuration. Creating empty simulation.')
-            simulation = map_parser.build_simulation_from_map(context, True)
+            simulation = map_parser.build_simulation_from_map(context, simulation_components, True)
         self.world: esper.World = simulation['world']
         # self.window = simulation['window']
         # self.batch = simulation['batch']

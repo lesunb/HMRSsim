@@ -17,7 +17,7 @@ from simulator.typehints.build_types import WindowOptions, DependencyNotFound
 from typing import List, Tuple
 
 
-def build_simulation_from_map(file: pathlib.Path, skip_map=False, simulation_components=None, line_width=10):
+def build_simulation_from_map(file: pathlib.Path, simulation_components=None, skip_map=False, line_width=10):
     """Creates the base for the simulation.
 
         If a map is provided, the simulation comes from the map.

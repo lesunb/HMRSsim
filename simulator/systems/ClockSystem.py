@@ -8,15 +8,16 @@ traces = []
 
 def process(kwargs: SystemArgs):
     env = kwargs['ENV']
+    event_store = kwargs['EVENT_STORE']
     sleep = env.timeout
     total = timedelta()
-    traces.append('env_time,total_time,avg_simulation_second\n')
+    traces.append('env_time,total_time,avg_simulation_second,event_store_size\n')
     while True:
         start = datetime.now()
         yield sleep(1)
         end = datetime.now()
         total += end - start
-        traces.append(f'{env.now},{total},{total / env.now}\n')
+        traces.append(f'{env.now},{total},{total / env.now},{len(event_store.items)}\n')
 
 
 def clean():
