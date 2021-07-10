@@ -12,14 +12,14 @@ from simulator.systems.CollisionProcessor import CollisionProcessor
 import systems.HoverDisturbance as HoverDisturbance
 import systems.HoverSystem as HoverSystem
 from systems.ControlSystem import control
-from examples.swarmSimulation.components.Control import Control
+from components.Control import Control
 
 from simulator.main import Simulator
-from simulator.utils.Firebase import db, clean_old_simulation
+from simulator.utils.Firebase import clean_old_simulation, send_build_report, create_consumer_for_namespace
 
 from generate_simulation_json import generate_simulation_json, generate_shapes
 
-DRONE_COUNT = 96
+DRONE_COUNT = 12
 # Prep Script and Navigation systems
 extra_instructions = [
     (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction),
@@ -40,18 +40,8 @@ env = simulator.ENV
 NAMESPACE = 'simulator'
 clean_old_simulation(NAMESPACE)
 build_report = simulator.build_report
-db.child(NAMESPACE).child('logs').set(build_report)
-
-
-def firebase_seer_consumer(message, msg_idx):
-    """Sends Seer messages to firebase"""
-    if msg_idx >= 0:
-        if msg_idx == 1:
-            for idx, j in enumerate(message):
-                db.child(NAMESPACE).child('live_report').child(msg_idx).child(idx).set({j: message[j]})
-        else:
-            _ = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
-
+send_build_report(NAMESPACE, build_report)
+firebase_seer_consumer = create_consumer_for_namespace(NAMESPACE)
 
 # Defines and initializes esper.Processor for the simulation
 normal_processors = [

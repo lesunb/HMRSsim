@@ -1,6 +1,7 @@
 import typing
 import esper
 import simpy
+import enum
 
 from simulator.typehints.build_types import WindowOptions
 
@@ -22,6 +23,17 @@ class EntityDefinition(typing.TypedDict):
     name: typing.Optional[str]
     type: typing.Optional[str]
 
+class LogLevel(enum.Enum):
+    DEBUG = 10
+    INFO  = 20
+    SEER  = 25
+    WARN  = 30
+    ERROR = 40
+
+    def __lt__(self, other):
+        # For some unknown reason other.value returns a tuple
+        # But self.value returns a proper int
+        return self.value < other.value
 
 class Config(typing.TypedDict):
     """Options for the Simulation config
@@ -35,6 +47,6 @@ class Config(typing.TypedDict):
     FPS: typing.Optional[int]
     DLW: typing.Optional[int]
     duration: typing.Optional[int]
-    verbose: typing.Optional[bool]
+    verbose: typing.Optional[LogLevel]
     simulationComponents: typing.Optional[typing.Dict[str, list]]
     extraEntities: typing.Optional[typing.List[EntityDefinition]]

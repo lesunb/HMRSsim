@@ -2,7 +2,7 @@ from collections import namedtuple
 from typing import Dict, List
 import simpy
 
-from typehints.component_types import Component, Point
+from simulator.typehints.component_types import Component, Point
 ControlResponseFormat = namedtuple('ControlResponse', ['drone', 'success'])
 
 

@@ -16,8 +16,7 @@ message_buffer = Queue()
 
 def consumer_manager(consumers: List[Callable], also_log: bool):
     logger = logging.getLogger(__name__ + '.consumer')
-    logging.addLevelName(25, 'SEER')
-    logger.setLevel('SEER')
+    logging.addLevelName(15, 'SEER')
     while True:
         message, msg_idx = message_buffer.get()  # Blocking function
         if also_log:
@@ -27,7 +26,7 @@ def consumer_manager(consumers: List[Callable], also_log: bool):
         message_buffer.task_done()
         if 'theEnd' in message:
             break
-    logger.log(25, f'Exiting consumer manager')
+    logger.log(15, f'Exiting consumer manager')
     return
 
 

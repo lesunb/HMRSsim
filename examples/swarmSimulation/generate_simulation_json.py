@@ -1,9 +1,10 @@
 import math
 from typing import List
 
-from typehints.component_types import Point, ShapeDefinition
-from typehints.dict_types import Config, EntityDefinition
+from simulator.typehints.component_types import Point, ShapeDefinition
+from simulator.typehints.dict_types import Config, EntityDefinition, LogLevel
 
+LOG_LEVEL = LogLevel.INFO
 
 def collidable_from_position(pos: Point) -> List[ShapeDefinition]:
     center = (pos[0] + 2.5, pos[1] + 2.5)
@@ -19,28 +20,28 @@ def collidable_from_position(pos: Point) -> List[ShapeDefinition]:
 def create_drone(pos: List[int], drone_id: str) -> EntityDefinition:
     definition = EntityDefinition(
         entId='drone_' + drone_id,
+        name='',
         isObject=True,
         isInteractive=False,
-        type='drone'
-    )
-    definition['components'] = {
+        type='drone',
+        components= {
         "Position": [pos[0], pos[1], 0, 5, 5],
         "Collidable": [collidable_from_position((pos[0], pos[1]))],
         "Hover": [],
         "Skeleton": ['drone_' + drone_id, "rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0000;fillColor=#000000;"],
         "Velocity": [0, 0],
         "ProximitySensor": [8, 'drone_sensor']
-    }
+    })
     return definition
 
 
 def generate_simulation_json(drone_count: int):
     simulation = Config(
-        context="examples/swarmSimulation",
+        context=".",
         map="swarm.drawio",
         FPS=24,
         DLW=10,
-        verbose=True,
+        verbose=LOG_LEVEL,
         extraEntities=[]
     )
 

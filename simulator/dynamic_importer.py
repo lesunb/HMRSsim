@@ -11,13 +11,15 @@ import typing
 
 from pathlib import Path
 from simulator.utils.helpers import list_folder
+import simulator.components as components
 
-available_components = list_folder(Path('./components'))
+SIMULATOR_ROOT = Path(__file__).parent
+
+available_components = components.__dict__
 
 
 def expand_available_components(paths: typing.List[Path]):
     global available_components
-    paths.append(Path('./simulator/components'))
     for p in paths:
         available_components.update(list_folder(p))
 

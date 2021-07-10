@@ -3,8 +3,8 @@ from typing import List
 
 import esper
 
-from examples.swarmSimulation.components.Control import Control
-from examples.swarmSimulation.components.Hover import Hover, HoverState
+from components.Control import Control
+from components.Hover import Hover, HoverState
 from systems.HoverSystem import change_hover_state
 from simulator.utils.Navigation import distance
 
@@ -12,8 +12,8 @@ from simulator.components.Position import Position
 
 
 # The controller for now
-from typehints.component_types import Point
-from typehints.dict_types import SystemArgs
+from simulator.typehints.component_types import Point
+from simulator.typehints.dict_types import SystemArgs
 
 
 def control(kwargs: SystemArgs):

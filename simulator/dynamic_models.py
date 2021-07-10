@@ -1,12 +1,12 @@
 from simulator.utils.helpers import list_folder
 from pathlib import Path
-
+from simulator import models
 
 def export_available_models():
-    available_models = {}
-    # TODO: Add an include option to add more model folder on simulation.json
-    modules = list_folder(Path('./simulator/models'))
-    for file_name, module in modules.items():
+    available_models = models.__dict__
+
+    modules = list_folder(Path('./models'))
+    for _, module in modules.items():
         tag = module.__dict__['MODEL']
         available_models[tag] = module
     return available_models

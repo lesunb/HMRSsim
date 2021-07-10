@@ -12,8 +12,8 @@ from simulator.components.Skeleton import Skeleton
 from simulator.components.Velocity import Velocity
 from simulator.components.Position import Position
 from simulator.components.Collidable import Collidable
-from examples.swarmSimulation.components.Hover import Hover, HoverState
-from examples.swarmSimulation.components.Control import ControlResponseFormat, Control
+from components.Hover import Hover, HoverState
+from components.Control import ControlResponseFormat, Control
 
 from simulator.utils.Navigation import distance
 from systems.CollisionAvoidance import find_safe_route

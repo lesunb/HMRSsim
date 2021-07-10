@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 
 from simulator.components.Inventory import Inventory
 from simulator.utils.create_components import initialize_components, import_external_component
-from simulator.typehints.dict_types import SystemArgs, Config, EntityDefinition
+from simulator.typehints.dict_types import LogLevel, SystemArgs, Config, EntityDefinition
 
 fileName = pathlib.Path(__file__).parent.joinpath('loggerConfig.yml')
 stream = open(fileName)
@@ -74,20 +74,22 @@ class Simulator:
         else:
             self.CONFIG = 'dict object'
         self.build_report.append(f'Loading simulation from {self.CONFIG}')
+        self.verbose: LogLevel = config.get('verbose', LogLevel.ERROR)
+        logger.root.setLevel(self.verbose.value)
+        logger.setLevel(self.verbose.value)
 
-        self.FPS = config.get('FPS', 0)
+        self.FPS = config.get('FPS', 0) if config is not None else 0
         if self.FPS < 0:
             logger.warning(f'WARNING: FPS value should not be negative')
             self.build_report.append(f'WARNING: FPS value should not be negative')
             self.FPS = 0
-        self.DEFAULT_LINE_WIDTH = config.get('DLW', 10)
-        self.DURATION = config.get('duration', -1)
-        simulation_components = config.get('simulationComponents', None)
+        self.DEFAULT_LINE_WIDTH = config.get('DLW', 10) if config is not None else 10
+        self.DURATION = config.get('duration', -1) if config is not None else -1
+        simulation_components = config.get('simulationComponents', None) if config is not None else None
 
-        context = config.get('context', '.')
+        context = config.get('context', '.') if config is not None else '.'
         self.build_report.append(f'Context is {context}')
-        if context != '.':
-            import_external_component(context)
+        import_external_component(context)
         if 'map' in config:
             file = pathlib.Path(context) / config.get('map')
             self.build_report.append(f'Using simulation map {file}')
@@ -126,8 +128,7 @@ class Simulator:
         self.cleanups: typing.List[CleanupFunction] = [cleanup]
         self.build_report.append('========== SIMULATION LOADING COMPLETE ==========')
         self.generate_simulation_build_report()
-        self.verbose = config.get('verbose', False)
-        if self.verbose:
+        if self.verbose < LogLevel.WARN:
             print('\n'.join(map(str.strip, self.build_report)))
 
     def generate_simulation_build_report(self):
