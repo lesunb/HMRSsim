@@ -19,7 +19,7 @@ from simulator.utils.Firebase import clean_old_simulation, send_build_report, cr
 
 from generate_simulation_json import generate_simulation_json, generate_shapes
 
-DRONE_COUNT = 12
+DRONE_COUNT = 48
 # Prep Script and Navigation systems
 extra_instructions = [
     (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction),
