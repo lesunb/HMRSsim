@@ -31,9 +31,20 @@ class LogLevel(enum.Enum):
     ERROR = 40
 
     def __lt__(self, other):
-        # For some unknown reason other.value returns a tuple
-        # But self.value returns a proper int
-        return self.value < other.value
+        if isinstance(other, LogLevel):
+            return self.value < other.value
+        elif isinstance(other, int):
+            return self.value < other
+        else:
+            raise TypeError(f"'<' not supported between instances of 'LogLevel' and {type(other)}")
+
+    def __ge__(self, other):
+        if isinstance(other, LogLevel):
+            return self.value >= other.value
+        elif isinstance(other, int):
+            return self.value >= other
+        else:
+            raise TypeError(f"'>=' not supported between instances of 'LogLevel' and {type(other)}")
 
 class Config(typing.TypedDict):
     """Options for the Simulation config
@@ -47,6 +58,6 @@ class Config(typing.TypedDict):
     FPS: typing.Optional[int]
     DLW: typing.Optional[int]
     duration: typing.Optional[int]
-    verbose: typing.Optional[LogLevel]
+    verbose: typing.Optional[typing.Union[LogLevel, int]]
     simulationComponents: typing.Optional[typing.Dict[str, list]]
     extraEntities: typing.Optional[typing.List[EntityDefinition]]

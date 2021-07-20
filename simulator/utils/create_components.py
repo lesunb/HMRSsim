@@ -16,4 +16,4 @@ def initialize_components(components):
 
 def import_external_component(context: str) -> None:
     path = pathlib.Path(context) / 'components'
-    expand_available_components([path])
+    expand_available_components([path.absolute()])

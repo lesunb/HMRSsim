@@ -10,18 +10,18 @@ import logging
 import typing
 
 from pathlib import Path
-from simulator.utils.helpers import list_folder
-import simulator.components as components
+from simulator.utils.helpers import import_components_from_folder
 
-SIMULATOR_ROOT = Path(__file__).parent
-
-available_components = components.__dict__
+root_components = Path(__file__.replace('dynamic_importer.py', 'components'))
+available_components = import_components_from_folder(root_components, 'simulator.components')
 
 
 def expand_available_components(paths: typing.List[Path]):
+    logger = logging.getLogger(__name__)
     global available_components
     for p in paths:
-        available_components.update(list_folder(p))
+        available_components.update(import_components_from_folder(p, 'components'))
+    logger.debug(f'Available components updated: {available_components}')
 
 
 def init_component(component_name: str, args: typing.List[typing.Any]):
@@ -32,11 +32,12 @@ def init_component(component_name: str, args: typing.List[typing.Any]):
                              Must be one of the available components.
            args -- List of arguments to be passed to __init__ method of the component
     """
-    # logger = logging.getLogger(__name__)
-    # logger.debug(f'Initing component {component_name} with values {args}')
+    logger = logging.getLogger(__name__)
     if component_name not in available_components:
         raise Exception(f"Component {component_name} is not available")
     module = available_components[component_name]
+    logger.debug(f'Initing component {component_name} with values {args}')
+    logger.debug(f'module is {module}')
     return module.__dict__[component_name](*args)
 
 

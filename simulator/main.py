@@ -74,9 +74,15 @@ class Simulator:
         else:
             self.CONFIG = 'dict object'
         self.build_report.append(f'Loading simulation from {self.CONFIG}')
+        # Parse level of verbosity.
+        # Can be an int or a LogLevel
         self.verbose: LogLevel = config.get('verbose', LogLevel.ERROR)
-        logger.root.setLevel(self.verbose.value)
-        logger.setLevel(self.verbose.value)
+        if isinstance(self.verbose, LogLevel):
+            logger.root.setLevel(self.verbose.value)
+            logger.setLevel(self.verbose.value)
+        elif isinstance(self.verbose, int):
+            logger.root.setLevel(self.verbose)
+            logger.setLevel(self.verbose)
 
         self.FPS = config.get('FPS', 0) if config is not None else 0
         if self.FPS < 0:
@@ -128,7 +134,7 @@ class Simulator:
         self.cleanups: typing.List[CleanupFunction] = [cleanup]
         self.build_report.append('========== SIMULATION LOADING COMPLETE ==========')
         self.generate_simulation_build_report()
-        if self.verbose < LogLevel.WARN:
+        if LogLevel.WARN >= self.verbose:
             print('\n'.join(map(str.strip, self.build_report)))
 
     def generate_simulation_build_report(self):
@@ -208,6 +214,13 @@ class Simulator:
                 break
         logger.debug(f'simulation loop exited')
 
+    def gracious_exit(self):
+        logger.info(f'Exiting gracefully')
+        while self.cleanups:
+            next_function = self.cleanups.pop()
+            logger.info(f'Executing clean-up function {next_function}')
+            next_function()
+
     def run(self):
         """
         Runs the simulation.
@@ -216,17 +229,19 @@ class Simulator:
         After simulation loop terminates, ALL cleanup functions are executed,
         the last being the user defined one, if present.
         """
-        logger.info('============ SIMULATION EXECUTION ============')
-        if self.DURATION > 0:
-            self.ENV.process(self.simulation_loop())
-            self.ENV.run(until=self.DURATION)
-        else:
-            self.ENV.process(self.simulation_loop())
-            self.ENV.run(until=self.EXIT_EVENT)
-        logger.info('============ SIMULATION EXECUTION FINISHED ============')
-        logger.info('============ CLEAN UP STAGE ============')
-        logger.info(f'{len(self.cleanups)} Clean up functions to execute')
-        while self.cleanups:
-            next_function = self.cleanups.pop()
-            logger.info(f'Executing clean-up function {next_function}')
-            next_function()
+        try:
+            logger.info('============ SIMULATION EXECUTION ============')
+            if self.DURATION > 0:
+                self.ENV.process(self.simulation_loop())
+                self.ENV.run(until=self.DURATION)
+            else:
+                self.ENV.process(self.simulation_loop())
+                self.ENV.run(until=self.EXIT_EVENT)
+            logger.info('============ SIMULATION EXECUTION FINISHED ============')
+            logger.info(f'{len(self.cleanups)} Clean up functions to execute')
+        except RuntimeError as err:
+            logger.error(f'Simulation aborted with critical error.')
+            logger.error(err)
+        finally:
+            logger.info('============ CLEAN UP STAGE ============')
+            self.gracious_exit()

@@ -1,12 +1,13 @@
 from simulator.utils.helpers import list_folder
 from typing import List
 from pathlib import Path
-from simulator import builders
 
 def export_available_builders(extra_paths: List[Path] = []) -> dict:
-    available_builders = builders.__dict__
+    root_builders = __file__.replace('dynamic_builders.py', 'builders')
+    extra_paths.append(root_builders)
+    available_builders = {}
     for f in extra_paths:
-        modules = list_folder(f)
+        modules = list_folder(Path(f))
         for _, module in modules.items():
             tag = module.__dict__['TYPE']
             available_builders[tag] = module

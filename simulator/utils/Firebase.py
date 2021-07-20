@@ -29,7 +29,7 @@ def create_consumer_for_namespace(namespace: str):
                 for idx, j in enumerate(message):
                     __db.child(namespace).child('live_report').child(msg_idx).child(idx).set({j: message[j]})
             else:
-                _ = __db.child(namespace).child('live_report').child(msg_idx).set(message)
+                __db.child(namespace).child('live_report').child(msg_idx).set(message)
     
     return firebase_seer_consumer
 

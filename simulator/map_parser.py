@@ -13,7 +13,7 @@ from simulator.utils.create_components import initialize_components
 from simulator.components.Inventory import Inventory
 from simulator.components.Skeleton import Skeleton
 from xml.etree.ElementTree import Element
-from simulator.typehints.build_types import WindowOptions, DependencyNotFound
+from simulator.typehints.build_types import SimulationParseError, WindowOptions, DependencyNotFound
 from typing import List, Tuple
 
 
@@ -131,6 +131,9 @@ def build_simulation_objects(
             except DependencyNotFound as err:
                 deferred.append(cell)
                 logger.debug(f'Cell {cell.tag} deferred - {err}')
+            except KeyError as err:
+                logger.error(f'Builder for type {err} not found. Check that you have that builder imported.')
+                raise SimulationParseError(f'Failed to create simulation object. Missing builder {err}')
     # 2nd pass
     for cell in deferred:
         if cell.tag == 'mxCell' and 'style' in cell.attrib:

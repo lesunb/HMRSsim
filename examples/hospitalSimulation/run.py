@@ -13,78 +13,73 @@ import simulator.systems.SeerPlugin as Seer
 
 from simulator.components.Script import Script
 
-from main import Simulator
+from simulator.main import Simulator
 
-from utils.Firebase import db, clean_old_simulation
+from simulator.utils.Firebase import clean_old_simulation, create_consumer_for_namespace, send_build_report
 
-# Create a simulation with config
-simulator = Simulator(sys.argv[1])
-# Some simulator objects
-width, height = simulator.window_dimensions
-# window = simulator.window
-eventStore = simulator.KWARGS['EVENT_STORE']
-exitEvent = simulator.EXIT_EVENT
-env = simulator.ENV
-NAMESPACE = 'hospital'
-clean_old_simulation(NAMESPACE)
-build_report = simulator.build_report
-db.child(NAMESPACE).child('logs').set(build_report)
+def setup():
+    # Create a simulation with config
+    simulator = Simulator(sys.argv[1])
+    # Some simulator objects
+    width, height = simulator.window_dimensions
+    # window = simulator.window
+    eventStore = simulator.KWARGS['EVENT_STORE']
+    exitEvent = simulator.EXIT_EVENT
+    env = simulator.ENV
 
-
-extra_instructions = [
-    (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction),
-    (ClawProcessor.GrabInstructionTag, ClawProcessor.grabInstruction),
-    (ClawProcessor.DropInstructionTag, ClawProcessor.dropInstrution)
-]
-ScriptProcessor = ScriptSystem.init(extra_instructions, [ClawProcessor.ClawDoneTag])
-NavigationSystemProcess = NavigationSystem.init()
+    NAMESPACE = 'hospital'
+    clean_old_simulation(NAMESPACE)
+    build_report = simulator.build_report
+    send_build_report(NAMESPACE, build_report)
+    firebase_seer_consumer = create_consumer_for_namespace(NAMESPACE)
 
 
-def firebase_seer_consumer(message, msg_idx):
-    """Sends Seer messages to firebase."""
-    if msg_idx >= 0:
-        if msg_idx == 1:
-            for idx, j in enumerate(message):
-                db.child(NAMESPACE).child('live_report').child(msg_idx).child(idx).set({j: message[j]})
-        else:
-            _ = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
+    extra_instructions = [
+        (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction),
+        (ClawProcessor.GrabInstructionTag, ClawProcessor.grabInstruction),
+        (ClawProcessor.DropInstructionTag, ClawProcessor.dropInstrution)
+    ]
+    ScriptProcessor = ScriptSystem.init(extra_instructions, [ClawProcessor.ClawDoneTag])
+    NavigationSystemProcess = NavigationSystem.init()
+
+    # Defines and initializes esper.Processor for the simulation
+    normal_processors = [
+        MovementProcessor(minx=0, miny=0, maxx=width, maxy=height),
+        CollisionProcessor(),
+        PathProcessor()
+    ]
+    # Defines DES processors
+    des_processors = [
+        Seer.init([firebase_seer_consumer], 0.05, False),
+        (ClawProcessor.process,),
+        (ObjectManager.process,),
+        (energySystem.process,),
+        (NavigationSystemProcess,),
+        (ScriptProcessor,),
+    ]
+    # Add processors to the simulation, according to processor type
+    for p in normal_processors:
+        simulator.add_system(p)
+    for p in des_processors:
+        simulator.add_des_system(p)
 
 
-# Defines and initializes esper.Processor for the simulation
-normal_processors = [
-    MovementProcessor(minx=0, miny=0, maxx=width, maxy=height),
-    CollisionProcessor(),
-    PathProcessor()
-]
-# Defines DES processors
-des_processors = [
-    Seer.init([firebase_seer_consumer], 0.05, False),
-    (ClawProcessor.process,),
-    (ObjectManager.process,),
-    (energySystem.process,),
-    (NavigationSystemProcess,),
-    (ScriptProcessor,),
-]
-# Add processors to the simulation, according to processor type
-for p in normal_processors:
-    simulator.add_system(p)
-for p in des_processors:
-    simulator.add_des_system(p)
+    # Create the error handlers dict
+    error_handlers = {
+        NavigationSystem.PathErrorTag: NavigationSystem.handle_PathError
+    }
+    # Adding error handlers to the robot
+    robot = simulator.objects[0][0]
+    script = simulator.world.component_for_entity(robot, Script)
+    script.error_handlers = error_handlers
 
+    return simulator, [script]
 
-# Create the error handlers dict
-error_handlers = {
-    NavigationSystem.PathErrorTag: NavigationSystem.handle_PathError
-}
-# Adding error handlers to the robot
-robot = simulator.objects[0][0]
-script = simulator.world.component_for_entity(robot, Script)
-script.error_handlers = error_handlers
 
 if __name__ == "__main__":
-    # NOTE!  schedule_interval will automatically pass a "delta time" argument
-    #        to world.process, so you must make sure that your Processor classes
-    #        account for this. See the example Processors above.
+    simulator, objects = setup()
+    script = objects[0]
     simulator.run()
     print("Robot's script logs")
     print("\n".join(script.logs))
+

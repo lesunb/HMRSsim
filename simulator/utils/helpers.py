@@ -1,12 +1,15 @@
 import math
 import os
+import importlib.util
 import importlib
 from simulator import primitives
 from collision import Vector
 from simulator.typehints.component_types import ShapeDefinition, Point
-from typing import Union, List, Dict
+from typing import Tuple, Union, List, Dict
 from pathlib import Path
+import logging
 
+logger = logging.getLogger(__name__)
 ShapeType = Union[primitives.Rectangle, primitives.Ellipse]
 
 
@@ -73,16 +76,11 @@ def mirror_shape_definition_vertically(definition: ShapeDefinition, shape_center
     new_points = list(map(lambda p: (p[0], (shape_center[1] - p[1]) + shape_center[1]), definition[1]))
     return new_def_center, new_points
 
-
-def path_to_import(path: Path):
-    bits = path.parts
-    if bits[0] == '..':
-        bits = bits[1:]
-    return '.'.join(bits)
-
-
 def list_folder(path: Path) -> Dict:
     available = {}
+    if not path.exists():
+        logger.log(5, f'[list_folder] Path {path} not found')
+        return {}
     try:
         for component in os.listdir(path):
             file_name, extension = os.path.splitext(component)
@@ -90,8 +88,34 @@ def list_folder(path: Path) -> Dict:
                 continue
             if file_name.startswith('__') and file_name.endswith('__'):
                 continue
-            module = importlib.import_module(path_to_import(path / file_name))
-            available[file_name] = module
+            try:
+                spec = importlib.util.spec_from_file_location(file_name, path / component)
+                module = importlib.util.module_from_spec(spec)
+                available[file_name] = module
+                spec.loader.exec_module(module)
+            except AttributeError:
+                logger.error(f'Failed to load module {path / file_name}')
+    except FileNotFoundError:
+        return {}
+    return available
+
+def import_components_from_folder(path: Path, prefix: str):
+    available = {}
+    if not path.exists():
+        logger.log(5, f'[list_folder] Path {path} not found')
+        return {}
+    try:
+        for component in os.listdir(path):
+            file_name, extension = os.path.splitext(component)
+            if not extension == '.py':
+                continue
+            if file_name.startswith('__') and file_name.endswith('__'):
+                continue
+            try:
+                module = importlib.import_module(prefix + '.' + file_name)
+                available[file_name] = module
+            except AttributeError:
+                logger.error(f'Failed to load module {path / file_name}')
     except FileNotFoundError:
         return {}
     return available

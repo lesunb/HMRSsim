@@ -20,7 +20,7 @@ def consumer_manager(consumers: List[Callable], also_log: bool):
     while True:
         message, msg_idx = message_buffer.get()  # Blocking function
         if also_log:
-            logger.log(25, message)
+            logger.log(15, message)
         for c in consumers:
             c(message, msg_idx)
         message_buffer.task_done()
