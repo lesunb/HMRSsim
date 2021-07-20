@@ -1,10 +1,9 @@
 from typing import List, Tuple
 from random import randint, sample, choice
-from examples.pokePlaceSimulation.components.Menu import Menu
-from typehints.component_types import EVENT
-from typehints.dict_types import SystemArgs
-from examples.pokePlaceSimulation.systems.KitchenManagement import \
-    IncomingOrderEventTag, IncomingOrderEventPayload, OrderOrigin
+from simulator.typehints.component_types import EVENT
+from simulator.typehints.dict_types import SystemArgs
+from components.Menu import Menu
+from systems.KitchenManagement import IncomingOrderEventTag, IncomingOrderEventPayload, OrderOrigin
 
 
 def init(stress: List[Tuple[int, int]]):

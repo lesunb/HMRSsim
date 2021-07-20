@@ -1,9 +1,9 @@
 from functools import reduce
-from examples.pokePlaceSimulation.components.KitchenLayout import KitchenLayout, OpenOrder
-from examples.pokePlaceSimulation.systems.KitchenManagement import CompleteOrderEventTag, CompleteOrderEventPayload
-from examples.pokePlaceSimulation.components.Menu import Menu
-from typehints.component_types import EVENT
-from typehints.dict_types import SystemArgs
+from components.KitchenLayout import KitchenLayout, OpenOrder
+from systems.KitchenManagement import CompleteOrderEventTag, CompleteOrderEventPayload
+from components.Menu import Menu
+from simulator.typehints.component_types import EVENT
+from simulator.typehints.dict_types import SystemArgs
 from simpy import Event
 
 MAX_DISHES = 100

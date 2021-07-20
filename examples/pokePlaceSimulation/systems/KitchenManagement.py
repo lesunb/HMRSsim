@@ -6,10 +6,10 @@ from functools import reduce
 from simpy import Resource, FilterStore
 
 from simulator.typehints.component_types import EVENT
-from typehints.dict_types import SystemArgs
+from simulator.typehints.dict_types import SystemArgs
 
-from examples.pokePlaceSimulation.components.KitchenLayout import KitchenLayout, OpenOrder
-from examples.pokePlaceSimulation.components.Menu import Menu
+from components.KitchenLayout import KitchenLayout, OpenOrder
+from components.Menu import Menu
 
 
 class OrderOrigin(Enum):

@@ -1,8 +1,8 @@
 
 from esper import World
 from typing import Tuple
-from examples.pokePlaceSimulation.components.KitchenArea import KitchenArea
-from examples.pokePlaceSimulation.components.KitchenLayout import KitchenLayout
+from components.KitchenArea import KitchenArea
+from components.KitchenLayout import KitchenLayout
 
 TYPE = 'kitchen_area'
 

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Dict, List, NamedTuple
-from examples.pokePlaceSimulation.components.KitchenArea import KitchenArea
+from components.KitchenArea import KitchenArea
 from simpy import FilterStore
 
 OpenOrder = NamedTuple('OpenOrder', [('orderId', int), ('createdAt', float), ('stove', bool), ('items', List[str])])

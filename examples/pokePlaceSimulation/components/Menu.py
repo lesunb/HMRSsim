@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Dict
-from examples.pokePlaceSimulation.components.Recipe import Recipe
+from components.Recipe import Recipe
 
 
 @dataclass

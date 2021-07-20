@@ -3,21 +3,21 @@ import json
 import utils
 from simulator.main import Simulator
 
-import examples.pokePlaceSimulation.systems.Cook as CookersSystem
-import examples.pokePlaceSimulation.systems.Customers as CustomerSystem
-import examples.pokePlaceSimulation.systems.KitchenManagement as KitchenManagement
+import systems.Cook as CookersSystem
+import systems.Customers as CustomerSystem
+import systems.KitchenManagement as KitchenManagement
 import simulator.systems.ClockSystem as ClockSystem
 
 SIMULATION_SIZE = "MEDIUM3"
 
-with open('./examples/pokePlaceSimulation/control.json', 'r') as fd:
+with open('./control.json', 'r') as fd:
     control = json.loads(fd.read())
     control = control[SIMULATION_SIZE]
 
 config = {
-    "context": "examples/pokePlaceSimulation",
+    "context": ".",
     "map": "kitchen.drawio",
-    "verbose": True,
+    "verbose": 20,
     "duration": 1000,
     "simulationComponents": {
         "KitchenLayout": [control['personnel']],
@@ -26,7 +26,7 @@ config = {
 }
 
 
-with open('./examples/pokePlaceSimulation/recipes.json', 'r') as fd:
+with open('./recipes.json', 'r') as fd:
     recipes = json.loads(fd.read())
 config['simulationComponents']['Menu'] = [{k: utils.recipe_from_json(v, k) for k, v in recipes.items()}]
 simulator = Simulator(config)

@@ -1,5 +1,5 @@
 
-from examples.pokePlaceSimulation.components.Recipe import Recipe
+from components.Recipe import Recipe
 
 
 def recipe_from_json(json: dict, name: str) -> Recipe:
