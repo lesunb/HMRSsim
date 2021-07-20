@@ -63,7 +63,8 @@ def handle_incoming_order(payload: IncomingOrderEventPayload, kwargs: SystemArgs
 
 def handle_complete_order(payload: CompleteOrderEventPayload, kwargs: SystemArgs):
     kitchen_layout = kwargs['WORLD'].component_for_entity(1, KitchenLayout)
+    logger = logging.getLogger(__name__)
     now = kwargs['ENV'].now
     kitchen_layout.orders_processed += 1
     kitchen_layout.avg_time_per_order = (kitchen_layout.avg_time_per_order * 0.4) + (payload.total_time * 0.6)
-    # print(f'[{now}] Completed order {payload.order} in {payload.total_time}s')
+    logger.debug(f'[{now}] Completed order {payload.order} in {payload.total_time}s')

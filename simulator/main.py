@@ -14,6 +14,7 @@ import typing
 from simulator import map_parser
 
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from simulator.components.Inventory import Inventory
 from simulator.utils.create_components import initialize_components, import_external_component
@@ -94,7 +95,7 @@ class Simulator:
         simulation_components = config.get('simulationComponents', None) if config is not None else None
 
         context = config.get('context', '.') if config is not None else '.'
-        self.build_report.append(f'Context is {context}')
+        self.build_report.append(f'Context is {context} ({Path(context).absolute()})')
         import_external_component(context)
         if 'map' in config:
             file = pathlib.Path(context) / config.get('map')
@@ -141,7 +142,7 @@ class Simulator:
         self.build_report.append(f'Simulation {self.simulation_name}\n')
         self.build_report.append(f'===> Simulation components\n')
         for c in self.world.components_for_entity(1):
-            self.build_report.append(str(c) + '\n')
+            self.build_report.append('- ' + str(c) + '\n')
         self.build_report.append(f'{len(self.draw2ent)} entities created.\n')
         self.build_report.append(f'{len(self.objects)} typed objects transformed into entities\n')
         self.build_report.append(f'===> TYPED OBJECTS\n')

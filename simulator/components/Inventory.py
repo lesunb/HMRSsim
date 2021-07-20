@@ -7,3 +7,6 @@ class Inventory(Component):
         if objects is None:
             objects = {}
         self.objects = objects
+
+    def __str__(self) -> str:
+        return f'Inventory[size={len(self.objects)}] = {self.objects}'

@@ -104,7 +104,7 @@ def build_simulation_objects(
                                  Key is the entity name, value is the entity id
     """
     logger = logging.getLogger(__name__)
-    logger.info(f'Available builders: {available_builders}')
+    logger.debug(f'Available builders: {available_builders}')
     draw2entity = {}
     objects: List[Tuple[int, str]] = []
     interactive = {}
