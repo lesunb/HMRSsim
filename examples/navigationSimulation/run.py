@@ -13,10 +13,10 @@ import simulator.systems.SeerPlugin as Seer
 
 from simulator.components.Script import Script
 
-from main import Simulator
+from simulator.main import Simulator
 
-from utils.Firebase import db, clean_old_simulation
 
+from simulator.utils.Firebase import create_consumer_for_namespace, send_build_report, clean_old_simulation
 
 # Create a simulation with config
 simulator = Simulator(sys.argv[1])
@@ -29,7 +29,8 @@ env = simulator.ENV
 NAMESPACE = 'navigation'
 clean_old_simulation(NAMESPACE)
 build_report = simulator.build_report
-db.child(NAMESPACE).child('logs').set(build_report)
+send_build_report(NAMESPACE, build_report)
+firebase_seer_consumer = create_consumer_for_namespace(NAMESPACE)
 
 
 extra_instructions = [
@@ -39,16 +40,6 @@ extra_instructions = [
 ]
 ScriptProcessor = ScriptSystem.init(extra_instructions, [ClawProcessor.ClawDoneTag])
 NavigationSystemProcess = NavigationSystem.init()
-
-
-def firebase_seer_consumer(message, msg_idx):
-    """Sends Seer messages to firebase."""
-    if msg_idx >= 0:
-        if msg_idx == 1:
-            for idx, j in enumerate(message):
-                db.child(NAMESPACE).child('live_report').child(msg_idx).child(idx).set({j: message[j]})
-        else:
-            _ = db.child(NAMESPACE).child('live_report').child(msg_idx).set(message)
 
 
 # Defines and initializes esper.Processor for the simulation
