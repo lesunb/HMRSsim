@@ -46,6 +46,9 @@ class LogLevel(enum.Enum):
         else:
             raise TypeError(f"'>=' not supported between instances of 'LogLevel' and {type(other)}")
 
+class SimulatorOptions(typing.TypedDict):
+    loggerConfig: typing.Optional[str]
+
 class Config(typing.TypedDict):
     """Options for the Simulation config
 
@@ -61,3 +64,4 @@ class Config(typing.TypedDict):
     verbose: typing.Optional[typing.Union[LogLevel, int]]
     simulationComponents: typing.Optional[typing.Dict[str, list]]
     extraEntities: typing.Optional[typing.List[EntityDefinition]]
+    simulatorConfigOptions: typing.Optional[SimulatorOptions]

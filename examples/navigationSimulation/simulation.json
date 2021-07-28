@@ -4,5 +4,8 @@
     "FPS": 60,
     "DLW": 10,
     "duration": 10,
-    "verbose": 20
+    "verbose": 20,
+    "simulatorConfigOptions": {
+        "loggerConfig": "loggerConfig.yml"
+    }
 }

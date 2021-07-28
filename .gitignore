@@ -1,5 +1,6 @@
 # Virtual environment
 venv/
+dist/
 
 # all the different pycaches
 simulator/__pycache__/

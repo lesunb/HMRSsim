@@ -3,12 +3,13 @@ Entrypoint for a simulator.
 Defines Simulator class.
 """
 import json
+import yaml
 import simpy
 import pathlib
 import esper
 from logging import getLogger
 import logging.config
-import yaml
+from simulator.logger_config import logger_config
 
 import typing
 from simulator import map_parser
@@ -20,10 +21,7 @@ from simulator.components.Inventory import Inventory
 from simulator.utils.create_components import initialize_components, import_external_component
 from simulator.typehints.dict_types import LogLevel, SystemArgs, Config, EntityDefinition
 
-fileName = pathlib.Path(__file__).parent.joinpath('loggerConfig.yml')
-stream = open(fileName)
-loggerConfig = yaml.safe_load(stream)
-logging.config.dictConfig(loggerConfig)
+logging.config.dictConfig(logger_config)
 logger = getLogger(__name__)
 """Format for all DES events added to Stores.
 
@@ -96,6 +94,20 @@ class Simulator:
 
         context = config.get('context', '.') if config is not None else '.'
         self.build_report.append(f'Context is {context} ({Path(context).absolute()})')
+        # Check for extra config options
+        simulator_extra_config = config.get('simulatorConfigOptions', {})
+        if ('loggerConfig' in simulator_extra_config):
+            logger_config_file = Path(context) / simulator_extra_config['loggerConfig']
+            if logger_config_file.exists():
+                logger.info(f'Loading logger config file {logger_config_file.absolute()}')
+                self.build_report.append(f'Loading logger config file {logger_config_file.absolute()}')
+                with open(logger_config_file) as fd:
+                    logger_config = yaml.safe_load(fd)
+                    logging.config.dictConfig(logger_config)
+            else:
+                logger.error(f'Logger config file {logger_config_file.absolute()} not found')
+                self.build_report.append(f'ERROR: Logger config file {logger_config_file.absolute()} not found')
+
         import_external_component(context)
         if 'map' in config:
             file = pathlib.Path(context) / config.get('map')

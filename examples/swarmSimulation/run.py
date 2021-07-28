@@ -8,7 +8,6 @@ import simulator.systems.ClockSystem as ClockSystem
 from simulator.systems.MovementProcessor import MovementProcessor
 from simulator.systems.CollisionProcessor import CollisionProcessor
 
-
 import systems.HoverDisturbance as HoverDisturbance
 import systems.HoverSystem as HoverSystem
 from systems.ControlSystem import control
