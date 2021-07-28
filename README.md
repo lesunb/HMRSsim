@@ -37,9 +37,24 @@ $ pipenv shell
 (hmrssim env) % pipenv install --dev
 ```
 
+Install the package
+-------------------
+
+Currently the easier way to install the package is to do it locally. In the root folder run the command below to install the `HMRsim_lesunb` package in edit mode. Edit mode means any changes you make to `src/simulator` will be reflected in the package.
+
+```bash
+pip install -e .
+```
+Check the package was installed.   
+
+```bash
+pip list
+# ...
+# HMRsim-lesunb            0.0.1
+# ...
+```
 Run
 ---
-> ⚠ You need to include the `simulator/` folder in your PYTHONPATH.
 
 Simulations are defined in by config objects. You can pass the config to the Simulator class either by a dict object, or by passing the path to a json file.  
 ```python
@@ -51,6 +66,10 @@ To execute the simulation, run
 ```bash
 $ python run.py [path/to/config.json]
 ```
+
+> 💡     
+> Check the `examples/` folder for different example simulations    
+>     
 
 Dependency
 ----------
