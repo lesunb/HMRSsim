@@ -18,8 +18,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from simulator.components.Inventory import Inventory
+from simulator.typehints.build_types import SimulationParseError
 from simulator.utils.create_components import initialize_components, import_external_component
 from simulator.typehints.dict_types import LogLevel, SystemArgs, Config, EntityDefinition
+from simulator.utils.validators import validate_config
 
 logging.config.dictConfig(logger_config)
 logger = getLogger(__name__)
@@ -72,6 +74,17 @@ class Simulator:
                 config = json.load(fd)
         else:
             self.CONFIG = 'dict object'
+        self.build_report.append(f'Validating config...')
+        config_errors = validate_config(config)
+        if len(config_errors) > 0:
+            self.build_report += config_errors
+            logger.error(f'Failed to parse config from {self.CONFIG}')
+            logger.error(f'{len(config_errors)} errors found in config:')
+            logger.error('\n- '.join(config_errors))
+            logger.error('Simulation execution aborted')
+            raise SimulationParseError(f'Config from {self.CONFIG} could not be parsed.')
+        else:
+            self.build_report.append('Config OK ✔')
         self.build_report.append(f'Loading simulation from {self.CONFIG}')
         # Parse level of verbosity.
         # Can be an int or a LogLevel

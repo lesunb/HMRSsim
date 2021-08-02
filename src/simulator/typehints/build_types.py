@@ -9,3 +9,7 @@ class DependencyNotFound(Exception):
 class SimulationParseError(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
+
+class ConfigParseError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
