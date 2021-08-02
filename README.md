@@ -61,6 +61,12 @@ Simulations are defined in by config objects. You can pass the config to the Sim
 simulator = Simulator(config)
 ```
 
+> 💡     
+> The package exports a utility function to help you parse the config.       
+> `$ hmrsimcli configtest -f simulation.json`   
+>     
+
+
 The file that build a simulation and runs it is `run.py`
 To execute the simulation, run
 ```bash

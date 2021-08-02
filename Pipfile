@@ -16,7 +16,6 @@ simpy = "*"
 codecov = "*"
 pygame = "==2.0.0.dev8"
 esper = "*"
-pyglet = "*"
 collision = "*"
 pep8 = "*"
 colorama = "*"
@@ -24,6 +23,7 @@ pyrebase = '*'
 python-dotenv = '*'
 pytest-cov = "*"
 pyyaml = "*"
+click = "*"
 
 [requires]
 python_version = "3.8.5"
