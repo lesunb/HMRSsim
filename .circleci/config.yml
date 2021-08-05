@@ -11,6 +11,7 @@ version: 2.1
 workflows:
   main:
     jobs:
+      - run: python --version
       - python/test:
           args: '--dev'
           pkg-manager: pipenv
