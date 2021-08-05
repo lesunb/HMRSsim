@@ -5,11 +5,6 @@
 Heterogeneous Multi-Robots Systems Simulator
 ======================================================
 
-Install From Repo
------------------
-
-python -m pip install --index-url https://test.pypi.org/simple/ --no-deps HMRsim-lesunb
-
 
 
 
