@@ -1,11 +1,34 @@
+jobs:
+  publish:
+    executor: python/default
+    steps:
+      - checkout
+      - python/dist
+      - run: pip install twine && twine upload
 orbs:
-  pipenv: frameio/pipenv@0.23.0
+  python: circleci/python@1.0.0
 version: 2.1
 workflows:
-  ci:
+  main:
     jobs:
-      - pipenv/build
-      - pipenv/shell:
-          args: pylint myapp/.
-          requires:
-            - pipenv/build
+      - python/test:
+          args: '--dev'
+          pkg-manager: pipenv
+          test-tool: pytest
+      #- publish
+# version: 2.1
+# workflows:
+#   ci:
+#     jobs:
+#       build:
+#         docker:
+#           - image: cimg/python:3.9.5
+#         steps:
+#           - checkout
+#           - run: |
+#               python --version
+#               pip install pipenv
+#               pipenv install
+#               pipenv shell
+#               pip install -e .
+#               pytest .
