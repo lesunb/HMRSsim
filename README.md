@@ -5,24 +5,22 @@
 Heterogeneous Multi-Robots Systems Simulator
 ======================================================
 
-Env Depencies
+Install From Repo
+-----------------
+
+python -m pip install --index-url https://test.pypi.org/simple/ --no-deps HMRsim-lesunb
+
+
+
+
+Install for Dev
 -------------
-python 3, pip
+Dependencies: python 3.8+, pip
 
 Install pipenv
 ------------- 
 
 pipenv easy the process of managing python dependencies
-
-PIP
-```console
-$ pip install pyenv
-```
-
-Alternatively, macOS brew
-```console
-$ brew install pipenv 
-```
 
 Install dependencies
 --------------------
@@ -30,8 +28,8 @@ Install dependencies
 Inside the project folder (after clone)
 
 ```console
-$ pyenv install 3.8.0
 $ pip install pipenv
+$ cd HMRSsim
 $ pipenv install
 $ pipenv shell
 (hmrssim env) % pipenv install --dev
