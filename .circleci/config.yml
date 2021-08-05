@@ -1,0 +1,11 @@
+orbs:
+  pipenv: frameio/pipenv@0.23.0
+version: 2.1
+workflows:
+  ci:
+    jobs:
+      - pipenv/build
+      - pipenv/shell:
+          args: pylint myapp/.
+          requires:
+            - pipenv/build
