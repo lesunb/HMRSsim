@@ -14,7 +14,6 @@ pytest-bdd = "*"
 [packages]
 simpy = "*"
 codecov = "*"
-pygame = "==2.0.0.dev8"
 esper = "*"
 collision = "*"
 pep8 = "*"
