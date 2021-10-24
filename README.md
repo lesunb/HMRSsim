@@ -6,8 +6,6 @@ Heterogeneous Multi-Robots Systems Simulator
 ======================================================
 
 
-
-
 Install for Dev
 -------------
 Dependencies: python 3.8+, pip
@@ -69,6 +67,28 @@ $ python run.py [path/to/config.json]
 > 💡     
 > Check the `examples/` folder for different example simulations    
 >     
+
+Run using Docker
+----------------
+
+If you just want to run a simulation in the project (e.g. you are not developing HMRSim itself) you may opt to run it using a Docker container. First you build the image, which does exactly what was described above in a Docker image
+
+```
+$ docker build --rm -t hmrsim .
+```
+
+Then you can run simulations inside the container by using the command below. 
+
+```
+$ docker run -it -v ${PWD}/examples/hospitalSimulation:/usr/app hmrsim:latest python run.py ./simulation.json
+```
+
+This command has a few important parts:
+* `-v ${PWD}/examples/hospitalSimulation:/usr/app` - Connects the folder `${PWD}/examples/hospitalSimulation` in the host machine to the folder `/usr/app` in the container. The working directory inside the container is `/usr/app`. You should change `examples/hospitalSimulation` by the path to the root folder of your simulation project.
+
+* `hmrsim:latest` - Indicates what image to use
+
+* `python run.py ./simulation.json` - Command to start the simulation, as described above. Notice that `run.py` is actually `/usr/app/run.py` inside the container. Same thing for `simualtion.json`.
 
 Dependency
 ----------
