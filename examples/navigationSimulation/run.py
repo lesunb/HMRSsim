@@ -16,7 +16,7 @@ from simulator.components.Script import Script
 from simulator.main import Simulator
 
 
-from simulator.utils.Firebase import create_consumer_for_namespace, send_build_report, clean_old_simulation
+from simulator.utils.Firebase import Firebase_conn
 
 # Create a simulation with config
 simulator = Simulator(sys.argv[1])
@@ -27,11 +27,10 @@ eventStore = simulator.KWARGS['EVENT_STORE']
 exitEvent = simulator.EXIT_EVENT
 env = simulator.ENV
 NAMESPACE = 'navigation'
-clean_old_simulation(NAMESPACE)
+firebase = Firebase_conn(NAMESPACE)
+firebase.clean_old_simulation()
 build_report = simulator.build_report
-send_build_report(NAMESPACE, build_report)
-firebase_seer_consumer = create_consumer_for_namespace(NAMESPACE)
-
+firebase.send_build_report(build_report)
 
 extra_instructions = [
     (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction),
@@ -50,7 +49,7 @@ normal_processors = [
 ]
 # Defines DES processors
 des_processors = [
-    Seer.init([firebase_seer_consumer], 0.05, False),
+    Seer.init([firebase.seer_consumer], 0.05, False),
     (ClawProcessor.process,),
     (ObjectManager.process,),
     (energySystem.process,),

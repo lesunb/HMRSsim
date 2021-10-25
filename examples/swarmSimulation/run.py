@@ -14,7 +14,7 @@ from systems.ControlSystem import control
 from components.Control import Control
 
 from simulator.main import Simulator
-from simulator.utils.Firebase import clean_old_simulation, send_build_report, create_consumer_for_namespace
+from simulator.utils.Firebase import Firebase_conn
 
 from generate_simulation_json import generate_simulation_json, generate_shapes
 
@@ -37,10 +37,10 @@ env = simulator.ENV
 
 # Prep Seer plugin
 NAMESPACE = 'simulator'
-clean_old_simulation(NAMESPACE)
+firebase = Firebase_conn(NAMESPACE)
+firebase.clean_old_simulation()
 build_report = simulator.build_report
-send_build_report(NAMESPACE, build_report)
-firebase_seer_consumer = create_consumer_for_namespace(NAMESPACE)
+firebase.send_build_report(build_report)
 
 # Defines and initializes esper.Processor for the simulation
 normal_processors = [
@@ -49,7 +49,7 @@ normal_processors = [
 ]
 # Defines DES processors
 des_processors = [
-    Seer.init([firebase_seer_consumer], 0.1, simulator.verbose),
+    Seer.init([firebase.seer_consumer], 0.1, simulator.verbose),
     (HoverDisturbance.init(max_disturbance=0.1, prob_disturbance=0.4, disturbance_interval=(1 / (fps / 3))),),
     (HoverSystem.init(max_fix_speed=0.2, hover_interval=(1.0 / fps), max_speed=2.5),),
     (ClockSystem.process, ClockSystem.clean)

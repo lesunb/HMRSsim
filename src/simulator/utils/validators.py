@@ -42,7 +42,12 @@ def validate_config(config: Union[str, Dict]) -> List[str]:
             if not isinstance(value, list):
                 errors_found.append(f'You should pass a list to initialize simulation component {key}. {type(value)} found.')
     if 'extraEntities' in config:
-        errors_found += validate_entity_definition(config['extraEntities'])
+        extra_entities = config['extraEntities']
+        for i, v in enumerate(extra_entities):
+            errors_in_entity = validate_entity_definition(v)
+            if len(errors_in_entity):
+                errors_found.append(f'Errors in extra entity definition (entity {i}):')
+                errors_found += list(map(lambda x: f'\t* {x}', errors_in_entity))
     if 'map' in config:
         map_file = pathlib.Path(config.get('context', '.')) / config['map']
         if not map_file.exists():

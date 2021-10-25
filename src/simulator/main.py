@@ -108,9 +108,9 @@ class Simulator:
         context = config.get('context', '.') if config is not None else '.'
         self.build_report.append(f'Context is {context} ({Path(context).absolute()})')
         # Check for extra config options
-        simulator_extra_config = config.get('simulatorConfigOptions', {})
-        if ('loggerConfig' in simulator_extra_config):
-            logger_config_file = Path(context) / simulator_extra_config['loggerConfig']
+        self.simulator_extra_config = config.get('simulatorConfigOptions', {})
+        if ('loggerConfig' in self.simulator_extra_config):
+            logger_config_file = Path(context) / self.simulator_extra_config['loggerConfig']
             if logger_config_file.exists():
                 logger.info(f'Loading logger config file {logger_config_file.absolute()}')
                 self.build_report.append(f'Loading logger config file {logger_config_file.absolute()}')
@@ -180,8 +180,9 @@ class Simulator:
             self.build_report.append(f'Entity has {len(components)} components.\n')
             for c in components:
                 self.build_report.append(f'\t- {c}\n')
-        self.build_report.append(f'===> Interactive objects\n')
-        self.build_report.append(str(self.interactive) + '\n')
+        if len(self.interactive):
+            self.build_report.append(f'===> Interactive objects\n')
+            self.build_report.append(str(self.interactive) + '\n')
 
     def add_des_system(self, system: DESSystem):
         """
