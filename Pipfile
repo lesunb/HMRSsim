@@ -18,7 +18,7 @@ esper = "*"
 collision = "*"
 pep8 = "*"
 colorama = "*"
-pyrebase = '*'
+pyrebase4 = '*'
 python-dotenv = '*'
 pytest-cov = "*"
 pyyaml = "*"
@@ -26,4 +26,4 @@ click = "*"
 pyglet = "*"
 
 [requires]
-python_version = "3.9.5"
+python_version = "3.8.10"
