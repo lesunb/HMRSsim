@@ -1,5 +1,3 @@
-import sys
-
 from simulator.systems.MovementProcessor import MovementProcessor
 from simulator.systems.CollisionProcessor import CollisionProcessor
 from simulator.systems.PathProcessor import PathProcessor
@@ -17,9 +15,10 @@ from simulator.main import Simulator
 
 from simulator.utils.Firebase import Firebase_conn
 
-import rclpy
+import logging
 
 def main():
+    logging.basicConfig(level=logging.DEBUG)
     # Create a simulation with config
     simulator = Simulator('/home/kalley/Workspace/unb/tg/HMRSsim/examples/navigationSimulationRos/simulation.json')
     # Some simulator objects
@@ -28,7 +27,7 @@ def main():
     eventStore = simulator.KWARGS['EVENT_STORE']
     exitEvent = simulator.EXIT_EVENT
     env = simulator.ENV
-    NAMESPACE = 'navigation'
+    NAMESPACE = 'navigation_ros'
     firebase = Firebase_conn(NAMESPACE)
     firebase.clean_old_simulation()
     build_report = simulator.build_report
@@ -39,7 +38,7 @@ def main():
     ]
     ScriptProcessor = ScriptSystem.init(extra_instructions, [])
     NavigationSystemProcess = NavigationSystem.init()
-    movebase_processor = MoveBaseProcessor(exit_event=simulator.EXIT_EVENT)
+    movebase_processor = MoveBaseProcessor(exit_event=exitEvent)
 
 
     # Defines and initializes esper.Processor for the simulation
@@ -52,10 +51,7 @@ def main():
     # Defines DES processors
     des_processors = [
         Seer.init([firebase.seer_consumer], 0.05, False),
-        (ObjectManager.process,),
-        (energySystem.process,),
-        (NavigationSystemProcess,),
-        (ScriptProcessor,)
+        (NavigationSystemProcess,)
     ]
     # Add processors to the simulation, according to processor type
     for p in normal_processors:
@@ -74,12 +70,10 @@ def main():
     script = simulator.world.component_for_entity(robot, Script)
     script.error_handlers = error_handlers
 
-    print('Initializing rclpy')
     simulator.run()
     print("Robot's script logs")
     print("\n".join(script.logs))
     movebase_processor.end()
-    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

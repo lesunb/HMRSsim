@@ -105,9 +105,10 @@ def goInstruction(ent: int, args: List[str], script: scriptComponent.Script,
         raise Exception('GO instruction failed. Go <poi> OR Go <x> <y>')
     event_store.put(new_event)
     # Needs to block the script
-    script.state = scriptComponent.States.BLOCKED
-    script.expecting.append(EndOfPathTag)
-    return script.state
+    if script:
+        script.state = scriptComponent.States.BLOCKED
+        script.expecting.append(EndOfPathTag)
+        return script.state
 
 
 def handle_PathError(payload: PathErrorPayload, kwargs: SystemArgs):

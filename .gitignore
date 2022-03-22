@@ -171,3 +171,5 @@ Thumbs.db
 src/ros2_ws/install/
 src/ros2_ws/log/
 src/ros2_ws/build/
+install/
+log/
