@@ -1,6 +1,8 @@
 from simulator.typehints.dict_types import SystemArgs
 import simulator.systems.GotoDESProcessor as NavigationSystem
 from simulator.typehints.component_types import EVENT, ERROR
+from simulator.components.Position import Position
+from simulator.components.Velocity import Velocity
 
 import esper
 from esper import World
@@ -25,15 +27,14 @@ class MoveBaseProcessor(esper.Processor):
 
     def process(self, kwargs: SystemArgs):
         __event_store = kwargs.get('EVENT_STORE', None)
-        __world: World = kwargs.get('WORLD', None)
         env: Environment = kwargs.get('ENV', None)
 
         if __event_store is None:
             raise Exception("Can't find eventStore")
         
         self.move_base_sub.event_store = __event_store
+        self.move_base_sub.world = self.world
         rclpy.spin_once(self.move_base_sub, timeout_sec=0.1)
-        self.logger.info('Spinned movebase/robot topic...')
     
     def end(self):
         self.move_base_sub.destroy_node()
@@ -67,5 +68,8 @@ class MinimalSubscriber(Node):
         if re.match('goto [0-9]{1,} [0-9]{1,}', msg.data):
             instruction = msg.data.split(' ')
             print('positions received: ' + instruction[1] + ' and ' + instruction[2])
-            NavigationSystem.goInstruction(2, [instruction[1], instruction[2]], None, self.event_store)
+            if not self.world:
+                return
+            for ent, (vel, pos) in self.world.get_components(Velocity, Position):
+                NavigationSystem.goInstruction(ent, [instruction[1], instruction[2]], None, self.event_store)
             return
