@@ -7,7 +7,8 @@ import simulator.systems.ManageObjects as ObjectManager
 import simulator.systems.ScriptEventsDES as ScriptSystem
 import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.SeerPlugin as Seer
-from simulator.systems.MoveBaseSystem import MoveBaseProcessor
+from simulator.systems.MoveBaseSystem import MoveBaseObserver
+from simulator.systems.RosControlSystem import RosControlProcessor
 
 from simulator.components.Script import Script
 
@@ -38,15 +39,16 @@ def main():
     ]
     ScriptProcessor = ScriptSystem.init(extra_instructions, [])
     NavigationSystemProcess = NavigationSystem.init()
-    movebase_processor = MoveBaseProcessor(exit_event=exitEvent)
-
+    # movebase_processor = MoveBaseProcessor(exit_event=exitEvent)
+    ros_control_processor = RosControlProcessor()
+    ros_control_processor.add_observer(MoveBaseObserver())
 
     # Defines and initializes esper.Processor for the simulation
     normal_processors = [
         MovementProcessor(minx=0, miny=0, maxx=width, maxy=height),
         CollisionProcessor(),
         PathProcessor(),
-        movebase_processor
+        ros_control_processor
     ]
     # Defines DES processors
     des_processors = [
@@ -73,7 +75,7 @@ def main():
     simulator.run()
     print("Robot's script logs")
     print("\n".join(script.logs))
-    movebase_processor.end()
+    ros_control_processor.end()
 
 if __name__ == '__main__':
     main()
