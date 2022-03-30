@@ -1,12 +1,12 @@
-import simulator.systems.GotoDESProcessor as NavigationSystem
-import simulator.systems.RosControlSystem as RosControlSystem
 from simulator.components.Position import Position
 from simulator.components.Velocity import Velocity
 from simulator.typehints.ros_types import RosService
+from simulator.typehints.component_types import EVENT, GotoPosPayload, GotoPoiPayload, GotoPosEventTag, GotoPoiEventTag
 
 import logging
 
 from std_msgs.msg import String
+from typing import List
 
 import re
 
@@ -36,8 +36,20 @@ class MoveBaseSystem(RosService):
             if not self.world:
                 return
             for ent, (vel, pos) in self.world.get_components(Velocity, Position):
-                NavigationSystem.goInstruction(ent, [instruction[1], instruction[2]], None, self.event_store)
+                self.go_to(ent, [instruction[1], instruction[2]])
             return
+
+    def go_to(self, ent, args: List[str]):
+        if len(args) == 1:
+            payload = GotoPoiPayload(ent, args[0])
+            new_event = EVENT(GotoPoiEventTag, payload)
+        elif len(args) == 2:
+            payload = GotoPosPayload(ent, [float(args[0]), float(args[1])])
+            new_event = EVENT(GotoPosEventTag, payload)
+        else:
+            raise Exception('GO instruction failed. Go <poi> OR Go <x> <y>')
+        if new_event:
+            self.event_store.put(new_event)
     
     def get_listener_callback(self):
         return self.listener_callback

@@ -1,6 +1,5 @@
 from abc import abstractmethod
 
-
 class RosService(object):
 
     @abstractmethod
@@ -14,4 +13,3 @@ class RosService(object):
     @abstractmethod
     def get_service_type(self):
         pass
-    pass

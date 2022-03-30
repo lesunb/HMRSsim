@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from simulator.typehints.dict_types import SystemArgs
 from simulator.typehints.component_types import EVENT, ERROR
 from simulator.typehints.ros_types import RosService
