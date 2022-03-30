@@ -28,7 +28,7 @@ class MoveBaseSystem(RosService):
             self.logger.warn('Could not find event store')
             return
         if msg.data == "exit" and self.exit_event:
-            self.event_store.put(self.exit_event)
+            self.exit_event.succeed()
             return
         if re.match('goto [0-9]{1,} [0-9]{1,}', msg.data):
             instruction = msg.data.split(' ')

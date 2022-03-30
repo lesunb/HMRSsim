@@ -24,11 +24,11 @@ def main():
     simulator = Simulator('/home/kalley/Workspace/unb/tg/HMRSsim/examples/navigationSimulationRos/simulation.json')
     # Some simulator objects
     width, height = simulator.window_dimensions
-    # window = simulator.window
     eventStore = simulator.KWARGS['EVENT_STORE']
     world = simulator.KWARGS['WORLD']
     exitEvent = simulator.EXIT_EVENT
     env = simulator.ENV
+
     NAMESPACE = 'navigation_ros'
     firebase = Firebase_conn(NAMESPACE)
     firebase.clean_old_simulation()
@@ -38,9 +38,8 @@ def main():
     extra_instructions = [
         (NavigationSystem.GotoInstructionId, NavigationSystem.goInstruction)
     ]
-    ScriptProcessor = ScriptSystem.init(extra_instructions, [])
     NavigationSystemProcess = NavigationSystem.init()
-    ros_control_processor = RosControlProcessor()
+    ros_control_processor = RosControlProcessor(scan_interval=0.1)
     move_base_service = MoveBaseSystem(event_store=eventStore, exit_event=exitEvent, world=world)
     ros_control_processor.create_subscription(move_base_service)
 
@@ -48,13 +47,13 @@ def main():
     normal_processors = [
         MovementProcessor(minx=0, miny=0, maxx=width, maxy=height),
         CollisionProcessor(),
-        PathProcessor(),
-        ros_control_processor
+        PathProcessor()
     ]
     # Defines DES processors
     des_processors = [
         Seer.init([firebase.seer_consumer], 0.05, False),
-        (NavigationSystemProcess,)
+        (NavigationSystemProcess,),
+        (ros_control_processor.process, ros_control_processor.end)
     ]
     # Add processors to the simulation, according to processor type
     for p in normal_processors:
@@ -68,15 +67,7 @@ def main():
         NavigationSystem.PathErrorTag: NavigationSystem.handle_PathError
     }
 
-    # Adding error handlers to the robot
-    robot = simulator.objects[0][0]
-    script = simulator.world.component_for_entity(robot, Script)
-    script.error_handlers = error_handlers
-
     simulator.run()
-    print("Robot's script logs")
-    print("\n".join(script.logs))
-    ros_control_processor.end()
 
 if __name__ == '__main__':
     main()

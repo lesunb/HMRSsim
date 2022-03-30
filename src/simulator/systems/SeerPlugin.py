@@ -104,6 +104,6 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
     def clean():
         message_buffer.put(({"theEnd": True}, -1))
         logging.getLogger(__name__).debug(f'Executing Seer cleanup function')
-        thread.join()
+        thread.join(timeout=1)
 
     return process, clean
