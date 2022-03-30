@@ -15,7 +15,7 @@ class RosControlNode(Node):
         super().__init__('hmrsim')
         self.logger = logging.getLogger(__name__)
 
-class RosControlProcessor(object):
+class RosControlPlugin(object):
     """
     This object deals with the Ros integration with HMRSim
     """
