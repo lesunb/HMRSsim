@@ -2,6 +2,7 @@ import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.RosControlSystem as RosControlSystem
 from simulator.components.Position import Position
 from simulator.components.Velocity import Velocity
+from simulator.typehints.ros_types import RosService
 
 import logging
 
@@ -9,15 +10,11 @@ from std_msgs.msg import String
 
 import re
 
-class MoveBaseObserver(RosControlSystem.RosControlObserver):
+class MoveBaseSystem(RosService):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
         self.logger = logging.getLogger(__name__)
-        self.subscription = RosControlSystem.RosControlProcessor.create_subscription(String, 'movebase/robot', self.listener_callback)
-        self.subscription # prevent not used warning
-
-    def notify(self, **kwargs):
         self.event_store = kwargs.get('event_store', None)
         self.exit_event = kwargs.get('exit_event', None)
         self.world = kwargs.get('world', None)
@@ -35,9 +32,18 @@ class MoveBaseObserver(RosControlSystem.RosControlObserver):
             return
         if re.match('goto [0-9]{1,} [0-9]{1,}', msg.data):
             instruction = msg.data.split(' ')
-            print('positions received: ' + instruction[1] + ' and ' + instruction[2])
+            self.logger.info('position received: ' + instruction[1] + ', ' + instruction[2])
             if not self.world:
                 return
             for ent, (vel, pos) in self.world.get_components(Velocity, Position):
                 NavigationSystem.goInstruction(ent, [instruction[1], instruction[2]], None, self.event_store)
             return
+    
+    def get_listener_callback(self):
+        return self.listener_callback
+    
+    def get_service_type(self):
+        return String
+
+    def get_name(self):
+        return 'movebase/robot'

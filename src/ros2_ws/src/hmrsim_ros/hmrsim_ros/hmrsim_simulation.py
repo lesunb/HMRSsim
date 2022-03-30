@@ -7,7 +7,7 @@ import simulator.systems.ManageObjects as ObjectManager
 import simulator.systems.ScriptEventsDES as ScriptSystem
 import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.SeerPlugin as Seer
-from simulator.systems.MoveBaseSystem import MoveBaseObserver
+from simulator.systems.MoveBaseSystem import MoveBaseSystem
 from simulator.systems.RosControlSystem import RosControlProcessor
 
 from simulator.components.Script import Script
@@ -26,6 +26,7 @@ def main():
     width, height = simulator.window_dimensions
     # window = simulator.window
     eventStore = simulator.KWARGS['EVENT_STORE']
+    world = simulator.KWARGS['WORLD']
     exitEvent = simulator.EXIT_EVENT
     env = simulator.ENV
     NAMESPACE = 'navigation_ros'
@@ -39,9 +40,9 @@ def main():
     ]
     ScriptProcessor = ScriptSystem.init(extra_instructions, [])
     NavigationSystemProcess = NavigationSystem.init()
-    # movebase_processor = MoveBaseProcessor(exit_event=exitEvent)
     ros_control_processor = RosControlProcessor()
-    ros_control_processor.add_observer(MoveBaseObserver())
+    move_base_service = MoveBaseSystem(event_store=eventStore, exit_event=exitEvent, world=world)
+    ros_control_processor.create_subscription(move_base_service)
 
     # Defines and initializes esper.Processor for the simulation
     normal_processors = [
@@ -66,8 +67,8 @@ def main():
     error_handlers = {
         NavigationSystem.PathErrorTag: NavigationSystem.handle_PathError
     }
-    # Adding error handlers to the robot
 
+    # Adding error handlers to the robot
     robot = simulator.objects[0][0]
     script = simulator.world.component_for_entity(robot, Script)
     script.error_handlers = error_handlers
