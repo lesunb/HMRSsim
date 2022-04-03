@@ -13,10 +13,16 @@ from simulator.utils.Firebase import Firebase_conn
 
 import logging
 
+import sys
+
 def main():
+    logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.DEBUG)
     # Create a simulation with config
-    simulator = Simulator('/home/kalley/Workspace/unb/tg/HMRSsim/examples/navigationSimulationRos/simulation.json')
+    if len(sys.argv) <= 1:
+        logger.error("You have to specify a path to a simulation file")
+        exit()
+    simulator = Simulator(sys.argv[1])
     # Some simulator objects
     width, height = simulator.window_dimensions
     eventStore = simulator.KWARGS['EVENT_STORE']
