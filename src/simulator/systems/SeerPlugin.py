@@ -95,7 +95,8 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
                 elif v[0] == 1:
                     deleted.append(v[1])
                     last_round[k] = (0, v[1])
-            new_message['deleted'] = deleted
+            if len(deleted) > 0:
+                new_message['deleted'] = deleted
             # Add message to queue
             message_buffer.put((new_message, msg_idx))
             msg_idx += 1
