@@ -11,7 +11,7 @@ SYSTEM_DEPENDENCIES = []
 
 
 def build_object(cell, world: World, window_options, draw2entity):
-    (components, style) = mxCellDecoder.parse_object(cell, window_options)
+    (components, style) = mxCellDecoder.parse_object(cell, window_options, shape="robot")
     ent = world.create_entity()
     # Custom components
     for key, val in cell.attrib.items():

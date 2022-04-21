@@ -4,8 +4,8 @@ from simulator.systems.PathProcessor import PathProcessor
 
 import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.SeerPlugin as Seer
-from simulator.systems.MoveBaseSystem import MoveBaseSystem
-from simulator.systems.RosControlSystem import RosControlPlugin
+from simulator.systems.RosNavigationSystem import RosNavigationSystem
+from simulator.systems.RosControlPlugin import RosControlPlugin
 
 from simulator.main import Simulator
 
@@ -17,7 +17,9 @@ import sys
 
 def main():
     logger = logging.getLogger(__name__)
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig()
+    logging.root.setLevel(logging.DEBUG)
+
     # Create a simulation with config
     if len(sys.argv) <= 1:
         logger.error("You have to specify a path to a simulation file")
@@ -38,8 +40,8 @@ def main():
 
     NavigationSystemProcess = NavigationSystem.init()
     ros_control = RosControlPlugin(scan_interval=0.1)
-    move_base_service = MoveBaseSystem(event_store=eventStore, exit_event=exitEvent, world=world)
-    ros_control.create_subscription(move_base_service)
+    move_base_service = RosNavigationSystem(event_store=eventStore, exit_event=exitEvent, world=world)
+    ros_control.create_action_server(move_base_service)
 
     # Defines and initializes esper.Processor for the simulation
     normal_processors = [
