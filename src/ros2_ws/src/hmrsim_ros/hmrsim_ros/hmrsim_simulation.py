@@ -1,14 +1,11 @@
 from simulator.systems.MovementProcessor import MovementProcessor
 from simulator.systems.CollisionProcessor import CollisionProcessor
 from simulator.systems.PathProcessor import PathProcessor
-
 import simulator.systems.GotoDESProcessor as NavigationSystem
 import simulator.systems.SeerPlugin as Seer
-from simulator.systems.RosNavigationSystem import RosNavigationSystem
+from simulator.systems.Nav2System import Nav2System
 from simulator.systems.RosControlPlugin import RosControlPlugin
-
 from simulator.main import Simulator
-
 from simulator.utils.Firebase import Firebase_conn
 
 import logging
@@ -40,7 +37,7 @@ def main():
 
     NavigationSystemProcess = NavigationSystem.init()
     ros_control = RosControlPlugin(scan_interval=0.1)
-    move_base_service = RosNavigationSystem(event_store=eventStore, exit_event=exitEvent, world=world)
+    move_base_service = Nav2System(event_store=eventStore, exit_event=exitEvent, world=world)
     ros_control.create_action_server(move_base_service)
 
     # Defines and initializes esper.Processor for the simulation
@@ -49,12 +46,14 @@ def main():
         CollisionProcessor(),
         PathProcessor()
     ]
+
     # Defines DES processors
     des_processors = [
         Seer.init([firebase.seer_consumer], 0.05, False),
         (NavigationSystemProcess,),
         (ros_control.process, ros_control.end)
     ]
+
     # Add processors to the simulation, according to processor type
     for p in normal_processors:
         simulator.add_system(p)

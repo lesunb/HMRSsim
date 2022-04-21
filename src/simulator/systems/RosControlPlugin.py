@@ -11,6 +11,9 @@ from rclpy.node import Node
 from rclpy.action import ActionServer
 
 class RosControlNode(Node):
+    """
+    Ros node of the simulation
+    """
 
     def __init__(self):
         super().__init__('hmrsim')
@@ -25,14 +28,15 @@ class RosControlPlugin(object):
         super().__init__()
         self.logger = logging.getLogger(__name__)
         rclpy.init()
-        self.logger.info("Initialized rclpy")
+        self.logger.info("Initialized rclpy.")
         self.node = RosControlNode()
         self.scan_interval = scan_interval
         self.services = []
     
     def create_action_server(self, service: RosActionServer):
         """
-        Creates an action server to the node of the RosControl
+        Creates an action server to the node of the RosControl with the service provided.
+        Also adds the service to the services used in this plugin.
         """
         self.services.append(service)
         action_server = ActionServer(self.node,
@@ -42,17 +46,13 @@ class RosControlPlugin(object):
                                     handle_accepted_callback=service.get_handle_accepted_goal_callback())
         return action_server
 
-    def remove_subscription(self, subscription):
-        """
-        Removes a subscription from the node
-        """
-        self.node.destroy_subscription(subscription)
-
     def process(self, kwargs: SystemArgs):
         while True:
             env: Environment = kwargs.get('ENV', None)
             sleep = env.timeout
             rclpy.spin_once(self.node, timeout_sec=0.1)
+
+            # notifying the services
             for service in self.services:
                 service.process()
             yield sleep(self.scan_interval)
@@ -60,4 +60,4 @@ class RosControlPlugin(object):
     def end(self):
         self.node.destroy_node()
         rclpy.shutdown()
-        self.logger.info("RosControl ended")
+        self.logger.info("RosControl ended.")

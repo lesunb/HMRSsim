@@ -12,7 +12,12 @@ from nav2_msgs.action import NavigateToPose
 
 from rclpy.action.server import ServerGoalHandle
 
-class RosNavigationSystem(RosActionServer):
+class Nav2System(RosActionServer):
+    """
+    This system controls the navigation interface with ROS.
+    For example, if a robot receives a goal through ROS to move to a point,
+    this module will take this goal and translate it to a robot in HMRSim.
+    """
 
     def __init__(self, **kwargs):
         super().__init__()
@@ -25,9 +30,10 @@ class RosNavigationSystem(RosActionServer):
     def process(self):
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
             if ros_goal.goal_handle is not None and ros_goal.goal_handle.is_active:
+                # An EndOfPathTag indicates that a robot arrived
                 end_event = self.event_store.get(lambda e: self.has_type_and_ent(e) and e.type == EndOfPathTag and e.ent == ent)
                 if end_event is not None:
-                    self.logger.info(f"The robot {ent} arrived at destination")
+                    self.logger.info(f"The robot {ent} arrived at destination.")
                     ros_goal.goal_handle.execute()
                     ros_goal.clean_goal()
     
@@ -35,6 +41,10 @@ class RosNavigationSystem(RosActionServer):
         return hasattr(ev, "type") and hasattr(ev, "ent")
 
     def handle_accepted_goal(self, goal_handle: ServerGoalHandle):
+        """
+        This is a callback to be executed after a goal has just been accepted through ROS.
+        """
+
         pose = goal_handle.request.pose.pose
         self.logger.info('Goal received: %s, %s' % (pose.position.x, pose.position.y))
         if not self.event_store:
@@ -43,22 +53,31 @@ class RosNavigationSystem(RosActionServer):
 
         x = str(pose.position.x)
         y = str(pose.position.y)
-        self.destiny = [x, y]
+        destiny = [x, y]
 
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
             if ros_goal.goal_handle is not None:
                 self.logger.info("There is already a goal running")
                 break
             ros_goal.goal_handle = goal_handle
-            self.go_to(ent, self.destiny)
+            self.go_to(ent, destiny)
 
     def send_result(self, goal_handle: ServerGoalHandle):
-        #goal_handle.succeed()
+        """
+        For HMRSim, this is a callback that should be called after an entity has arrived
+        in the destiny.
+        """
+
+        goal_handle.succeed()
         result = NavigateToPose.Result()
         return result
 
     def go_to(self, ent, args: List[str]):
-        if len(args) == 1:
+        """
+        This is gonna add a new event to move an entity towards it's destination.
+        """
+
+        if len(args) == 1: # it's a POI
             payload = GotoPoiPayload(ent, args[0])
             new_event = EVENT(GotoPoiEventTag, payload)
         elif len(args) == 2:
