@@ -49,9 +49,10 @@ def main():
 
     # Defines DES processors
     des_processors = [
-        Seer.init([firebase.seer_consumer], 0.05, False),
+        Seer.init([firebase.seer_consumer], 0.25, False),
         (NavigationSystemProcess,),
-        (ros_control.process, ros_control.end)
+        (ros_control.process, ros_control.end),
+        (move_base_service.end_path_event_listener,)
     ]
 
     # Add processors to the simulation, according to processor type

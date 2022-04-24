@@ -1,7 +1,7 @@
 {
     "context": ".",
     "map": "/home/kalley/Workspace/unb/tg/HMRSsim/examples/navigationSimulationRos/poi_test.drawio",
-    "FPS": 60,
+    "FPS": 1,
     "DLW": 10,
     "verbose": 20,
     "simulatorConfigOptions": {

@@ -8,9 +8,8 @@ class NavToPoseRosGoal(Component):
 
     def __init__(self):
         self.goal_handle = None
-
-    def clean_goal(self):
-        self.goal_handle = None
+        self.x = None
+        self.y = None
 
     def __str__(self):
         return "NavToPose"
