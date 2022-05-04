@@ -8,7 +8,6 @@ from std_msgs.msg import String
 class ROS2_conn():
     # start_time = 0
     def __init__(self):
-        rclpy.init(args=None)
 
         self.seer_node = Node('seer_publisher')
         self.seer_node.publisher_ = self.seer_node.create_publisher(String, 'live_report', 10)

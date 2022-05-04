@@ -1,5 +1,6 @@
 from simulator.components.Position import Position
 from simulator.components.Velocity import Velocity
+from simulator.components.Path import Path
 from simulator.components.NavToPoseRosGoal import NavToPoseRosGoal
 from simulator.typehints.ros_types import RosActionServer
 from simulator.typehints.component_types import EVENT, GotoPosPayload, GotoPoiPayload, GotoPosEventTag, GotoPoiEventTag, EndOfPathTag
@@ -11,6 +12,7 @@ from typing import List
 
 from nav2_msgs.action import NavigateToPose
 
+from rclpy.action import CancelResponse
 from rclpy.action.server import ServerGoalHandle
 
 import math
@@ -110,6 +112,25 @@ class Nav2System(RosActionServer):
             raise Exception('GO instruction failed. Go <poi> OR Go <x> <y>')
         if new_event:
             self.event_store.put(new_event)
+
+    def cancel(self, goal_handle: ServerGoalHandle):
+        """
+        This is gonna be executed when a cancelation is requested.
+        """
+        self.logger.info("Cancel requested...")
+        for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
+            if ros_goal.goal_handle == goal_handle:
+                vel.x = 0
+                vel.y = 0
+                vel.alpha = 0
+                self.world.remove_component(ent, Path)
+                ros_goal.goal_handle = None
+                self.logger.info("Cancelation accepted")
+                return CancelResponse.ACCEPT
+        return CancelResponse.REJECT
+
+    def get_cancel_callback(self):
+        return self.cancel
 
     def get_handle_accepted_goal_callback(self):
         return self.handle_accepted_goal

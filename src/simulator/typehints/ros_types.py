@@ -20,6 +20,10 @@ class RosActionServer(RosService):
         pass
 
     @abstractmethod
+    def get_cancel_callback(self):
+        pass
+
+    @abstractmethod
     def get_name(self):
         pass
 

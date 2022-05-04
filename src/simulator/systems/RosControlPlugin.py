@@ -1,6 +1,6 @@
 from simulator.typehints.dict_types import SystemArgs
 from simulator.typehints.component_types import EVENT, ERROR
-from simulator.typehints.ros_types import RosActionServer, RosService
+from simulator.typehints.ros_types import RosActionServer
 
 import logging
 
@@ -27,7 +27,6 @@ class RosControlPlugin(object):
     def __init__(self, scan_interval: float):
         super().__init__()
         self.logger = logging.getLogger(__name__)
-        rclpy.init()
         self.logger.info("Initialized rclpy.")
         self.node = RosControlNode()
         self.scan_interval = scan_interval
@@ -43,7 +42,8 @@ class RosControlPlugin(object):
                                     service.get_service_type(),
                                     service.get_name(),
                                     execute_callback=service.get_result_callback(),
-                                    handle_accepted_callback=service.get_handle_accepted_goal_callback())
+                                    handle_accepted_callback=service.get_handle_accepted_goal_callback(),
+                                    cancel_callback=service.get_cancel_callback())
         return action_server
 
     def process(self, kwargs: SystemArgs):

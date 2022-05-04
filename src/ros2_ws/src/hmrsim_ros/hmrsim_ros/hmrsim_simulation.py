@@ -7,12 +7,15 @@ from simulator.systems.Nav2System import Nav2System
 from simulator.systems.RosControlPlugin import RosControlPlugin
 from simulator.main import Simulator
 from simulator.utils.Firebase import Firebase_conn
+from simulator.utils.ROS2 import ROS2_conn
+import rclpy
 
 import logging
 
 import sys
 
 def main():
+    rclpy.init()
     logger = logging.getLogger(__name__)
     logging.basicConfig()
     logging.root.setLevel(logging.DEBUG)
@@ -30,11 +33,8 @@ def main():
     env = simulator.ENV
 
     NAMESPACE = 'navigation_ros'
-    firebase = Firebase_conn(NAMESPACE)
-    firebase.clean_old_simulation()
-    build_report = simulator.build_report
-    firebase.send_build_report(build_report)
 
+    ros2 = ROS2_conn()
     NavigationSystemProcess = NavigationSystem.init()
     ros_control = RosControlPlugin(scan_interval=0.1)
     move_base_service = Nav2System(event_store=eventStore, exit_event=exitEvent, world=world)
@@ -49,7 +49,7 @@ def main():
 
     # Defines DES processors
     des_processors = [
-        Seer.init([firebase.seer_consumer], 0.25, False),
+        Seer.init([ros2.seer_consumer], 0.25, False),
         (NavigationSystemProcess,),
         (ros_control.process, ros_control.end),
         (move_base_service.end_path_event_listener,)
