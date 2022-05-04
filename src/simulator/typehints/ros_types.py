@@ -16,6 +16,10 @@ class RosActionServer(RosService):
         pass
 
     @abstractmethod
+    def get_goal_callback(self):
+        pass
+
+    @abstractmethod
     def get_handle_accepted_goal_callback(self):
         pass
 

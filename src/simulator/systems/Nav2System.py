@@ -12,7 +12,7 @@ from typing import List
 
 from nav2_msgs.action import NavigateToPose
 
-from rclpy.action import CancelResponse
+from rclpy.action import CancelResponse, GoalResponse
 from rclpy.action.server import ServerGoalHandle
 
 import math
@@ -67,6 +67,18 @@ class Nav2System(RosActionServer):
     def has_type_payload(self, ev):
         return hasattr(ev, "type") and hasattr(ev, "payload")
 
+    def goal_callback(self, goal_request):
+        """
+        Executed when a new goal is received. If there is another goal running,
+        then it is canceled and the new goal started.
+        """
+        for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
+            if ros_goal.goal_handle is not None:
+                self.cancel_ros_goal_component(ros_goal, ent, vel)
+                self.logger.info("New goal accepted. There was another goal running.")
+                break
+        return GoalResponse.ACCEPT
+
     def handle_accepted_goal(self, goal_handle: ServerGoalHandle):
         """
         This is a callback to be executed after a goal had just been accepted through ROS.
@@ -120,14 +132,20 @@ class Nav2System(RosActionServer):
         self.logger.info("Cancel requested...")
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
             if ros_goal.goal_handle == goal_handle:
-                vel.x = 0
-                vel.y = 0
-                vel.alpha = 0
-                self.world.remove_component(ent, Path)
-                ros_goal.goal_handle = None
-                self.logger.info("Cancelation accepted")
+                self.cancel_ros_goal_component(ros_goal, ent, vel)
+                self.logger.info("Cancel accepted")
                 return CancelResponse.ACCEPT
         return CancelResponse.REJECT
+    
+    def cancel_ros_goal_component(self, ros_goal, ent, vel):
+        vel.x = 0
+        vel.y = 0
+        vel.alpha = 0
+        self.world.remove_component(ent, Path)
+        ros_goal.goal_handle = None
+
+    def get_goal_callback(self):
+        return self.goal_callback
 
     def get_cancel_callback(self):
         return self.cancel

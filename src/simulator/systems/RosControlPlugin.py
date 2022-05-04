@@ -42,6 +42,7 @@ class RosControlPlugin(object):
                                     service.get_service_type(),
                                     service.get_name(),
                                     execute_callback=service.get_result_callback(),
+                                    goal_callback=service.get_goal_callback(),
                                     handle_accepted_callback=service.get_handle_accepted_goal_callback(),
                                     cancel_callback=service.get_cancel_callback())
         return action_server
