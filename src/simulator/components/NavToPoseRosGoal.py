@@ -10,6 +10,7 @@ class NavToPoseRosGoal(Component):
         self.goal_handle = None
         self.x = None
         self.y = None
+        self.name = None
 
     def __str__(self):
-        return "NavToPose"
+        return f"NavToPose[name={self.name}]"

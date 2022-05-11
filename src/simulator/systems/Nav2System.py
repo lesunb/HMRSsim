@@ -28,7 +28,6 @@ class Nav2System(RosActionServer):
         super().__init__()
         self.logger = logging.getLogger(__name__)
         self.event_store = kwargs.get('event_store', None)
-        self.exit_event = kwargs.get('exit_event', None)
         self.world = kwargs.get('world', None)
         self.destiny = None
 
@@ -43,7 +42,7 @@ class Nav2System(RosActionServer):
 
             for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
                 if end_event.payload.ent == ent and ros_goal.goal_handle is not None:
-                    self.logger.info(f"The robot {ent} arrived at destination.")
+                    self.logger.info(f"The robot {ent} ({ros_goal.name}) arrived at destination.")
                     ros_goal.goal_handle.execute()
                     ros_goal.goal_handle = None
                     break
@@ -64,20 +63,19 @@ class Nav2System(RosActionServer):
                     feedback.distance_remaining = math.dist([pos.x, pos.y], [ros_goal.x, ros_goal.y])
                     ros_goal.goal_handle.publish_feedback(feedback)
     
-    def has_type_payload(self, ev):
-        return hasattr(ev, "type") and hasattr(ev, "payload")
-
     def goal_callback(self, goal_request):
         """
         Executed when a new goal is received. If there is another goal running,
         then it is canceled and the new goal started.
         """
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
+            if ros_goal.name != goal_request.pose.header.frame_id:
+                continue
             if ros_goal.goal_handle is not None:
                 self.cancel_ros_goal_component(ros_goal, ent, vel)
                 self.logger.info("New goal accepted. There was another goal running.")
-                break
-        return GoalResponse.ACCEPT
+            return GoalResponse.ACCEPT
+        return GoalResponse.REJECT
 
     def handle_accepted_goal(self, goal_handle: ServerGoalHandle):
         """
@@ -85,12 +83,15 @@ class Nav2System(RosActionServer):
         """
 
         pose = goal_handle.request.pose.pose
-        self.logger.info('Goal received: %s, %s' % (pose.position.x, pose.position.y))
+        header = goal_handle.request.pose.header
+        self.logger.info('Goal received for %s: %s, %s' % (header.frame_id, pose.position.x, pose.position.y))
         if not self.event_store:
             self.logger.warn('Could not find event store')
             return
 
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
+            if ros_goal.name != header.frame_id:
+                continue
             if ros_goal.goal_handle is not None:
                 self.logger.info("There is already a goal running")
                 break
