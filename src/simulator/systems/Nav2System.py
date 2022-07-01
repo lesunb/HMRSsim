@@ -24,11 +24,22 @@ class Nav2System(RosActionServer):
     this module will take this goal and translate it to a robot in HMRSim.
     """
 
+    def create_services(**kwargs):
+        event_store = kwargs.get('event_store', None)
+        world = kwargs.get('world', None)
+        
+        services = []
+        for ent, (vel, pos, ros_goal) in world.get_components(Velocity, Position, NavToPoseRosGoal):
+            if ros_goal.name is not None:
+                services.append(Nav2System(event_store=event_store, world=world, robot_name=ros_goal.name))
+        return services
+
     def __init__(self, **kwargs):
         super().__init__()
         self.logger = logging.getLogger(__name__)
         self.event_store = kwargs.get('event_store', None)
         self.world = kwargs.get('world', None)
+        self.robot_name = kwargs.get('robot_name', None)
         self.destiny = None
 
     def end_path_event_listener(self, kwargs: SystemArgs):
@@ -41,6 +52,8 @@ class Nav2System(RosActionServer):
             end_event = yield self.event_store.get(lambda e: e.type == EndOfPathTag)
 
             for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
+                if ros_goal.name != self.robot_name:
+                    continue
                 if end_event.payload.ent == ent and ros_goal.goal_handle is not None:
                     self.logger.info(f"The robot {ent} ({ros_goal.name}) arrived at destination.")
                     ros_goal.goal_handle.execute()
@@ -54,6 +67,8 @@ class Nav2System(RosActionServer):
         """
 
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
+            if ros_goal.name != self.robot_name:
+                continue
             if ros_goal.goal_handle is not None and ros_goal.goal_handle.is_active:
                 if pos.changed:
                     # Publishing feedback
@@ -69,7 +84,7 @@ class Nav2System(RosActionServer):
         then it is canceled and the new goal started.
         """
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
-            if ros_goal.name != goal_request.pose.header.frame_id:
+            if ros_goal.name != self.robot_name:
                 continue
             if ros_goal.goal_handle is not None:
                 self.cancel_ros_goal_component(ros_goal, ent, vel)
@@ -83,14 +98,13 @@ class Nav2System(RosActionServer):
         """
 
         pose = goal_handle.request.pose.pose
-        header = goal_handle.request.pose.header
-        self.logger.info('Goal received for %s: %s, %s' % (header.frame_id, pose.position.x, pose.position.y))
+        self.logger.info('Goal received for %s: %s, %s' % (self.robot_name, pose.position.x, pose.position.y))
         if not self.event_store:
             self.logger.warn('Could not find event store')
             return
 
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
-            if ros_goal.name != header.frame_id:
+            if ros_goal.name != self.robot_name:
                 continue
             if ros_goal.goal_handle is not None:
                 self.logger.info("There is already a goal running")
@@ -161,4 +175,4 @@ class Nav2System(RosActionServer):
         return NavigateToPose
 
     def get_name(self):
-        return 'navigate_to_pose'
+        return 'navigate_to_pose/' + self.robot_name

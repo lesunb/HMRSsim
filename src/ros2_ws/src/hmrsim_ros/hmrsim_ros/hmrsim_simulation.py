@@ -37,8 +37,10 @@ def main():
     ros2 = ROS2_conn()
     NavigationSystemProcess = NavigationSystem.init()
     ros_control = RosControlPlugin(scan_interval=0.1)
-    move_base_service = Nav2System(event_store=eventStore, exit_event=exitEvent, world=world)
-    ros_control.create_action_server(move_base_service)
+
+    ros_services = Nav2System.create_services(event_store=eventStore, world=world)
+    for service in ros_services:
+        ros_control.create_action_server(service)
 
     # Defines and initializes esper.Processor for the simulation
     normal_processors = [
@@ -52,8 +54,9 @@ def main():
         Seer.init([ros2.seer_consumer], 0.25, False),
         (NavigationSystemProcess,),
         (ros_control.process, ros_control.end),
-        (move_base_service.end_path_event_listener,)
     ]
+    for service in ros_services:
+        des_processors.append((service.end_path_event_listener,))
 
     # Add processors to the simulation, according to processor type
     for p in normal_processors:
