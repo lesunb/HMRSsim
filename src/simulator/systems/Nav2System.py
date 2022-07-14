@@ -109,6 +109,9 @@ class Nav2System(RosActionServer):
             if ros_goal.goal_handle is not None:
                 self.logger.info("There is already a goal running")
                 break
+            if list(pos.center) == list((pose.position.x, pose.position.y)):
+                goal_handle.execute()
+                break
             ros_goal.goal_handle = goal_handle
             ros_goal.x = pose.position.x
             ros_goal.y = pose.position.y
