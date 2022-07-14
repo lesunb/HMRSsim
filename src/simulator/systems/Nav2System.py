@@ -42,20 +42,20 @@ class Nav2System(RosActionServer):
         self.robot_name = kwargs.get('robot_name', None)
         self.destiny = None
 
-    def end_path_event_listener(self, kwargs: SystemArgs):
+    def end_path_event_listener(kwargs: SystemArgs):
         """
         This method waits for an event that indicates that an entity arrived at destiny is triggered.
         When a ROS entity arrives at destination, a result is sent to the client.
         """
+        event_store = kwargs.get('EVENT_STORE')
+        world = kwargs.get('WORLD')
         while True:
             # An EndOfPathTag indicates that a robot arrived
-            end_event = yield self.event_store.get(lambda e: e.type == EndOfPathTag)
+            end_event = yield event_store.get(lambda e: e.type == EndOfPathTag)
 
-            for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
-                if ros_goal.name != self.robot_name:
-                    continue
+            for ent, (vel, pos, ros_goal) in world.get_components(Velocity, Position, NavToPoseRosGoal):
                 if end_event.payload.ent == ent and ros_goal.goal_handle is not None:
-                    self.logger.info(f"The robot {ent} ({ros_goal.name}) arrived at destination.")
+                    logging.getLogger(__name__).info(f"The robot {ent} ({ros_goal.name}) arrived at destination.")
                     ros_goal.goal_handle.execute()
                     ros_goal.goal_handle = None
                     break

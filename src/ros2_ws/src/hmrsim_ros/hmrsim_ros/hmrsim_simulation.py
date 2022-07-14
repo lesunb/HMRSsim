@@ -54,9 +54,8 @@ def main():
         Seer.init([ros2.seer_consumer], 0.25, False),
         (NavigationSystemProcess,),
         (ros_control.process, ros_control.end),
+        (Nav2System.end_path_event_listener,)
     ]
-    for service in ros_services:
-        des_processors.append((service.end_path_event_listener,))
 
     # Add processors to the simulation, according to processor type
     for p in normal_processors:
