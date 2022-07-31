@@ -1,32 +1,42 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "HMRsim_lesunb"
-version = "0.0.1-3"
-license = {text = "GPLv3"}
-readme = "README.md"
-description = "Lightweight, modular multi-robot simulator"
-requires-python = ">=3.8"
-
-dependencies = [
-   "pyyaml >= 5.3.0",
-   "click >= 8.0.0",
-   "pyrebase >= 3.0.27",
-   "python-dotenv >= 0.19.2",
-   "esper == 1.3",
-   "collision == 1.2.2",
-   "simpy >= 4.0",
-   "colorama >= 0.4.4",
-   "pyglet >= 1.5.22",
+packages = [
+    { include = "simulator", from = "src" }
 ]
-
-[project.urls]
+version = "0.0.1-3"
+description = "Lightweight, modular multi-robot simulator"
+authors = ["Gguidini <giovanni.guidini@gmail.com>", "CristianeNaves <cristianenavescardoso09@gmail.com>", "gabrielsr <gabrielsr@gmail.com>"]
+license = "GPLv3"
+readme = "README.md"
 homepage = "https://github.com/lesunb/HMRSsim"
 repository = "https://github.com/lesunb/HMRSsim"
 documentation = "https://github.com/lesunb/HMRSsim/wiki"
+include = [
+    "LICENSE",
+]
 
+[tool.poetry.dependencies]
+python = "^3.8"
+pyrebase = "^3.0.27"
+pyyaml = "^5.3.0"
+click = "^8.0.0"
+python-dotenv = "^0.19.2"
+esper = "1.3"
+collision = "1.2.2"
+simpy = "^4.0"
+colorama = "^0.4.4"
+pyglet = "^1.5.22"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+flake8 = "*"
+pytest-cov = "*"
+autopep8 = "*"
+codacy-coverage = "*"
+pytest-bdd = "*"
+codecov = "*"
+pep8 = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
