@@ -8,7 +8,8 @@ services:
     ports:
       - 9090:9090
     volumes:
-      - ./examples:/usr/app
+      - ./examples:/etc/hmrsim/examples
+    working_dir: /etc/hmrsim/examples
     networks:
       - hmrsim
   roseer:
