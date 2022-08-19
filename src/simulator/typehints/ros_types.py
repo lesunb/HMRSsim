@@ -9,6 +9,13 @@ class RosService(object):
         """
         pass
 
+class RosTopicServer(RosService):
+
+    @abstractmethod
+    def get_listener_callback(self):
+        pass
+
+
 class RosActionServer(RosService):
 
     @abstractmethod

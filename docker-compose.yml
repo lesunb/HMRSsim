@@ -8,9 +8,9 @@ services:
     ports:
       - 9090:9090
     volumes:
-      - ./src/ros2_ws:/etc/hmrsim/src/ros2_ws
+      - ./src/:/etc/hmrsim/src/
       - ./examples:/etc/hmrsim/examples
-    working_dir: /etc/hmrsim/examples
+    working_dir: /etc/hmrsim
     networks:
       - hmrsim
   roseer:

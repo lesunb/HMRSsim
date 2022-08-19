@@ -6,7 +6,6 @@ RUN python get-pip.py
 RUN pip install "poetry==1.1.13"
 
 COPY src/ /etc/hmrsim/src
-COPY examples/ /etc/hmrsim/examples
 COPY ./pyproject.toml /etc/hmrsim/pyproject.toml
 COPY ./poetry.lock /etc/hmrsim/poetry.lock
 COPY ./LICENSE /etc/hmrsim/LICENSE

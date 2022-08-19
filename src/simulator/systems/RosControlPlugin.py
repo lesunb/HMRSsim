@@ -1,6 +1,7 @@
 from simulator.typehints.dict_types import SystemArgs
 from simulator.typehints.component_types import EVENT, ERROR
 from simulator.typehints.ros_types import RosActionServer
+from simulator.typehints.ros_types import RosTopicServer
 
 import logging
 
@@ -9,6 +10,8 @@ from simpy import Environment
 import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionServer
+
+from std_msgs.msg import String
 
 class RosControlNode(Node):
     """
@@ -46,6 +49,14 @@ class RosControlPlugin(object):
                                     handle_accepted_callback=service.get_handle_accepted_goal_callback(),
                                     cancel_callback=service.get_cancel_callback())
         return action_server
+
+    def create_topic_server(self, service: RosTopicServer):
+        """
+        Creates a topic server to the node of the RosControl with the service provided.
+        Also adds the service to the services used in this plugin.
+        """
+        self.services.append(service)
+        self.node.create_subscription(String, 'spawn_robot', service.get_listener_callback(), 10)
 
     def process(self, kwargs: SystemArgs):
         while True:
