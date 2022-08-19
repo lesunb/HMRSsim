@@ -8,6 +8,7 @@ services:
     ports:
       - 9090:9090
     volumes:
+      - ./src/ros2_ws:/etc/hmrsim/src/ros2_ws
       - ./examples:/etc/hmrsim/examples
     working_dir: /etc/hmrsim/examples
     networks:
@@ -22,7 +23,12 @@ services:
       - "3000:3000"
     networks:
       - hmrsim
-
+  robot_control:
+    image: robot_control
+    container_name: robot_control
+    build: /home/kalley/Workspace/tg/learning-py-trees/
+    networks:
+      - hmrsim
 networks:
   hmrsim:
     driver: bridge

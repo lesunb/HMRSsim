@@ -27,6 +27,7 @@ collision = "1.2.2"
 simpy = "^4.0"
 colorama = "^0.4.4"
 pyglet = "^1.5.22"
+urdf-parser-py = "^0.0.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

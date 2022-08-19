@@ -8,6 +8,8 @@ from typing import NamedTuple
 from urdf_parser_py import urdf
 from simulator.utils.create_components import initialize_components, import_external_component
 
+from simulator.systems.Nav2System import Nav2System
+
 RobotSpawnEventTag = 'RobotEntityEvent'
 
 
@@ -24,7 +26,8 @@ def collidable_from_position(pos: Point) -> List[ShapeDefinition]:
     return [(center, points)]
 
 
-def init():
+def init(ros_control=None):
+    ros_control = ros_control
     def process(kwargs: SystemArgs):
         event_store = kwargs.get('EVENT_STORE', None)
         world: esper.World = kwargs.get('WORLD', None)
@@ -48,13 +51,19 @@ def init():
                 {
                     "Position": [pos[0], pos[1], 0, 5, 5],
                     "Collidable": [collidable_from_position((pos[0], pos[1]))],
+                    "NavToPoseRosGoal": [robot.name],
                     "Skeleton": ['robot_' + str(
-                        ent_id) + "rounded=0;whiteSpace=wrap;html=1;strokeColor=#00FF00;fillColor=#000000;"],
-                    # "Velocity": [0, 0],
+                        ent_id) + "rounded=0;whiteSpace=wrap;html=1;strokeColor=#00FF00;fillColor=#000000;width='50';height='50';"],
+                    "Velocity": [0, 0]
                     # "Script": [["Go exit"], 10]
                 })
             ent = world.create_entity(*initialized_components)
             draw2ent[ent_id] = [ent, {'type': type}]
             objects.append((ent, ent_id))
 
+            # TODO esse cara vai spawnar tudo de novo se chamar evento de spawn outra vez
+            ros_services = Nav2System.create_services(event_store=event_store, world=world)
+            for service in ros_services:
+                ros_control.create_action_server(service)
+    
     return process

@@ -2,6 +2,7 @@ from simulator.systems.MovementProcessor import MovementProcessor
 from simulator.systems.CollisionProcessor import CollisionProcessor
 from simulator.systems.PathProcessor import PathProcessor
 import simulator.systems.GotoDESProcessor as NavigationSystem
+import simulator.systems.RobotSpawnDESProcessor as RobotSpawnDESProcessor
 import simulator.systems.SeerPlugin as Seer
 from simulator.systems.Nav2System import Nav2System
 from simulator.systems.RosControlPlugin import RosControlPlugin
@@ -9,10 +10,14 @@ from simulator.main import Simulator
 from simulator.utils.Firebase import Firebase_conn
 from simulator.utils.ROS2 import ROS2_conn
 import rclpy
-
 import logging
-
 import sys
+
+
+from simulator.typehints.component_types import EVENT
+from typing import NamedTuple
+
+RobotSpawnPayload = NamedTuple('RobotSpawnEvent', [('robot_definition', str)])
 
 def main():
     rclpy.init()
@@ -38,9 +43,9 @@ def main():
     NavigationSystemProcess = NavigationSystem.init()
     ros_control = RosControlPlugin(scan_interval=0.1)
 
-    ros_services = Nav2System.create_services(event_store=eventStore, world=world)
-    for service in ros_services:
-        ros_control.create_action_server(service)
+    # ros_services = Nav2System.create_services(event_store=eventStore, world=world)
+    # for service in ros_services:
+    #     ros_control.create_action_server(service)
 
     # Defines and initializes esper.Processor for the simulation
     normal_processors = [
@@ -54,7 +59,8 @@ def main():
         Seer.init([ros2.seer_consumer], 0.25, False),
         (NavigationSystemProcess,),
         (ros_control.process, ros_control.end),
-        (Nav2System.end_path_event_listener,)
+        (Nav2System.end_path_event_listener,),
+        (RobotSpawnDESProcessor.init(ros_control=ros_control),)
     ]
 
     # Add processors to the simulation, according to processor type
@@ -62,6 +68,10 @@ def main():
         simulator.add_system(p)
     for p in des_processors:
         simulator.add_des_system(p)
+
+    urdf_xml = open("src/ros2_ws/src/hmrsim_ros/hmrsim_ros/robot_urdf.xml").read()
+    event = EVENT(RobotSpawnDESProcessor.RobotSpawnEventTag, RobotSpawnPayload(urdf_xml))
+    eventStore.put(event)
 
     simulator.run()
 
