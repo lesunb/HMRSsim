@@ -38,6 +38,9 @@ pytest-bdd = "*"
 codecov = "*"
 pep8 = "*"
 
+[tool.poetry.scripts]
+hmrsimcli = "simulator.hmrsim_cli:main"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
