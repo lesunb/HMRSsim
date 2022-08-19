@@ -153,6 +153,9 @@ class Simulator:
         self.KWARGS: SystemArgs = {
             "ENV": self.ENV,
             "WORLD": self.world,
+            "OBJECTS": self.objects,
+            "DRAW2ENT": self.draw2ent,
+            "INTERACTIVE": self.interactive,
             "_KILL_SWITCH": self.EXIT_EVENT,
             "EVENT_STORE": simpy.FilterStore(self.ENV),
             "WINDOW_OPTIONS": (self.window_dimensions, self.DEFAULT_LINE_WIDTH),
