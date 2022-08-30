@@ -77,7 +77,6 @@ def init(ros_control=None):
             draw2ent[ent_id] = [ent, {'type': type}]
             objects.append((ent, ent_id))
 
-            # TODO esse cara vai spawnar tudo de novo se chamar evento de spawn outra vez
             # TODO Desacoplar o Nav2System daqui
             ros_services = Nav2System.create_services(event_store=event_store, world=world)
             for service in ros_services:

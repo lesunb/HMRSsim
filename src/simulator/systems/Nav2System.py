@@ -73,8 +73,8 @@ class Nav2System(RosActionServer):
                 if pos.changed:
                     # Publishing feedback
                     feedback = NavigateToPose.Feedback()
-                    feedback.current_pose.pose.position.x = pos.x
-                    feedback.current_pose.pose.position.y = pos.y
+                    feedback.current_pose.pose.position.x = float(pos.x)
+                    feedback.current_pose.pose.position.y = float(pos.y)
                     feedback.distance_remaining = math.dist([pos.x, pos.y], [ros_goal.x, ros_goal.y])
                     ros_goal.goal_handle.publish_feedback(feedback)
     
