@@ -65,7 +65,7 @@ def init(ros_control=None):
             # TODO Arrumar o tamanho do robô
             initialized_components = initialize_components(
                 {
-                    "Position": [pos[0], pos[1], 0, 5, 5],
+                    "Position": [pos[0], pos[1], 0, 20, 20],
                     "Collidable": [collidable_from_position((pos[0], pos[1]))],
                     "NavToPoseRosGoal": [robot.name],
                     "Skeleton": ['robot_' + str(
