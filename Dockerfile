@@ -6,6 +6,7 @@ RUN python get-pip.py
 RUN pip install "poetry==1.1.13"
 
 COPY src/ /etc/hmrsim/src
+COPY examples/ /etc/hmrsim/examples
 COPY ./pyproject.toml /etc/hmrsim/pyproject.toml
 COPY ./poetry.lock /etc/hmrsim/poetry.lock
 COPY ./LICENSE /etc/hmrsim/LICENSE
@@ -15,4 +16,5 @@ WORKDIR /etc/hmrsim
 RUN poetry install
 
 COPY ./hmrsim_entrypoint.sh /hmrsim_entrypoint.sh
+
 ENTRYPOINT ["/bin/bash", "/hmrsim_entrypoint.sh"]

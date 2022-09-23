@@ -5,7 +5,10 @@ from esper import World
 from simpy import FilterStore, Store, Environment
 from simulator.typehints.component_types import EVENT
 from simulator.typehints.dict_types import SystemArgs
+from simulator.typehints.ros_types import RosTopicServer
 
+from simulator.components.Velocity import Velocity
+from simulator.components.NavToPoseRosGoal import NavToPoseRosGoal
 from simulator.components.Position import Position
 from simulator.components.Claw import Claw
 from simulator.components.Collidable import Collidable
@@ -53,9 +56,9 @@ def process(kwargs: SystemArgs):
         op = event.payload.op
         logger.debug(f'Claw Received op {op}')
         if op == ClawOps.GRAB:
-            pick_object(event.payload.obj, event.payload.me)
+            yield from pick_object(event.payload.obj, event.payload.me)
         elif op == ClawOps.DROP:
-            drop_object(event.payload.obj, event.payload.me)
+            yield from drop_object(event.payload.obj, event.payload.me)
 
 
 def pick_object(obj_name: str, me: int):
@@ -154,3 +157,53 @@ def dropInstrution(ent: int, args: List[str], script: Script, event_store: Filte
     script.state = States.BLOCKED
     script.expecting.append(ClawDoneTag)
     return script.state
+
+
+class RosClawService(RosTopicServer):
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.logger = logging.getLogger(__name__)
+        self.event_store = kwargs.get('event_store', None)
+        self.world = kwargs.get('world', None)
+
+    def get_name(self):
+        return "claw"
+
+    def listener_callback(self, msg):
+        entity = 1
+        for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
+            entity = ent
+            break
+        self.logger.info('Received order for a robot to grab')
+        payload = GRAB_ClawPayload(op=ClawOps.GRAB, obj=msg.data, me=entity)
+        event = EVENT(ClawTag, payload)
+        self.event_store.put(event)
+
+    def get_listener_callback(self):
+        return self.listener_callback
+
+class RosClawDropService(RosTopicServer):
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.logger = logging.getLogger(__name__)
+        self.event_store = kwargs.get('event_store', None)
+        self.world = kwargs.get('world', None)
+
+    def get_name(self):
+        return "drop"
+
+    def listener_callback(self, msg):
+        entity = 1
+        for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
+            entity = ent
+            break
+        self.logger.info('Received order for a robot to drop')
+        payload = GRAB_ClawPayload(op=ClawOps.DROP, obj=msg.data, me=entity)
+        event = EVENT(ClawTag, payload)
+        self.event_store.put(event)
+
+    def get_listener_callback(self):
+        return self.listener_callback
+

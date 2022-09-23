@@ -56,7 +56,7 @@ class RosControlPlugin(object):
         Also adds the service to the services used in this plugin.
         """
         self.services.append(service)
-        self.node.create_subscription(String, 'spawn_robot', service.get_listener_callback(), 10)
+        self.node.create_subscription(String, service.get_name(), service.get_listener_callback(), 10)
 
     def process(self, kwargs: SystemArgs):
         while True:
