@@ -171,12 +171,16 @@ class RosClawService(RosTopicServer):
         return "claw"
 
     def listener_callback(self, msg):
-        entity = 1
-        for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
-            entity = ent
-            break
         self.logger.info('Received order for a robot to grab')
-        payload = GRAB_ClawPayload(op=ClawOps.GRAB, obj=msg.data, me=entity)
+        entity = None
+        data = msg.data.split(' ')
+        robot = data[0]
+        object = data[1]
+        entity = find_robot_in_world(self.world, robot)
+        if entity == None:
+            self.logger.info('Could not find a robot with the name ' + robot)
+            return
+        payload = GRAB_ClawPayload(op=ClawOps.GRAB, obj=object, me=entity)
         event = EVENT(ClawTag, payload)
         self.event_store.put(event)
 
@@ -195,15 +199,25 @@ class RosClawDropService(RosTopicServer):
         return "drop"
 
     def listener_callback(self, msg):
-        entity = 1
-        for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
-            entity = ent
-            break
         self.logger.info('Received order for a robot to drop')
-        payload = GRAB_ClawPayload(op=ClawOps.DROP, obj=msg.data, me=entity)
+        entity = None
+        data = msg.data.split(' ')
+        robot = data[0]
+        object = data[1]
+        entity = find_robot_in_world(self.world, robot)
+        if entity == None:
+            self.logger.info('Could not find a robot with the name ' + robot)
+            return
+        payload = GRAB_ClawPayload(op=ClawOps.DROP, obj=object, me=entity)
         event = EVENT(ClawTag, payload)
         self.event_store.put(event)
 
     def get_listener_callback(self):
         return self.listener_callback
 
+
+def find_robot_in_world(world, robot_name):
+    for ent, (vel, pos, ros_goal) in world.get_components(Velocity, Position, NavToPoseRosGoal):
+        if ros_goal.name == robot_name:
+            return ent
+    return None
