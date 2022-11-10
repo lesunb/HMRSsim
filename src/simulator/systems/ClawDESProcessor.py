@@ -172,15 +172,18 @@ class RosClawService(RosTopicServer):
 
     def listener_callback(self, msg):
         entity = None
-        data = msg.data.split(' ')
+        data = get_claw_msg_data(msg.data)
+        if data is None:
+            return
         robot = data[0]
         object = data[1]
         self.logger.info(f'Received order for {robot} to grab')
         entity = find_robot_in_world(self.world, robot)
-        if entity is not None:
-            payload = GRAB_ClawPayload(op=ClawOps.GRAB, obj=object, me=entity)
-            event = EVENT(ClawTag, payload)
-            self.event_store.put(event)
+        if entity is None:
+            return
+        payload = GRAB_ClawPayload(op=ClawOps.GRAB, obj=object, me=entity)
+        event = EVENT(ClawTag, payload)
+        self.event_store.put(event)
 
     def get_listener_callback(self):
         return self.listener_callback
@@ -198,25 +201,32 @@ class RosClawDropService(RosTopicServer):
 
     def listener_callback(self, msg):
         entity = None
-        data = msg.data.split(' ')
+        data = get_claw_msg_data(msg.data)
+        if data is None:
+          return
         robot = data[0]
         object = data[1]
         self.logger.info(f'Received order for {robot} to drop')
         entity = find_robot_in_world(self.world, robot)
-        if entity is not None:
-            payload = GRAB_ClawPayload(op=ClawOps.DROP, obj=object, me=entity)
-            event = EVENT(ClawTag, payload)
-            self.event_store.put(event)
+        if entity is None:
+            return
+        payload = GRAB_ClawPayload(op=ClawOps.DROP, obj=object, me=entity)
+        event = EVENT(ClawTag, payload)
+        self.event_store.put(event)
 
     def get_listener_callback(self):
         return self.listener_callback
 
+def get_claw_msg_data(msg):
+    msg = msg.split(' ')
+    if len(msg) != 2:
+        logging.getLogger(__name__).warn('Message not in the correct format: robot_name object')
+        return None
+    return msg
 
 def find_robot_in_world(world, robot_name):
-    entity = None
     for ent, (vel, pos, ros_goal) in world.get_components(Velocity, Position, NavToPoseRosGoal):
         if ros_goal.name == robot_name:
-            entity = ent
-    if entity == None:
-        logging.getLogger(__name__).info('Could not find a robot with the name ' + robot_name)
-    return entity
+            return ent
+    logging.getLogger(__name__).info('Could not find a robot with the name ' + robot_name)
+    return None
