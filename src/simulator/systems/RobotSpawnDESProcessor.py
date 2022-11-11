@@ -94,6 +94,9 @@ class RobotSpawnerRos(RosTopicServer):
         self.logger = logging.getLogger(__name__)
         self.event_store = kwargs.get('event_store', None)
 
+    def get_name(self):
+        return 'spawn_robot'
+
     def listener_callback(self, msg):
         self.logger.info('Received order to spawn a robot')
         event = EVENT(RobotSpawnEventTag, RobotSpawnPayload(msg.data))
