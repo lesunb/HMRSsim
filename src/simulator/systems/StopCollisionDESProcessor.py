@@ -37,21 +37,6 @@ def process(kwargs: SystemArgs):
             collision.add_collision(otherEnt, kwargs.get('ENV').now, Position(position.x, position.y))
             continue
 
-        #logger.debug(f'Collision! ent {ent}@({pos}) hit {otherEnt}@({other_pos})')
-        if mx < ox:
-            # I'm on the left of the other entity
-            pos.x = other_pos.x - 1
-        elif mx > ox:
-            # I'm on the right
-            pos.x = other_pos.x + other_pos.w + 1
-        # TODO: Handle case when they are in the same X coordinate?...
-        # TODO: Handle diagonal contact with round shapes
-        if my < oy:
-            pos.y = other_pos.y - 1
-        elif my > oy:
-            pos.y = other_pos.y + other_pos.h + 1
-        # TODO: Handle case when they are in the same Y coordinate?...
-
         # If following path, remove it
         # This can cause failure of other systems.
         # We need to communicate the control system, instead of doing this.
