@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y curl build-essential python-is-python3 
 RUN curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python get-pip.py
 RUN pip install "poetry==1.1.13"
+RUN apt-get -y dist-upgrade
 
 COPY src/ /etc/hmrsim/src
 COPY examples/ /etc/hmrsim/examples

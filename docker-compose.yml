@@ -1,16 +1,23 @@
 version: "3"
 
 services:
-  hmrsim-rosbridge:
-    image: hmrsim-rosbridge
-    container_name: hmrsim-rosbridge
+  hmrsim:
+    image: hmrsim
+    container_name: hmrsim
     build: .
-    ports:
-      - 9090:9090
     volumes:
       - ./src/:/etc/hmrsim/src/
       - ./examples:/etc/hmrsim/examples
     working_dir: /etc/hmrsim
+    networks:
+      - hmrsim
+  rosbridge:
+    image: rosbridge
+    build:
+      dockerfile: ./bridge.DockerFile
+    working_dir: /etc/hmrsim
+    ports:
+      - 9090:9090
     networks:
       - hmrsim
   roseer:
@@ -18,7 +25,7 @@ services:
     container_name: roseer
     build: https://github.com/daniloinacio/ROSeer.git#main
     depends_on:
-      - hmrsim-rosbridge
+      - hmrsim
     ports:
       - "3000:3000"
     networks:
