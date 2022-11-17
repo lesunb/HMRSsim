@@ -158,24 +158,31 @@ def dropInstrution(ent: int, args: List[str], script: Script, event_store: Filte
     script.expecting.append(ClawDoneTag)
     return script.state
 
+def create_grab_and_drop_for_each_robot(world, event_store):
+    services = []
+    for ent, (vel, pos, ros_goal) in world.get_components(Velocity, Position, NavToPoseRosGoal):
+        grab = RosClawGrabService(event_store=event_store, world=world, robot_name=ros_goal.name)
+        drop = RosClawDropService(event_store=event_store, world=world, robot_name=ros_goal.name)
+        services.append(grab)
+        services.append(drop)
+    return services
 
-class RosClawService(RosTopicServer):
+class RosClawGrabService(RosTopicServer):
 
     def __init__(self, **kwargs):
         super().__init__()
         self.logger = logging.getLogger(__name__)
         self.event_store = kwargs.get('event_store', None)
         self.world = kwargs.get('world', None)
+        self.robot_name = kwargs.get('robot_name', None)
 
     def get_name(self):
-        return "claw"
+        return self.robot_name + "/grab"
 
     def listener_callback(self, msg):
-        robot, object = get_claw_msg_data(msg.data)
-        if robot is None:
-            return
-        self.logger.info(f'Received order for {robot} to grab')
-        entity = find_robot_in_world(self.world, robot)
+        object = msg.data
+        self.logger.info(f'Received order for {self.robot_name} to grab {object}')
+        entity = find_robot_in_world(self.world, self.robot_name)
         if entity is None:
             return
         payload = GRAB_ClawPayload(op=ClawOps.GRAB, obj=object, me=entity)
@@ -192,16 +199,15 @@ class RosClawDropService(RosTopicServer):
         self.logger = logging.getLogger(__name__)
         self.event_store = kwargs.get('event_store', None)
         self.world = kwargs.get('world', None)
+        self.robot_name = kwargs.get('robot_name', None)
 
     def get_name(self):
-        return "drop"
+        return self.robot_name + "/drop"
 
     def listener_callback(self, msg):
-        robot, object = get_claw_msg_data(msg.data)
-        if robot is None:
-          return
-        self.logger.info(f'Received order for {robot} to drop')
-        entity = find_robot_in_world(self.world, robot)
+        object = msg.data
+        self.logger.info(f'Received order for {self.robot_name} to drop {object}')
+        entity = find_robot_in_world(self.world, self.robot_name)
         if entity is None:
             return
         payload = GRAB_ClawPayload(op=ClawOps.DROP, obj=object, me=entity)
@@ -210,13 +216,6 @@ class RosClawDropService(RosTopicServer):
 
     def get_listener_callback(self):
         return self.listener_callback
-
-def get_claw_msg_data(msg):
-    msg = msg.split(' ')
-    if len(msg) != 2:
-        logging.getLogger(__name__).warn('Message not in the correct format: robot_name object')
-        return None, None
-    return msg[0], msg[1]
 
 def find_robot_in_world(world, robot_name):
     for ent, (vel, pos, ros_goal) in world.get_components(Velocity, Position, NavToPoseRosGoal):
