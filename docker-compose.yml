@@ -9,13 +9,6 @@ services:
       - ./src/:/etc/hmrsim/src/
       - ./examples:/etc/hmrsim/examples
     working_dir: /etc/hmrsim
-    networks:
-      - hmrsim
-  rosbridge:
-    image: rosbridge
-    build:
-      dockerfile: ./bridge.DockerFile
-    working_dir: /etc/hmrsim
     ports:
       - 9090:9090
     networks:
