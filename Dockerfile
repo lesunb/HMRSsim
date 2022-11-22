@@ -21,6 +21,7 @@ COPY ./README.md /etc/hmrsim/README.md
 
 WORKDIR /etc/hmrsim
 RUN poetry install
+WORKDIR /etc/hmrsim/examples
 
 COPY ./hmrsim_entrypoint.sh /hmrsim_entrypoint.sh
 
