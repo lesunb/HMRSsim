@@ -7,7 +7,6 @@ services:
     build: .
     volumes:
       - ./src/:/etc/hmrsim/src/
-      - ./examples:/etc/hmrsim/examples
     working_dir: /etc/hmrsim
     ports:
       - 9090:9090
