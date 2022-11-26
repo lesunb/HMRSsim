@@ -1,6 +1,6 @@
 FROM ros:foxy-ros-core
 
-RUN apt-get update && apt-get install -y curl build-essential python-is-python3 ros-foxy-rosbridge-server ros-foxy-navigation2 ros-foxy-nav2-bringup '~ros-foxy-turtlebot3-.*'
+RUN apt-get update && apt-get install -y curl build-essential python-is-python3 ros-foxy-rosbridge-server ros-foxy-navigation2 ros-foxy-nav2-bringup ros-foxy-moveit-msgs '~ros-foxy-turtlebot3-.*'
 RUN curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python get-pip.py
 RUN pip install "poetry==1.1.13"

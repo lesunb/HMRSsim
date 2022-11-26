@@ -44,7 +44,7 @@ def main():
     ros_control = RosControlPlugin(scan_interval=0.1)
     claw_services = ClawProcessor.create_grab_and_drop_for_each_robot(world=world, event_store=eventStore)
     for service in claw_services:
-        ros_control.create_topic_server(service)
+        ros_control.create_action_server(service)
     nav2_services = Nav2System.create_services(event_store=eventStore, world=world)
     for service in nav2_services:
         ros_control.create_action_server(service)
