@@ -161,11 +161,13 @@ def drop_object(obj_name, me, ros_service: RosClawService = None):
     _EVENT_STORE.put(event_to_put)
     return success, msg
 
+
 def grabInstruction(ent: int, args: List[str], script: Script, event_store: FilterStore) -> States:
     _ENV.process(pick_object(obj_name=args[0], me=ent))
     script.state = States.BLOCKED
     script.expecting.append(ClawDoneTag)
     return script.state
+
 
 def dropInstrution(ent: int, args: List[str], script: Script, event_store: FilterStore) -> States:
     _ENV.process(drop_object(obj_name=args[0], me=ent))
@@ -173,14 +175,18 @@ def dropInstrution(ent: int, args: List[str], script: Script, event_store: Filte
     script.expecting.append(ClawDoneTag)
     return script.state
 
+
 def create_grab_and_drop_for_each_robot(world, event_store):
     services = []
     for ent, (vel, pos, ros_goal) in world.get_components(Velocity, Position, NavToPoseRosGoal):
-        grab = RosClawGrabService(event_store=event_store, world=world, robot_name=ros_goal.name)
-        drop = RosClawDropService(event_store=event_store, world=world, robot_name=ros_goal.name)
+        grab = RosClawGrabService(
+            event_store=event_store, world=world, robot_name=ros_goal.name)
+        drop = RosClawDropService(
+            event_store=event_store, world=world, robot_name=ros_goal.name)
         services.append(grab)
         services.append(drop)
     return services
+
 
 class RosClawGrabService(RosClawService):
 
@@ -198,13 +204,16 @@ class RosClawGrabService(RosClawService):
         return self.robot_name + "/grab"
 
     def result_callback(self, goal_handle: ServerGoalHandle):
-        if self.succeed:
-            goal_handle.succeed()
-        else:
-            goal_handle.abort()
+        self.update_goal_handle(goal_handle)
         result = Pickup.Result()
         result.trajectory_descriptions = [self.msg]
         return result
+
+    def update_goal_handle(self, goal_handle: ServerGoalHandle):
+        if self.succeed:
+            goal_handle.succeed()
+            return
+        goal_handle.abort()
 
     def get_result_callback(self):
         return self.result_callback
@@ -215,12 +224,10 @@ class RosClawGrabService(RosClawService):
         self.succeed = succeed
         self.msg = msg
         self.goal_handle.execute()
-    
+
     def goal_callback(self, goal_request):
-        # TODO Take this to a method
-        for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
-            if ros_goal.name != self.robot_name:
-                continue
+        entity = find_robot_in_world(self.world, self.robot_name)
+        if entity is not None:
             return GoalResponse.ACCEPT
         self.logger.warn(f"Coudn't find a robot named {self.robot_name}")
         return GoalResponse.REJECT
@@ -236,7 +243,8 @@ class RosClawGrabService(RosClawService):
         if entity is None:
             return
         self.goal_handle = goal_handle
-        payload = GRAB_ClawPayload(op=ClawOps.GRAB, obj=object, me=entity, ros_service=self)
+        payload = GRAB_ClawPayload(
+            op=ClawOps.GRAB, obj=object, me=entity, ros_service=self)
         event = EVENT(ClawTag, payload)
         self.event_store.put(event)
 
@@ -269,13 +277,16 @@ class RosClawDropService(RosClawService):
         return self.robot_name + "/drop"
 
     def result_callback(self, goal_handle: ServerGoalHandle):
-        if self.succeed:
-            goal_handle.succeed()
-        else:
-            goal_handle.abort()
+        self.update_goal_handle(goal_handle)
         result = Place.Result()
         result.trajectory_descriptions = [self.msg]
         return result
+
+    def update_goal_handle(self, goal_handle: ServerGoalHandle):
+        if self.succeed:
+            goal_handle.succeed()
+            return
+        goal_handle.abort()
 
     def get_result_callback(self):
         return self.result_callback
@@ -288,10 +299,8 @@ class RosClawDropService(RosClawService):
         self.goal_handle.execute()
 
     def goal_callback(self, goal_request):
-        # TODO Take this to a method
-        for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
-            if ros_goal.name != self.robot_name:
-                continue
+        entity = find_robot_in_world(self.world, self.robot_name)
+        if entity is not None:
             return GoalResponse.ACCEPT
         self.logger.warn(f"Coudn't find a robot named {self.robot_name}")
         return GoalResponse.REJECT
@@ -307,7 +316,8 @@ class RosClawDropService(RosClawService):
         if entity is None:
             return
         self.goal_handle = goal_handle
-        payload = GRAB_ClawPayload(op=ClawOps.DROP, obj=object, me=entity, ros_service=self)
+        payload = GRAB_ClawPayload(
+            op=ClawOps.DROP, obj=object, me=entity, ros_service=self)
         event = EVENT(ClawTag, payload)
         self.event_store.put(event)
 
@@ -323,9 +333,11 @@ class RosClawDropService(RosClawService):
     def get_service_type(self):
         return Place
 
+
 def find_robot_in_world(world, robot_name):
     for ent, (vel, pos, ros_goal) in world.get_components(Velocity, Position, NavToPoseRosGoal):
         if ros_goal.name == robot_name:
             return ent
-    logging.getLogger(__name__).info('Could not find a robot with the name ' + robot_name)
+    logging.getLogger(__name__).info(
+        'Could not find a robot with the name ' + robot_name)
     return None
