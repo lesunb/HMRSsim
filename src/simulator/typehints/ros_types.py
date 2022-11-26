@@ -24,6 +24,7 @@ class RosActionServer(RosService):
 
     @abstractmethod
     def get_result_callback(self):
+        # TODO Rename this to get_execute_callback
         pass
 
     @abstractmethod
