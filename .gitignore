@@ -164,7 +164,7 @@ Thumbs.db
 
 # VSCode
 .vscode/settings.json
-.vscode/
+.vscode/tasks.json
 .idea/
 
 ### ROS2 ###
