@@ -122,7 +122,6 @@ class Nav2System(RosActionServer):
         For HMRSim, this is a callback that should be called after an entity had arrived
         in the destiny.
         """
-
         goal_handle.succeed()
         result = NavigateToPose.Result()
         return result
@@ -131,7 +130,6 @@ class Nav2System(RosActionServer):
         """
         This is gonna add a new event to move an entity towards it's destination.
         """
-
         if len(args) == 1: # it's a POI
             payload = GotoPoiPayload(ent, args[0])
             new_event = EVENT(GotoPoiEventTag, payload)
@@ -151,11 +149,14 @@ class Nav2System(RosActionServer):
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
             if ros_goal.goal_handle == goal_handle:
                 self.cancel_ros_goal_component(ros_goal, ent, vel)
-                self.logger.info("Cancel accepted")
+                self.logger.info(f"Cancelation requested for {ros_goal.name} accepted")
                 return CancelResponse.ACCEPT
         return CancelResponse.REJECT
     
     def cancel_ros_goal_component(self, ros_goal, ent, vel):
+        """
+        This will make the necessary procedures to cancel a ros gotopose goal.
+        """
         vel.x = 0
         vel.y = 0
         vel.alpha = 0
