@@ -215,7 +215,7 @@ class RosClawGrabService(RosClawService):
             return
         goal_handle.abort()
 
-    def get_result_callback(self):
+    def get_execute_callback(self):
         return self.result_callback
 
     def execute_goal(self, succeed=False, msg=None):
@@ -288,7 +288,7 @@ class RosClawDropService(RosClawService):
             return
         goal_handle.abort()
 
-    def get_result_callback(self):
+    def get_execute_callback(self):
         return self.result_callback
 
     def execute_goal(self, succeed=False, msg=None):

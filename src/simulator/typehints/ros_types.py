@@ -23,7 +23,7 @@ class RosTopicServer(RosService):
 class RosActionServer(RosService):
 
     @abstractmethod
-    def get_result_callback(self):
+    def get_execute_callback(self):
         # TODO Rename this to get_execute_callback
         pass
 

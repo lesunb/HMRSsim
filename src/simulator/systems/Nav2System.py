@@ -171,7 +171,7 @@ class Nav2System(RosActionServer):
     def get_handle_accepted_goal_callback(self):
         return self.handle_accepted_goal
 
-    def get_result_callback(self):
+    def get_execute_callback(self):
         return self.send_result
     
     def get_service_type(self):

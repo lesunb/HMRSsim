@@ -8,7 +8,7 @@
             "name": "hmrsim hospital",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/examples/hospitalSimulationRos/hospital_ros_run.py",
+            "program": "${workspaceFolder}/examples/hospitalSimulationRos/run.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/examples/hospitalSimulationRos",
             "args": [
