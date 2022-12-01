@@ -50,15 +50,19 @@ class Nav2System(RosActionServer):
         event_store = kwargs.get('EVENT_STORE')
         world = kwargs.get('WORLD')
         while True:
-            # An EndOfPathTag indicates that a robot arrived
+            # An EndOfPathTag indicates that the robot arrived
             end_event = yield event_store.get(lambda e: e.type == EndOfPathTag)
 
             for ent, (vel, pos, ros_goal) in world.get_components(Velocity, Position, NavToPoseRosGoal):
-                if end_event.payload.ent == ent and ros_goal.goal_handle is not None:
-                    logging.getLogger(__name__).info(f"The robot {ent} ({ros_goal.name}) arrived at destination.")
-                    ros_goal.goal_handle.execute()
-                    ros_goal.goal_handle = None
+                entity_found = end_event.payload.ent == ent and ros_goal.goal_handle is not None
+                if entity_found:
+                    logging.getLogger(__name__).info(f"{ros_goal.name} (entity {ent}) arrived at destination.")
+                    Nav2System.finalize_ros_goal(ros_goal)
                     break
+
+    def finalize_ros_goal(ros_goal):
+        ros_goal.goal_handle.execute()
+        ros_goal.goal_handle = None
 
     def process(self):
         """
@@ -69,15 +73,21 @@ class Nav2System(RosActionServer):
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
             if ros_goal.name != self.robot_name:
                 continue
-            if ros_goal.goal_handle is not None and ros_goal.goal_handle.is_active:
-                if pos.changed:
-                    # Publishing feedback
-                    feedback = NavigateToPose.Feedback()
-                    feedback.current_pose.pose.position.x = float(pos.x)
-                    feedback.current_pose.pose.position.y = float(pos.y)
-                    feedback.distance_remaining = math.dist([pos.x, pos.y], [ros_goal.x, ros_goal.y])
-                    ros_goal.goal_handle.publish_feedback(feedback)
+            has_active_goal = ros_goal.goal_handle is not None and ros_goal.goal_handle.is_active
+            if has_active_goal and pos.changed:
+                self.publish_feedback(ros_goal, pos)
     
+    def publish_feedback(self, ros_goal, pos):
+        """
+        This will publish acoring to the actual position of the goal
+        """
+        feedback = NavigateToPose.Feedback()
+        feedback.current_pose.pose.position.x = float(pos.x)
+        feedback.current_pose.pose.position.y = float(pos.y)
+        feedback.distance_remaining = math.dist(
+            [pos.x, pos.y], [ros_goal.x, ros_goal.y])
+        ros_goal.goal_handle.publish_feedback(feedback)
+
     def goal_callback(self, goal_request):
         """
         Executed when a new goal is received. If there is another goal running,
@@ -96,26 +106,30 @@ class Nav2System(RosActionServer):
         """
         This is a callback to be executed after a goal had just been accepted through ROS.
         """
-
         pose = goal_handle.request.pose.pose
         self.logger.info('Goal received for %s: %s, %s' % (self.robot_name, pose.position.x, pose.position.y))
         if not self.event_store:
             self.logger.warn('Could not find event store')
             return
 
+        # looking for the robot and making it move
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
             if ros_goal.name != self.robot_name:
                 continue
             if ros_goal.goal_handle is not None:
-                self.logger.info("There is already a goal running")
+                self.logger.info(f"There is already a goal running for {self.robot_name}")
                 break
-            if list(pos.center) == list((pose.position.x, pose.position.y)):
+            arrived = list(pos.center) == list((pose.position.x, pose.position.y))
+            if arrived:
                 goal_handle.execute()
                 break
-            ros_goal.goal_handle = goal_handle
-            ros_goal.x = pose.position.x
-            ros_goal.y = pose.position.y
-            self.go_to(ent, [str(pose.position.x), str(pose.position.y)])
+            self.start_moving(ent, ros_goal, goal_handle, pose)
+    
+    def start_moving(self, ent, ros_goal, goal_handle, pose):
+        ros_goal.goal_handle = goal_handle
+        ros_goal.x = pose.position.x
+        ros_goal.y = pose.position.y
+        self.go_to(ent, [str(pose.position.x), str(pose.position.y)])
 
     def send_result(self, goal_handle: ServerGoalHandle):
         """
@@ -130,16 +144,24 @@ class Nav2System(RosActionServer):
         """
         This is gonna add a new event to move an entity towards it's destination.
         """
-        if len(args) == 1: # it's a POI
-            payload = GotoPoiPayload(ent, args[0])
-            new_event = EVENT(GotoPoiEventTag, payload)
-        elif len(args) == 2:
-            payload = GotoPosPayload(ent, [float(args[0]), float(args[1])])
-            new_event = EVENT(GotoPosEventTag, payload)
-        else:
-            raise Exception('GO instruction failed. Go <poi> OR Go <x> <y>')
+        new_event = self.create_goto_event(ent, args)
         if new_event:
             self.event_store.put(new_event)
+    
+    def create_goto_event(self, ent, args):
+        if len(args) == 1: # it's a POI
+            return self.createPOIEvent(ent, args[0])
+        if len(args) == 2: # a position
+            return self.createPOSEvent(ent, [float(args[0]), float(args[1])])
+        raise Exception('Navigate to Pose failed.')
+    
+    def createPOIEvent(self, ent, arg):
+        payload = GotoPoiPayload(ent, arg)
+        return EVENT(GotoPoiEventTag, payload)
+
+    def createPOSEvent(self, ent, arg):
+        payload = GotoPosPayload(ent, arg)
+        return EVENT(GotoPosEventTag, payload)
 
     def cancel(self, goal_handle: ServerGoalHandle):
         """
@@ -147,7 +169,8 @@ class Nav2System(RosActionServer):
         """
         self.logger.info("Cancel requested...")
         for ent, (vel, pos, ros_goal) in self.world.get_components(Velocity, Position, NavToPoseRosGoal):
-            if ros_goal.goal_handle == goal_handle:
+            running_goal_found = ros_goal.goal_handle == goal_handle
+            if running_goal_found:
                 self.cancel_ros_goal_component(ros_goal, ent, vel)
                 self.logger.info(f"Cancelation requested for {ros_goal.name} accepted")
                 return CancelResponse.ACCEPT
