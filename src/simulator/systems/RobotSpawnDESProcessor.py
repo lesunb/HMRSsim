@@ -30,8 +30,7 @@ def collidable_from_position(pos: Point) -> List[ShapeDefinition]:
     return [(center, points)]
 
 
-def init(ros_control=None):
-    ros_control = ros_control
+def init(on_robot_spawn=None):
     def process(kwargs: SystemArgs):
         event_store = kwargs.get('EVENT_STORE', None)
         world: esper.World = kwargs.get('WORLD', None)
@@ -62,7 +61,6 @@ def init(ros_control=None):
 
             pos = robot.joints[0].origin.xyz
             type = 'robot'
-            # TODO Arrumar o tamanho do robô
             initialized_components = initialize_components(
                 {
                     "Position": [pos[0], pos[1], 0, 20, 20],
@@ -77,12 +75,8 @@ def init(ros_control=None):
             draw2ent[ent_id] = [ent, {'type': type}]
             objects.append((ent, ent_id))
 
-            # TODO Desacoplar o Nav2System daqui
-            ros_services = Nav2System.create_services(event_store=event_store, world=world)
-            for service in ros_services:
-                if any((hasattr(s, "robot_name") and s.robot_name == service.robot_name) for s in ros_control.services):
-                    continue
-                ros_control.create_action_server(service)
+            if on_robot_spawn is not None:
+                on_robot_spawn()
     
     return process
 

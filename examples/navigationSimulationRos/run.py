@@ -54,7 +54,7 @@ def main():
         (NavigationSystemProcess,),
         (ros_control.process, ros_control.end),
         (Nav2System.end_path_event_listener,),
-        (RobotSpawnDESProcessor.init(ros_control=ros_control),)
+        (RobotSpawnDESProcessor.init(lambda: on_robot_spawn(eventStore, world, ros_control)),)
     ]
 
     # Add processors to the simulation, according to processor type
@@ -64,6 +64,14 @@ def main():
         simulator.add_des_system(p)
 
     simulator.run()
+
+def on_robot_spawn(event_store, world, ros_control):
+    ros_services = Nav2System.create_services(event_store=event_store, world=world)
+    for service in ros_services:
+        # verificando se tá faltando algum robô no mapa
+        if any((hasattr(s, "robot_name") and s.robot_name == service.robot_name) for s in ros_control.services):
+            continue
+        ros_control.create_action_server(service)
 
 if __name__ == '__main__':
     main()

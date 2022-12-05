@@ -1,10 +1,10 @@
 {
     "context": ".",
-    "map": "/etc/hmrsim/examples/navigationSimulationRos/poi_test.drawio",
+    "map": "poi_test.drawio",
     "FPS": 1,
     "DLW": 10,
     "verbose": 20,
     "simulatorConfigOptions": {
-        "loggerConfig": "/etc/hmrsim/examples/navigationSimulationRos/loggerConfig.yml"
+        "loggerConfig": "loggerConfig.yml"
     }
 }

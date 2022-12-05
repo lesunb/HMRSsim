@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "hmrsim hospital",
+            "name": "hospital ros",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/examples/hospitalSimulationRos/run.py",
@@ -13,6 +13,17 @@
             "cwd": "${workspaceFolder}/examples/hospitalSimulationRos",
             "args": [
                 "${workspaceFolder}/examples/hospitalSimulationRos/simulation.json"
+            ]
+        },
+        {
+            "name": "navigation ros",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/navigationSimulationRos/run.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/examples/navigationSimulationRos",
+            "args": [
+                "${workspaceFolder}/examples/navigationSimulationRos/simulation.json"
             ]
         },
         {
