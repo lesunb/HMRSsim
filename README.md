@@ -8,87 +8,107 @@ Heterogeneous Multi-Robots Systems Simulator
 
 Install for Dev
 -------------
-Dependencies: python 3.8+, pip
+Dependencies: python 3.8+, pip, poetry
 
-Install pipenv
-------------- 
-
-pipenv easy the process of managing python dependencies
 
 Install dependencies
 --------------------
 
-Inside the project folder (after clone)
+The poject runs inside a virtual environment managed by [Poetry](https://python-poetry.org/).
+To install it do
 
-```console
-$ pip install pipenv
-$ cd HMRSsim
-$ pipenv install
-$ pipenv shell
-(hmrssim env) % pipenv install --dev
+```bash
+$ pip install poetry
 ```
+
+
+Install ROS dependencies (opitional)
+------------------------------------
+
+To install ROS dependecies run the commands below:
+
+
+```bash
+$ apt-get update
+$ apt-get install -y curl build-essential ros-foxy-rosbridge-server ros-foxy-navigation2 ros-foxy-nav2-bringup ros-foxy-moveit-msgs '~ros-foxy-turtlebot3-.*'
+```
+
+The project was tested only with ROS [Foxy](https://docs.ros.org/en/foxy/index.html), but it doesn't mean you cannot try with other versions.
+
 
 Install the package
 -------------------
 
-Currently the easier way to install the package is to do it locally. In the root folder run the command below to install the `HMRsim_lesunb` package in edit mode. Edit mode means any changes you make to `src/simulator` will be reflected in the package.
+Currently the easiest way to install the package is to do it locally.
+After installing Poetry, in the root folder run the command below to install the `HMRsim_lesunb` inside the environment.
+Edit mode means any changes you make to `src/simulator` will be reflected in the package.
 
 ```bash
-pip install -e .
+$ poetry install
 ```
-Check the package was installed.   
+Check if the package was installed.
 
 ```bash
-pip list
+$ poetry run pip list
 # ...
 # HMRsim-lesunb            0.0.1
 # ...
 ```
+
 Run
 ---
 
-Simulations are defined in by config objects. You can pass the config to the Simulator class either by a dict object, or by passing the path to a json file.  
-```python
-simulator = Simulator(config)
-```
+Some examples do not use ROS to run, you can run them with no need to install ROS related dependencies.
 
-> 💡     
+Below we describe how to run the examples.
+
+> 💡
 > The package exports a utility function to help you parse the config.       
 > `$ hmrsimcli configtest -f simulation.json`   
 >     
 
 
+Get inside the environment
+
+```bash
+$ poetry shell
+```
+
+>
+> Check the `examples/` folder for different example simulations
+>
+
 The file that build a simulation and runs it is `run.py`
-To execute the simulation, run
+To execute the simulation, go inside the example you want to run and do
+
 ```bash
 $ python run.py [path/to/config.json]
 ```
 
-> 💡     
-> Check the `examples/` folder for different example simulations    
->     
+Simulations are defined by config objects. You can pass the config to the Simulator class either by a dict object, or by passing the path to a json file.
+```python
+simulator = Simulator(config)
+```
 
 Run using Docker
 ----------------
 
-If you just want to run a simulation in the project (e.g. you are not developing HMRSim itself) you may opt to run it using a Docker container. First you build the image, which does exactly what was described above in a Docker image
+If you just want to run a simulation in the project (e.g. you are not developing HMRSim itself) you may opt to run it using a Docker container.
+First you build the image, which does what was described above in a Docker image:
 
+```bash
+$ docker build --rm -t hmrsim --build-arg example_folder=[path/to/example/folder] .
 ```
-$ docker build --rm -t hmrsim .
+Explaining somethings in the command:
+
+* With the `--build-arg` argument you specify the path to the example folder you want to execute inside the container.
+* If you don't want to set this variable everytime you build, you can set the `example_folder` parameter in the `Dockerfile`.
+
+Then you can run simulations inside the container by using the command below:
+
+```bash
+$ docker run hmrsim:latest
 ```
-
-Then you can run simulations inside the container by using the command below. 
-
-```
-$ docker run -it -v ${PWD}/examples/hospitalSimulation:/usr/app hmrsim:latest python run.py ./simulation.json
-```
-
-This command has a few important parts:
-* `-v ${PWD}/examples/hospitalSimulation:/usr/app` - Connects the folder `${PWD}/examples/hospitalSimulation` in the host machine to the folder `/usr/app` in the container. The working directory inside the container is `/usr/app`. You should change `examples/hospitalSimulation` by the path to the root folder of your simulation project.
-
-* `hmrsim:latest` - Indicates what image to use
-
-* `python run.py ./simulation.json` - Command to start the simulation, as described above. Notice that `run.py` is actually `/usr/app/run.py` inside the container. Same thing for `simualtion.json`.
 
 Dependency
 ----------
@@ -99,16 +119,14 @@ Add New Dependency
 To add new dependencies use the following command.
 
 ```console
-$ pipenv install [name]
+$ poetry add [name]
+$ poetry install
 ```
 
-This command will add the dependency to the Pipfile and Pipfile.lock assuring that the execution can be reproduced in another environment (after dependencies are updated with `pipenv install` command )
+This command will add the dependency to the project.
 
-Add New Dev Dependency
-----------------------
-Same as previous dependencies, but for development libraries such as the ones used for test.
 
-```console
-$ pipenv install [name] --dev
-```
-Note that other systems after pulling updates will need a reexecution of `pipenv install --dev`
+Troubleshooting
+---------------
+
+% TODO problem with the poetry.lock file, outdated packages.
