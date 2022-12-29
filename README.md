@@ -157,3 +157,8 @@ Troubleshooting
 * Your operational system may not have the ROS version used here to run (foxy) the simulation, if that happens try another version.
 * If you're having trouble with the version of the `poetry.lock` when building the container, maybe your `poetry.lock` is modified, checkout the changes and try again.
 * If you get an error in ROS Seer try stopping HMR Sim (not ROSeer), reloading the page and starting HMR Sim again. This should be solved after an implementation of a handshake process between HMR Sim and ROSeer.
+
+How to use HMR Sim with ROS
+---------------------------
+
+In the file [ROS Controller](./ROS%20Controller.md) you find some instructions of how to control HMR Sim robots via ROS.
