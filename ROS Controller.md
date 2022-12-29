@@ -52,3 +52,10 @@ Below, there is a command example to make **wall_e** drop it.
 ```bash
 ros2 action send_goal wall_e/drop moveit_msgs/action/Place "{ attached_object_name: 'medicine' }" --feedback
 ```
+
+Controlling with python
+-----------------------
+
+[Here](https://github.com/yellak/learning-ros/blob/main/hmrsim_tester.py) is an example of controlling a robot in HMR Sim with python, just sending a *go to pose* goal.
+
+[Here](https://github.com/yellak/learning-py-trees/blob/main/go_to_pose_tree.py) is another example of sending a *go to pose* goal but using [py-trees](https://py-trees.readthedocs.io/en/devel/).
