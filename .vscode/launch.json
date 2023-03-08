@@ -4,13 +4,43 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        {"name":"Python: Current File","type":"python","request":"launch","program":"${file}","console":"integratedTerminal"},
         {
-            "name": "Python: Current File",
+            "name": "hospital ros",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
+            "program": "${workspaceFolder}/examples/hospitalSimulationRos/run.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/examples/hospitalSimulationRos",
+            "args": [
+                "${workspaceFolder}/examples/hospitalSimulationRos/simulation.json"
+            ]
+        },
+        {
+            "name": "navigation ros",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/navigationSimulationRos/run.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/examples/navigationSimulationRos",
+            "args": [
+                "${workspaceFolder}/examples/navigationSimulationRos/simulation.json"
+            ]
+        },
+        {
+            "name": "Docker: Python - General",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run: debug",
+            "removeContainerAfterDebug": false,
+            "python": {
+                "pathMappings": [
+                    {
+                        "localRoot": "${workspaceFolder}",
+                        "remoteRoot": "/etc/hmrsim"
+                    }
+                ],
+                "projectType": "general"
+            }
         }
     ]
 }

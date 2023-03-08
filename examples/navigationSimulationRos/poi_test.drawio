@@ -1,0 +1,113 @@
+<mxfile host="65bd71144e">
+    <diagram id="nFHqeYb1Vjg3AZ5FSIf_" name="POI test">
+        <mxGraphModel dx="1331" dy="349" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="583" pageHeight="413" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <object label="" type="POI" tag="7" display="true" id="MUB7im2g7Zm_g3CCuWGE-4">
+                    <mxCell style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e51400;strokeColor=#B20000;fontColor=#ffffff;" parent="1" vertex="1">
+                        <mxGeometry x="70" y="350" width="16" height="16" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object label="" type="POI" tag="9" display="true" id="MUB7im2g7Zm_g3CCuWGE-5">
+                    <mxCell style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e51400;strokeColor=#B20000;fontColor=#ffffff;" parent="1" vertex="1">
+                        <mxGeometry x="510" y="350" width="16" height="16" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object label="" type="POI" tag="3" display="true" id="MUB7im2g7Zm_g3CCuWGE-6">
+                    <mxCell style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e51400;strokeColor=#B20000;fontColor=#ffffff;" parent="1" vertex="1">
+                        <mxGeometry x="510" y="30" width="16" height="16" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object label="" type="POI" tag="2" display="true" id="MUB7im2g7Zm_g3CCuWGE-7">
+                    <mxCell style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e51400;strokeColor=#B20000;fontColor=#ffffff;" parent="1" vertex="1">
+                        <mxGeometry x="284" y="30" width="16" height="16" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object label="" type="POI" tag="8" display="true" id="MUB7im2g7Zm_g3CCuWGE-8">
+                    <mxCell style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e51400;strokeColor=#B20000;fontColor=#ffffff;" parent="1" vertex="1">
+                        <mxGeometry x="284" y="350" width="16" height="16" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object label="" type="POI" tag="4" display="true" id="MUB7im2g7Zm_g3CCuWGE-11">
+                    <mxCell style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e51400;strokeColor=#B20000;fontColor=#ffffff;" parent="1" vertex="1">
+                        <mxGeometry x="70" y="199" width="16" height="16" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object label="" type="POI" tag="6" display="true" id="MUB7im2g7Zm_g3CCuWGE-12">
+                    <mxCell style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e51400;strokeColor=#B20000;fontColor=#ffffff;" parent="1" vertex="1">
+                        <mxGeometry x="510" y="199" width="16" height="16" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object label="" type="POI" tag="5" display="true" id="MUB7im2g7Zm_g3CCuWGE-13">
+                    <mxCell style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e51400;strokeColor=#B20000;fontColor=#ffffff;" parent="1" vertex="1">
+                        <mxGeometry x="284" y="199" width="16" height="16" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object label="" type="POI" tag="1" display="true" id="2">
+                    <mxCell style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e51400;strokeColor=#B20000;fontColor=#ffffff;" parent="1" vertex="1">
+                        <mxGeometry x="70" y="30" width="16" height="16" as="geometry"/>
+                    </mxCell>
+                </object>
+                <object label="" type="map-path" id="3">
+                    <mxCell style="endArrow=classic;html=1;" parent="1" edge="1">
+                        <mxGeometry width="50" height="50" relative="1" as="geometry">
+                            <mxPoint x="120" y="60" as="sourcePoint"/>
+                            <mxPoint x="520" y="60" as="targetPoint"/>
+                            <Array as="points">
+                                <mxPoint x="160" y="60"/>
+                                <mxPoint x="300" y="60"/>
+                            </Array>
+                        </mxGeometry>
+                    </mxCell>
+                </object>
+                <object label="" type="map-path" id="4">
+                    <mxCell style="endArrow=classic;html=1;" parent="1" edge="1">
+                        <mxGeometry width="50" height="50" relative="1" as="geometry">
+                            <mxPoint x="160" y="60" as="sourcePoint"/>
+                            <mxPoint x="160" y="370" as="targetPoint"/>
+                            <Array as="points">
+                                <mxPoint x="160" y="220"/>
+                                <mxPoint x="160" y="330"/>
+                            </Array>
+                        </mxGeometry>
+                    </mxCell>
+                </object>
+                <object label="" type="map-path" id="5">
+                    <mxCell style="endArrow=classic;html=1;" parent="1" edge="1">
+                        <mxGeometry width="50" height="50" relative="1" as="geometry">
+                            <mxPoint x="80" y="240" as="sourcePoint"/>
+                            <mxPoint x="480" y="240" as="targetPoint"/>
+                            <Array as="points">
+                                <mxPoint x="180" y="240"/>
+                                <mxPoint x="290" y="240"/>
+                            </Array>
+                        </mxGeometry>
+                    </mxCell>
+                </object>
+                <object label="" type="map-path" id="6">
+                    <mxCell style="endArrow=classic;html=1;" parent="1" edge="1">
+                        <mxGeometry width="50" height="50" relative="1" as="geometry">
+                            <mxPoint x="74" y="330" as="sourcePoint"/>
+                            <mxPoint x="400" y="330" as="targetPoint"/>
+                            <Array as="points">
+                                <mxPoint x="160" y="330"/>
+                            </Array>
+                        </mxGeometry>
+                    </mxCell>
+                </object>
+                <object label="" type="map-path" id="7">
+                    <mxCell style="endArrow=classic;html=1;" parent="1" edge="1">
+                        <mxGeometry width="50" height="50" relative="1" as="geometry">
+                            <mxPoint x="82" y="60" as="sourcePoint"/>
+                            <mxPoint x="292" y="60" as="targetPoint"/>
+                            <Array as="points">
+                                <mxPoint x="170" y="60"/>
+                            </Array>
+                        </mxGeometry>
+                    </mxCell>
+                </object>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

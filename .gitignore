@@ -164,5 +164,12 @@ Thumbs.db
 
 # VSCode
 .vscode/settings.json
-.vscode/
+.vscode/tasks.json
 .idea/
+
+### ROS2 ###
+src/ros2_ws/install/
+src/ros2_ws/log/
+src/ros2_ws/build/
+install/
+log/

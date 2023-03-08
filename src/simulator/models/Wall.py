@@ -17,8 +17,8 @@ def from_mxCell(el, lineWidth=10):
     geometry = el[0]
     x = float(geometry.attrib.get('x', '0'))
     y = float(geometry.attrib.get('y', '0'))
-    width = float(geometry.attrib['width'])
-    height = float(geometry.attrib['height'])
+    width = float(geometry.attrib.get('width', 1))
+    height = float(geometry.attrib.get('height', 1))
     # Create drawing
     pos = Position(x=x, y=y, w=width, h=height, movable=False)
 

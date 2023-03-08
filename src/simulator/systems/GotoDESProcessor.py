@@ -16,15 +16,11 @@ from simulator.components.Script import Script
 
 from simulator.systems.NavigationSystem import find_route
 
-from simulator.typehints.component_types import EVENT, ERROR
+from simulator.typehints.component_types import EVENT, ERROR, GotoPoiPayload, GotoPosPayload, GotoPoiEventTag, GotoPosEventTag
 
 from simulator.systems.PathProcessor import EndOfPathTag
 from simulator.utils.Navigation import PathNotFound, add_nodes_from_points
 
-GotoPoiPayload = NamedTuple('GotoPoiPayload', [('entity', int), ('target', str)])
-GotoPosPayload = NamedTuple('GotoPosPayload', [('entity', int), ('target', list)])
-GotoPoiEventTag = 'GoToPoiEvent'
-GotoPosEventTag = 'GoToPosEvent'
 GotoInstructionId = 'Go'
 NavigationFunction = Callable[[Map, Point, Point], Path]
 
@@ -105,9 +101,10 @@ def goInstruction(ent: int, args: List[str], script: scriptComponent.Script,
         raise Exception('GO instruction failed. Go <poi> OR Go <x> <y>')
     event_store.put(new_event)
     # Needs to block the script
-    script.state = scriptComponent.States.BLOCKED
-    script.expecting.append(EndOfPathTag)
-    return script.state
+    if script:
+        script.state = scriptComponent.States.BLOCKED
+        script.expecting.append(EndOfPathTag)
+        return script.state
 
 
 def handle_PathError(payload: PathErrorPayload, kwargs: SystemArgs):

@@ -1,14 +1,12 @@
 from simulator import primitives as primitives
 from simulator.components.Collidable import Collidable
 from simulator.components.Position import Position
-from simulator.components.Velocity import Velocity
 from simulator.utils.helpers import parse_style
 
 from typing import Tuple, List
 from simulator.typehints.component_types import Component
 
 MODEL = 'default'
-
 
 def from_object(el, line_width=10) -> Tuple[List[Component], dict]:
     options = el.attrib
@@ -20,9 +18,6 @@ def from_object(el, line_width=10) -> Tuple[List[Component], dict]:
         options['movable'] = True
 
     options.update(style)
-    pos = components[0]
-    if options['type'] == 'robot':
-        components.append(Velocity(x=0, y=0))
     if 'collision_tag' in options:
         coll = list(filter(lambda c: isinstance(c, Collidable), components))[0]
         coll.event_tag = options['collision_tag']

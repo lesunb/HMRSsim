@@ -95,7 +95,8 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
                 elif v[0] == 1:
                     deleted.append(v[1])
                     last_round[k] = (0, v[1])
-            new_message['deleted'] = deleted
+            if len(deleted) > 0:
+                new_message['deleted'] = deleted
             # Add message to queue
             message_buffer.put((new_message, msg_idx))
             msg_idx += 1
@@ -104,6 +105,6 @@ def init(consumers: List[Callable], scan_interval: float, also_log=False):
     def clean():
         message_buffer.put(({"theEnd": True}, -1))
         logging.getLogger(__name__).debug(f'Executing Seer cleanup function')
-        thread.join()
+        thread.join(timeout=1)
 
     return process, clean

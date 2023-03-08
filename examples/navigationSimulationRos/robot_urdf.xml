@@ -1,0 +1,1 @@
+<robot name="wall_e"> <link name="link1" /> <joint name="joint1" type="continuous"> <parent link="link1"/> <child link="link2"/> <origin xyz="5 3 0" rpy="0 0 0" /> </joint> </robot>

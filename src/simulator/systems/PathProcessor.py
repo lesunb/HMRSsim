@@ -10,14 +10,7 @@ from simulator.components.Position import Position
 from simulator.components.Velocity import Velocity
 from simulator.components.ApproximationHistory import ApproximationHistory
 from typing import List
-from simulator.typehints.component_types import Point, EVENT
-
-
-EndOfPathPayload = NamedTuple('EndOfPathPayload', [('ent', int), ('timestamp', str), ('path', List[Point])])
-EndOfPathTag = 'EndOfPath'
-
-EndOfApproximationPayload = NamedTuple('EndOfApproximation', [('ent', int), ('timestamp', str),])
-EndOfApproximationTag = 'EndOfApproximation'
+from simulator.typehints.component_types import EVENT, EndOfPathPayload, EndOfPathTag, EndOfApproximationPayload, EndOfApproximationTag
 
 class PathProcessor(esper.Processor):
     def __init__(self):

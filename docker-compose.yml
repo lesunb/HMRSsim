@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  hmrsim:
+    image: hmrsim
+    container_name: hmrsim
+    build: .
+    volumes:
+      - ./src/:/etc/hmrsim/src/
+    working_dir: /etc/hmrsim/examples
+    ports:
+      - 9090:9090
+    networks:
+      - hmrsim
+  roseer:
+    image: roseer
+    container_name: roseer
+    build: https://github.com/daniloinacio/ROSeer.git#main
+    depends_on:
+      - hmrsim
+    ports:
+      - "3000:3000"
+    networks:
+      - hmrsim
+  robot_control:
+    image: robot_control
+    container_name: robot_control
+    build: /home/kalley/Workspace/tg/learning-py-trees/
+    networks:
+      - hmrsim
+networks:
+  hmrsim:
+    driver: bridge
+

@@ -1,0 +1,10 @@
+{
+    "context": ".",
+    "map": "poi_test.drawio",
+    "FPS": 1,
+    "DLW": 10,
+    "verbose": 20,
+    "simulatorConfigOptions": {
+        "loggerConfig": "loggerConfig.yml"
+    }
+}
